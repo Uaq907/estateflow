@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EstateFlow QR Code</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        #qrcode {
+            margin: 20px 0;
+        }
+        .info {
+            margin-top: 20px;
+            color: #666;
+        }
+        .url {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏢 EstateFlow</h1>
+        <h2>QR Code للوصول السريع</h2>
+        
+        <div id="qrcode"></div>
+        
+        <div class="info">
+            <p><strong>عنوان الوصول:</strong></p>
+            <div class="url">http://192.168.1.251:5000/login</div>
+            
+            <p><strong>معلومات تسجيل الدخول:</strong></p>
+            <p>البريد: <code>uaq907@gmail.com</code></p>
+            <p>كلمة المرور: <code>demo123</code></p>
+        </div>
+    </div>
+
+    <script>
+        // Generate QR Code
+        const url = 'http://192.168.1.251:5000/login';
+        
+        QRCode.toCanvas(document.getElementById('qrcode'), url, {
+            width: 200,
+            height: 200,
+            color: {
+                dark: '#000000',
+                light: '#FFFFFF'
+            }
+        }, function (error) {
+            if (error) console.error(error);
+            console.log('QR Code generated successfully!');
+        });
+    </script>
+</body>
+</html>
+
+

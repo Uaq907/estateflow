@@ -1,0 +1,251 @@
+
+
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { 
+    Building, LogOut, Home, Users, ChevronDown, LandPlot, UserSquare,
+    Calendar, User, FileText, Banknote, Wallet, Receipt, Wrench, Package, WalletCards, Edit, Briefcase
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { handleUpdateLease, uploadFile, handleRemoveTenant } from '@/app/dashboard/actions';
+import PaymentPlan from '@/components/payment-plan';
+import { useToast } from '@/hooks/use-toast';
+import type { Employee, Lease, LeasePayment, LeaseWithDetails } from '@/lib/types';
+import { format, isPast } from 'date-fns';
+import { Badge } from './ui/badge';
+import { AppHeader } from './layout/header';
+import LeaseDialog from './lease-dialog';
+import { hasPermission } from '@/lib/permissions';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useRouter } from 'next/navigation';
+import { Separator } from './ui/separator';
+import { useLanguage } from '@/contexts/language-context';
+
+export default function LeaseDetailClient({
+  leaseWithDetails,
+  initialPayments,
+  loggedInEmployee
+}: {
+  leaseWithDetails: LeaseWithDetails,
+  initialPayments: LeasePayment[],
+  loggedInEmployee: Employee | null
+}) {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const [isLeaseDialogOpen, setIsLeaseDialogOpen] = useState(false);
+  const [isEndLeaseAlertOpen, setIsEndLeaseAlertOpen] = useState(false);
+  const router = useRouter();
+
+  const { lease, tenant, property, unit } = leaseWithDetails;
+  
+  const canUpdateLease = hasPermission(loggedInEmployee, 'leases:update');
+  const canEndLease = hasPermission(loggedInEmployee, 'leases:delete');
+  const isCommercial = unit.type === 'Commercial';
+
+  const paymentPlanSubtotal = initialPayments.reduce((acc, payment) => acc + payment.amount, 0);
+
+  const handleLeaseSubmit = async (formData: FormData) => {
+    let contractUrl = lease.contractUrl;
+    const contractFile = formData.get('contract') as File | null;
+    if (contractFile && contractFile.size > 0) {
+        const uploadResult = await uploadFile(formData, 'contract', 'leases');
+        if (uploadResult.success && uploadResult.filePath) { contractUrl = uploadResult.filePath; } 
+        else { toast({ variant: 'destructive', title: t('leaseDetail.uploadFailed'), description: uploadResult.message }); return; }
+    }
+
+    let guaranteeChequeUrl = lease.guaranteeChequeUrl;
+    const chequeFile = formData.get('guaranteeCheque') as File | null;
+    if (chequeFile && chequeFile.size > 0) {
+        const uploadResult = await uploadFile(formData, 'guaranteeCheque', 'leases');
+        if (uploadResult.success && uploadResult.filePath) { guaranteeChequeUrl = uploadResult.filePath; } 
+        else { toast({ variant: 'destructive', title: t('leaseDetail.uploadFailed'), description: uploadResult.message }); return; }
+    }
+
+    let tradeLicenseUrl = lease.tradeLicenseUrl;
+    const licenseFile = formData.get('tradeLicense') as File | null;
+    if (licenseFile && licenseFile.size > 0) {
+        const uploadResult = await uploadFile(formData, 'tradeLicense', 'leases');
+        if (uploadResult.success && uploadResult.filePath) { tradeLicenseUrl = uploadResult.filePath; }
+        else { toast({ variant: 'destructive', title: t('leaseDetail.uploadFailed'), description: uploadResult.message }); return; }
+    }
+      
+    const leaseData = {
+      status: formData.get('status') as Lease['status'],
+      tenantSince: formData.get('tenantSince') ? new Date(formData.get('tenantSince') as string) : null,
+      startDate: new Date(formData.get('startDate') as string),
+      endDate: new Date(formData.get('endDate') as string),
+      totalLeaseAmount: Number(formData.get('totalLeaseAmount')) || null,
+      taxedAmount: Number(formData.get('taxedAmount')) || null,
+      numberOfPayments: Number(formData.get('numberOfPayments')) || null,
+      renewalIncreasePercentage: Number(formData.get('renewalIncreasePercentage')) || null,
+      contractUrl,
+      guaranteeChequeAmount: Number(formData.get('guaranteeChequeAmount')) || null,
+      guaranteeChequeUrl,
+      businessName: formData.get('businessName') as string || null,
+      businessType: formData.get('businessType') as string || null,
+      tradeLicenseNumber: formData.get('tradeLicenseNumber') as string || null,
+      tradeLicenseUrl,
+    };
+
+    const result = await handleUpdateLease(lease.id, leaseData);
+    if (result.success) {
+        toast({ title: t('leaseDetail.success'), description: result.message });
+        setIsLeaseDialogOpen(false);
+        router.refresh();
+    } else {
+        toast({ variant: 'destructive', title: t('leaseDetail.error'), description: result.message });
+    }
+  }
+
+  const handleEndLeaseConfirm = async () => {
+    const result = await handleRemoveTenant(unit.id, lease.id);
+    if (result.success) {
+        toast({ title: t('leaseDetail.success'), description: result.message });
+        setIsEndLeaseAlertOpen(false);
+        router.refresh();
+    } else {
+        toast({ variant: 'destructive', title: t('leaseDetail.error'), description: result.message });
+    }
+  }
+
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      <AppHeader loggedInEmployee={loggedInEmployee} />
+      <main className="p-4 sm:p-6 lg:p-8 flex-grow space-y-6 pt-24">
+        <Card>
+            <CardHeader className="flex flex-row items-start justify-between gap-4">
+                <div className="text-right">
+                    <CardTitle>{t('leaseDetail.title')}</CardTitle>
+                    <CardDescription>
+                        الإيجار للوحدة <span className="font-semibold">{unit.unitNumber}</span> في العقار <span className="font-semibold">{property.name}</span>
+                    </CardDescription>
+                </div>
+                <div className="flex gap-2">
+                    {canEndLease && lease.status === 'Active' && isPast(new Date(lease.endDate)) && (
+                        <Button onClick={() => setIsEndLeaseAlertOpen(true)} variant="destructive">{t('leaseDetail.endLease')}</Button>
+                    )}
+                    {canUpdateLease &&
+                      <Button onClick={() => setIsLeaseDialogOpen(true)} variant="outline">
+                          <Edit className="mr-2"/>
+                          {t('leaseDetail.editLease')}
+                      </Button>
+                    }
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="space-y-2 text-right">
+                        <h4 className="font-semibold text-lg flex items-center gap-2 justify-end flex-row-reverse"><User /> {t('leaseDetail.tenantInfo')}</h4>
+                        <p><strong>{t('leaseDetail.name')}:</strong> {tenant.name}</p>
+                        <p><strong>{t('leaseDetail.email')}:</strong> {tenant.email}</p>
+                        <p><strong>{t('leaseDetail.phone')}:</strong> {tenant.phone ?? 'N/A'}</p>
+                    </div>
+
+                    <div className="space-y-2 text-right">
+                        <h4 className="font-semibold text-lg flex items-center gap-2 justify-end flex-row-reverse"><Home /> {t('leaseDetail.unitInfo')}</h4>
+                        <p><strong>{t('leaseDetail.unit')}:</strong> {unit.unitNumber}</p>
+                        <p><strong>{t('leaseDetail.type')}:</strong> {unit.type}</p>
+                        <p><strong>{t('leaseDetail.property')}:</strong> {property.name}</p>
+                    </div>
+
+                    <div className="space-y-2 text-right">
+                        <h4 className="font-semibold text-lg flex items-center gap-2 justify-end flex-row-reverse"><Calendar /> {t('leaseDetail.leaseTerm')}</h4>
+                        <p><strong>{t('leaseDetail.startDate')}:</strong> {format(new Date(lease.startDate), 'dd/MM/yyyy')}</p>
+                        <p><strong>{t('leaseDetail.endDate')}:</strong> {format(new Date(lease.endDate), 'dd/MM/yyyy')}</p>
+                        <div className="flex items-center gap-2 justify-end"><Badge>{lease.status}</Badge> :<strong>{t('leaseDetail.status')}</strong></div>
+                    </div>
+
+                    <div className="space-y-2 text-right">
+                        <h4 className="font-semibold text-lg flex items-center gap-2 justify-end flex-row-reverse"><Banknote /> {t('leaseDetail.financials')}</h4>
+                        <p><strong>{t('leaseDetail.totalAmount')}:</strong> AED {lease.totalLeaseAmount?.toLocaleString() ?? 'N/A'}</p>
+                        <p><strong>{t('leaseDetail.subTotal')}:</strong> AED {paymentPlanSubtotal.toLocaleString() ?? 'N/A'}</p>
+                        <p><strong>{t('leaseDetail.taxedAmount')}:</strong> AED {lease.taxedAmount?.toLocaleString() ?? 'N/A'}</p>
+                        <p><strong>{t('leaseDetail.payments')}:</strong> {lease.numberOfPayments ?? 'N/A'}</p>
+                    </div>
+                </div>
+
+                {isCommercial && (lease.businessName || lease.tradeLicenseNumber) && (
+                    <>
+                        <Separator className="my-6" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="space-y-2 lg:col-span-2 text-right">
+                                <h4 className="font-semibold text-lg flex items-center gap-2 justify-end flex-row-reverse"><Briefcase /> {t('leaseDetail.businessDetails')}</h4>
+                                <p><strong>{t('leaseDetail.businessName')}:</strong> {lease.businessName ?? 'N/A'}</p>
+                                <p><strong>{t('leaseDetail.businessType')}:</strong> {lease.businessType ?? 'N/A'}</p>
+                                <p><strong>{t('leaseDetail.licenseNumber')}:</strong> {lease.tradeLicenseNumber ?? 'N/A'}</p>
+                                {lease.tradeLicenseUrl && (
+                                    <Button asChild variant="link" size="sm" className="p-0 h-auto">
+                                        <Link href={lease.tradeLicenseUrl} target="_blank">{t('leaseDetail.viewTradeLicense')}</Link>
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
+                    </>
+                )}
+
+
+                 <div className="mt-6 flex flex-wrap gap-4 justify-end">
+                    {lease.contractUrl && (
+                        <Button asChild variant="outline">
+                            <Link href={lease.contractUrl} target="_blank"><FileText className="mr-2"/> {t('leaseDetail.viewContract')}</Link>
+                        </Button>
+                    )}
+                    {lease.guaranteeChequeUrl && (
+                        <Button asChild variant="outline">
+                            <Link href={lease.guaranteeChequeUrl} target="_blank"><Wallet className="mr-2" /> {t('leaseDetail.viewGuaranteeCheque')}</Link>
+                        </Button>
+                    )}
+                 </div>
+            </CardContent>
+        </Card>
+        
+        <PaymentPlan 
+            lease={lease}
+            initialPayments={initialPayments}
+            loggedInEmployee={loggedInEmployee}
+        />
+
+      </main>
+
+      <LeaseDialog
+        isOpen={isLeaseDialogOpen}
+        onOpenChange={setIsLeaseDialogOpen}
+        lease={lease}
+        unitType={unit.type}
+        onSubmit={handleLeaseSubmit}
+        loggedInEmployee={loggedInEmployee}
+      />
+
+       <AlertDialog open={isEndLeaseAlertOpen} onOpenChange={setIsEndLeaseAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader className="text-right">
+            <AlertDialogTitle className="text-right">{t('leaseDetail.endLeaseTitle')}</AlertDialogTitle>
+            <AlertDialogDescription className="text-right">
+              {t('leaseDetail.endLeaseDescription')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row-reverse">
+            <AlertDialogAction onClick={handleEndLeaseConfirm} className="bg-destructive hover:bg-destructive/90">
+              {t('leaseDetail.confirmEndLease')}
+            </AlertDialogAction>
+            <AlertDialogCancel>{t('leaseDetail.cancel')}</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}

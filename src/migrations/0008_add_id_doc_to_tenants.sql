@@ -1,0 +1,2 @@
+
+ALTER TABLE tenants ADD COLUMN idDocumentUrl VARCHAR(255) NULL;

@@ -1,0 +1,13 @@
+ALTER TABLE employees
+ADD COLUMN emergencyContact VARCHAR(255),
+ADD COLUMN emiratesId VARCHAR(255),
+ADD COLUMN passportNumber VARCHAR(255),
+ADD COLUMN visaDetails TEXT,
+ADD COLUMN insuranceDetails TEXT,
+ADD COLUMN allowLogin BOOLEAN DEFAULT true,
+ADD COLUMN telegramConfig TEXT,
+ADD COLUMN dateOfBirth DATE,
+ADD COLUMN status VARCHAR(50) DEFAULT 'Active',
+ADD COLUMN nationality VARCHAR(255),
+ADD COLUMN managerId VARCHAR(36),
+ADD COLUMN salary DECIMAL(10, 2);

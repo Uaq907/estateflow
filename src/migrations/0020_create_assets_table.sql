@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS assets (
+    id VARCHAR(36) PRIMARY KEY,
+    propertyId VARCHAR(36) NOT NULL,
+    unitId VARCHAR(36),
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(100),
+    manufacturer VARCHAR(100),
+    modelNumber VARCHAR(100),
+    serialNumber VARCHAR(100),
+    status ENUM('In Service', 'Under Repair', 'Decommissioned', 'In Storage') DEFAULT 'In Service',
+    purchaseDate DATE,
+    purchasePrice DECIMAL(10, 2),
+    warrantyExpiryDate DATE,
+    locationInProperty VARCHAR(255),
+    notes TEXT,
+    invoiceUrl VARCHAR(255),
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (propertyId) REFERENCES properties(id) ON DELETE CASCADE,
+    FOREIGN KEY (unitId) REFERENCES units(id) ON DELETE SET NULL
+);

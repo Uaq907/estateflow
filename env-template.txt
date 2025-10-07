@@ -1,0 +1,13 @@
+# Copy this content to a file named .env in your project root
+
+# Database Configuration
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=
+DB_DATABASE=estateflow
+
+# Application Configuration
+NEXTAUTH_SECRET=your-secret-key-here-change-this
+NEXTAUTH_URL=http://localhost:5000
+
+

@@ -1,0 +1,9 @@
+
+ALTER TABLE properties
+ADD COLUMN ownerName VARCHAR(255),
+ADD COLUMN ownerContact VARCHAR(255),
+ADD COLUMN ownerEmail VARCHAR(255),
+ADD COLUMN ownerEmiratesId VARCHAR(255),
+ADD COLUMN ownerNationality VARCHAR(255),
+ADD COLUMN managerId VARCHAR(36),
+ADD CONSTRAINT fk_manager FOREIGN KEY (managerId) REFERENCES employees(id) ON DELETE SET NULL;
