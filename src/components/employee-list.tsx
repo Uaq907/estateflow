@@ -64,13 +64,13 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead className="hidden lg:table-cell">ID</TableHead>
-              <TableHead className="hidden md:table-cell">Position</TableHead>
-              <TableHead className="hidden lg:table-cell">Department</TableHead>
-              <TableHead className="hidden sm:table-cell">Start Date</TableHead>
+              <TableHead className="text-right">Name</TableHead>
+              <TableHead className="hidden lg:table-cell text-right">ID</TableHead>
+              <TableHead className="hidden md:table-cell text-right">Position</TableHead>
+              <TableHead className="hidden lg:table-cell text-right">Department</TableHead>
+              <TableHead className="hidden sm:table-cell text-right">Start Date</TableHead>
               {(onEdit || onDelete) && (
-                <TableHead>
+                <TableHead className="text-right">
                   <span className="sr-only">Actions</span>
                 </TableHead>
               )}
@@ -80,31 +80,31 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
             {employees.length > 0 ? (
               employees.map((employee) => (
                 <TableRow key={employee.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
+                  <TableCell className="text-right">
+                    <div className="flex items-center gap-3 justify-end">
+                      <div className="text-right">
+                        <div className="font-medium">{employee.name}</div>
+                        <div className="text-sm text-muted-foreground md:hidden">{employee.position}</div>
+                        <div className="text-sm text-muted-foreground">{employee.email}</div>
+                      </div>
                       <Avatar>
                          <AvatarImage src={employee.profilePictureUrl ?? undefined} alt={employee.name} />
                          <AvatarFallback>
                            <User/>
                          </AvatarFallback>
                       </Avatar>
-                      <div>
-                        <div className="font-medium">{employee.name}</div>
-                        <div className="text-sm text-muted-foreground md:hidden">{employee.position}</div>
-                        <div className="text-sm text-muted-foreground">{employee.email}</div>
-                      </div>
                     </div>
                   </TableCell>
-                  <TableCell className="hidden lg:table-cell text-xs text-muted-foreground">{employee.id}</TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell className="hidden lg:table-cell text-xs text-muted-foreground text-right">{employee.id}</TableCell>
+                  <TableCell className="hidden md:table-cell text-right">
                     <Badge variant="secondary">{employee.position}</Badge>
                   </TableCell>
-                  <TableCell className="hidden lg:table-cell">{employee.department}</TableCell>
-                  <TableCell className="hidden sm:table-cell">
+                  <TableCell className="hidden lg:table-cell text-right">{employee.department}</TableCell>
+                  <TableCell className="hidden sm:table-cell text-right">
                     {format(new Date(employee.startDate), 'dd/MM/yyyy')}
                   </TableCell>
                   {(onEdit || onDelete) && (
-                    <TableCell>
+                    <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
