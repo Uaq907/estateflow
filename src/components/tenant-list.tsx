@@ -63,18 +63,18 @@ export default function TenantList({ tenants, onEdit, onDelete }: TenantListProp
 
   return (
     <>
-      <div className="rounded-md border">
+      <div className="rounded-md border" dir="rtl">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('tenants.name')}</TableHead>
-              <TableHead className="hidden lg:table-cell">{t('tenants.id')}</TableHead>
-              <TableHead className="hidden md:table-cell">{t('tenants.phone')}</TableHead>
-              <TableHead className="hidden lg:table-cell">{t('tenants.idNumber')}</TableHead>
-              <TableHead className="hidden sm:table-cell">{t('tenants.nationality')}</TableHead>
-              <TableHead>{t('tenants.document')}</TableHead>
+              <TableHead className="text-right">{t('tenants.name')}</TableHead>
+              <TableHead className="hidden lg:table-cell text-right">{t('tenants.id')}</TableHead>
+              <TableHead className="hidden md:table-cell text-right">{t('tenants.phone')}</TableHead>
+              <TableHead className="hidden lg:table-cell text-right">{t('tenants.idNumber')}</TableHead>
+              <TableHead className="hidden sm:table-cell text-right">{t('tenants.nationality')}</TableHead>
+              <TableHead className="text-right">{t('tenants.document')}</TableHead>
               {(onEdit || onDelete) && (
-                <TableHead>
+                <TableHead className="text-right">
                   <span className="sr-only">{t('tenants.actions')}</span>
                 </TableHead>
               )}
@@ -84,34 +84,34 @@ export default function TenantList({ tenants, onEdit, onDelete }: TenantListProp
             {tenants.length > 0 ? (
               tenants.map((tenant) => (
                 <TableRow key={tenant.id} className="cursor-pointer" onClick={() => router.push(`/dashboard/tenants/${tenant.id}`)}>
-                  <TableCell>
+                  <TableCell className="text-right">
                     <div className="flex items-center gap-3">
                       <Avatar>
                          <AvatarFallback>
                            <User/>
                          </AvatarFallback>
                       </Avatar>
-                      <div>
+                      <div className="text-right">
                         <div className="font-medium hover:underline">{tenant.name}</div>
                         <div className="text-sm text-muted-foreground">{tenant.email}</div>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="hidden lg:table-cell text-xs text-muted-foreground">{tenant.id}</TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell className="hidden lg:table-cell text-xs text-muted-foreground text-right">{tenant.id}</TableCell>
+                  <TableCell className="hidden md:table-cell text-right">
                     {tenant.phone || 'N/A'}
                   </TableCell>
-                  <TableCell className="hidden lg:table-cell">
+                  <TableCell className="hidden lg:table-cell text-right">
                     {tenant.idNumber ? `${tenant.idNumber} (${tenant.idType})` : 'N/A'}
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell">
+                  <TableCell className="hidden sm:table-cell text-right">
                     {tenant.nationality || 'N/A'}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-right">
                     {tenant.idDocumentUrl ? (
                         <Button asChild variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>
                             <Link href={tenant.idDocumentUrl} target="_blank">
-                                <FileText className="mr-2 h-4 w-4"/> {t('tenants.view')}
+                                {t('tenants.view')} <FileText className="ml-2 h-4 w-4"/>
                             </Link>
                         </Button>
                     ) : (
@@ -119,7 +119,7 @@ export default function TenantList({ tenants, onEdit, onDelete }: TenantListProp
                     )}
                   </TableCell>
                   {(onEdit || onDelete) && (
-                    <TableCell onClick={(e) => e.stopPropagation()}>
+                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -127,17 +127,17 @@ export default function TenantList({ tenants, onEdit, onDelete }: TenantListProp
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="start">
                           {onEdit && (
                             <DropdownMenuItem onClick={() => onEdit(tenant)}>
-                              <Edit className="mr-2 h-4 w-4" />
                               <span>{t('tenants.edit')}</span>
+                              <Edit className="ml-2 h-4 w-4" />
                             </DropdownMenuItem>
                           )}
                           {onDelete && (
                             <DropdownMenuItem onClick={() => handleDeleteClick(tenant)} className="text-destructive focus:text-destructive">
-                              <Trash2 className="mr-2 h-4 w-4" />
                               <span>{t('tenants.delete')}</span>
+                              <Trash2 className="ml-2 h-4 w-4" />
                             </DropdownMenuItem>
                           )}
                         </DropdownMenuContent>
@@ -148,7 +148,7 @@ export default function TenantList({ tenants, onEdit, onDelete }: TenantListProp
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
+                <TableCell colSpan={7} className="h-24 text-right">
                   {t('tenants.noTenantsFound')}
                 </TableCell>
               </TableRow>
