@@ -40,8 +40,8 @@ interface PropertySheetProps {
 const defaultValues: Omit<Property, 'id'> = {
     name: '',
     type: 'Flat',
-    location: '',
-    address: '',
+    location: 'أم القيوين، الإمارات العربية المتحدة',
+    address: 'أم القيوين، الإمارات العربية المتحدة',
     status: 'Available',
     purpose: 'For Sale',
     price: 0,
@@ -53,8 +53,8 @@ const defaultValues: Omit<Property, 'id'> = {
     floors: null,
     rooms: null,
     configuration: null,
-    latitude: 25.2048, // Default to Dubai
-    longitude: 55.2708,
+    latitude: 25.5647, // Default to Umm Al Quwain
+    longitude: 55.5527,
     ownerId: '',
     managerId: '',
     accountNumber: '',

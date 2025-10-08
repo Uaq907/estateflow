@@ -183,7 +183,7 @@ export async function getPropertyById(id: string): Promise<(Property & { owner: 
               o.*, 
               o.id as owner_id, 
               o.name as owner_name, 
-              o.contact as owner_contact, 
+              o.phone as owner_contact, 
               o.email as owner_email, 
               o.nationality as owner_nationality, 
               o.emiratesId as owner_emiratesId,
