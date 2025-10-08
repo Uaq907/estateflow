@@ -44,12 +44,22 @@ export default function CalendarClient({
             cheque: true
         };
         const saved = localStorage.getItem('calendarEventVisibility');
-        return saved ? JSON.parse(saved) : {
-            lease: true,
-            payment: true,
-            maintenance: true,
-            cheque: true
-        };
+        try {
+            return (saved && saved !== '') ? JSON.parse(saved) : {
+                lease: true,
+                payment: true,
+                maintenance: true,
+                cheque: true
+            };
+        } catch (e) {
+            console.error('Error parsing calendar visibility:', e);
+            return {
+                lease: true,
+                payment: true,
+                maintenance: true,
+                cheque: true
+            };
+        }
     });
     const [viewMode, setViewMode] = useState<'monthly' | 'yearly'>(() => {
         if (typeof window === 'undefined') return 'monthly';
@@ -71,8 +81,12 @@ export default function CalendarClient({
         const handleVisibilityChange = () => {
             if (typeof window !== 'undefined') {
                 const saved = localStorage.getItem('calendarEventVisibility');
-                if (saved) {
-                    setEventVisibility(JSON.parse(saved));
+                if (saved && saved !== '') {
+                    try {
+                        setEventVisibility(JSON.parse(saved));
+                    } catch (e) {
+                        console.error('Error parsing calendar visibility on change:', e);
+                    }
                 }
             }
         };

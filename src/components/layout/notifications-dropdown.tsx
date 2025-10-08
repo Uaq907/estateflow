@@ -52,18 +52,35 @@ export function NotificationsDropdown({ language, t }: NotificationsDropdownProp
       
       // تحميل إعدادات المستخدم من localStorage
       const savedPreferences = localStorage.getItem('notificationPreferences');
-      const userPreferences = savedPreferences ? JSON.parse(savedPreferences) : {
-        payment_due: true,
-        payment_due_days: 7,
-        lease_expiring: true,
-        lease_expiring_days: 90,
-        contract_expiring: true,
-        contract_expiring_days: 90,
-        cheque_due: true,
-        cheque_due_days: 7,
-        contract_renewal: true,
-        contract_renewal_days: 60
-      };
+      let userPreferences;
+      try {
+        userPreferences = (savedPreferences && savedPreferences !== '') ? JSON.parse(savedPreferences) : {
+          payment_due: true,
+          payment_due_days: 7,
+          lease_expiring: true,
+          lease_expiring_days: 90,
+          contract_expiring: true,
+          contract_expiring_days: 90,
+          cheque_due: true,
+          cheque_due_days: 7,
+          contract_renewal: true,
+          contract_renewal_days: 60
+        };
+      } catch (e) {
+        console.error('Error parsing notification preferences:', e);
+        userPreferences = {
+          payment_due: true,
+          payment_due_days: 7,
+          lease_expiring: true,
+          lease_expiring_days: 90,
+          contract_expiring: true,
+          contract_expiring_days: 90,
+          cheque_due: true,
+          cheque_due_days: 7,
+          contract_renewal: true,
+          contract_renewal_days: 60
+        };
+      }
       
       // محاكاة جلب البيانات - يمكن استبداله بـ API call حقيقي
       const mockNotifications: Notification[] = [];

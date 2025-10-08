@@ -50,12 +50,22 @@ export default function UserPreferencesClient({ loggedInEmployee }: { loggedInEm
             cheque: true
         };
         const saved = localStorage.getItem('calendarEventVisibility');
-        return saved ? JSON.parse(saved) : {
-            lease: true,
-            payment: true,
-            maintenance: true,
-            cheque: true
-        };
+        try {
+            return (saved && saved !== '') ? JSON.parse(saved) : {
+                lease: true,
+                payment: true,
+                maintenance: true,
+                cheque: true
+            };
+        } catch (e) {
+            console.error('Error parsing calendar visibility preferences:', e);
+            return {
+                lease: true,
+                payment: true,
+                maintenance: true,
+                cheque: true
+            };
+        }
     });
     
     const [preferences, setPreferences] = useState<NotificationPreferences>(
