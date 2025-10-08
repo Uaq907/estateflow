@@ -35,6 +35,7 @@ import { AppHeader } from './layout/header';
 import { hasPermission } from '@/lib/permissions';
 import PropertyDocuments from './property-documents';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import { useLanguage } from '@/contexts/language-context';
 
 
 export default function PropertyDetailClient({
@@ -56,6 +57,7 @@ export default function PropertyDetailClient({
   documents: PropertyDocument[],
   loggedInEmployee: Employee | null
 }) {
+  const { t } = useLanguage();
   const [property, setProperty] = useState<Property & { owner?: Owner | null }>(initialProperty);
   const [units, setUnits] = useState<Unit[]>(initialUnits);
   const [assignedEmployees, setAssignedEmployees] = useState<Employee[]>(initialAssignedEmployees);
@@ -362,26 +364,26 @@ export default function PropertyDetailClient({
 
              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card>
-                    <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Total Units</CardTitle></CardHeader>
+                    <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">{t('propertyDetail.totalUnits')}</CardTitle></CardHeader>
                     <CardContent><div className="text-2xl font-bold">{unitStats.totalUnits}</div></CardContent>
                 </Card>
                 <Card>
-                    <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Occupied</CardTitle></CardHeader>
+                    <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">{t('propertyDetail.occupied')}</CardTitle></CardHeader>
                     <CardContent><div className="text-2xl font-bold">{unitStats.occupiedUnits}</div></CardContent>
                 </Card>
                 <Card>
-                    <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Available</CardTitle></CardHeader>
+                    <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">{t('propertyDetail.available')}</CardTitle></CardHeader>
                     <CardContent><div className="text-2xl font-bold">{unitStats.availableUnits}</div></CardContent>
                 </Card>
                  <Card>
-                    <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Occupancy</CardTitle></CardHeader>
+                    <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">{t('propertyDetail.occupancy')}</CardTitle></CardHeader>
                     <CardContent><div className="text-2xl font-bold">{unitStats.occupancyRate.toFixed(1)}%</div></CardContent>
                 </Card>
             </div>
             
              <Card>
                 <CardHeader>
-                    <CardTitle>Unit Type Breakdown</CardTitle>
+                    <CardTitle>{t('propertyDetail.unitTypeBreakdown')}</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {Object.keys(unitStats.types).length > 0 ? (
@@ -395,7 +397,7 @@ export default function PropertyDetailClient({
                             </div>
                         ))
                     ) : (
-                        <p className="text-sm text-muted-foreground col-span-full text-center">No units added to this property yet.</p>
+                        <p className="text-sm text-muted-foreground col-span-full text-center">{t('propertyDetail.noUnits')}</p>
                     )}
                 </CardContent>
             </Card>
@@ -404,26 +406,26 @@ export default function PropertyDetailClient({
                 <CardHeader>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div className="flex-grow">
-                            <CardTitle>Units ({filteredUnits.length})</CardTitle>
+                            <CardTitle>{t('propertyDetail.unitsTitle')} ({filteredUnits.length})</CardTitle>
                             <CardDescription>
-                                Manage and filter individual units for this property.
+                                {t('propertyDetail.manageUnits')}
                             </CardDescription>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                             <Select value={statusFilter} onValueChange={setStatusFilter}>
                                 <SelectTrigger className="w-full sm:w-[150px]">
-                                    <SelectValue placeholder="Filter by status" />
+                                    <SelectValue placeholder={t('propertyDetail.filterByStatus')} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All Statuses</SelectItem>
-                                    <SelectItem value="Available">Available</SelectItem>
-                                    <SelectItem value="Rented">Rented</SelectItem>
-                                    <SelectItem value="Under Maintenance">Under Maintenance</SelectItem>
+                                    <SelectItem value="all">{t('propertyDetail.allStatuses')}</SelectItem>
+                                    <SelectItem value="Available">{t('propertyDetail.available')}</SelectItem>
+                                    <SelectItem value="Rented">{t('propertyDetail.rented')}</SelectItem>
+                                    <SelectItem value="Under Maintenance">{t('propertyDetail.underMaintenance')}</SelectItem>
                                 </SelectContent>
                             </Select>
                              <Select value={typeFilter} onValueChange={setTypeFilter}>
                                 <SelectTrigger className="w-full sm:w-[150px]">
-                                    <SelectValue placeholder="Filter by type" />
+                                    <SelectValue placeholder={t('propertyDetail.filterByType')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {unitTypes.map(type => (
@@ -434,7 +436,7 @@ export default function PropertyDetailClient({
                             {canCreateUnit && (
                                 <Button onClick={handleAddNewUnit} className="w-full sm:w-auto">
                                     <PlusCircle className="mr-2" />
-                                    Add Unit
+                                    {t('propertyDetail.addUnit')}
                                 </Button>
                             )}
                         </div>
@@ -444,9 +446,9 @@ export default function PropertyDetailClient({
                     {unitsWithLeaseConflict.length > 0 && (
                         <Alert variant="destructive" className="mb-4">
                             <AlertTriangle className="h-4 w-4" />
-                            <AlertTitle>Data Inconsistency Detected</AlertTitle>
+                            <AlertTitle>{t('propertyDetail.leaseConflict')}</AlertTitle>
                             <AlertDescription>
-                                The following unit(s) are marked as 'Available' but still have an active lease record: {unitsWithLeaseConflict.join(', ')}. Please end the lease contract to resolve this.
+                                {t('propertyDetail.leaseConflictDesc')}: {unitsWithLeaseConflict.join(', ')}. {t('propertyDetail.resolveConflict')}
                             </AlertDescription>
                         </Alert>
                     )}
@@ -464,12 +466,12 @@ export default function PropertyDetailClient({
         <div className="lg:col-span-1 space-y-6">
             <Card>
                 <CardHeader>
-                    <CardTitle>Owner & Manager</CardTitle>
-                    <CardDescription>Contact information for key personnel.</CardDescription>
+                    <CardTitle>{t('propertyDetail.ownerDetails')} & {t('propertyDetail.propertyManager')}</CardTitle>
+                    <CardDescription>{t('propertyDetail.contactInfo')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div>
-                        <h4 className="font-semibold text-md flex items-center gap-2 mb-2"><User /> Owner Details</h4>
+                        <h4 className="font-semibold text-md flex items-center gap-2 mb-2"><User /> {t('propertyDetail.ownerDetails')}</h4>
                         <Separator/>
                         <div className="text-sm text-muted-foreground mt-3 space-y-2">
                             {propertyOwner ? (
@@ -481,12 +483,12 @@ export default function PropertyDetailClient({
                                     <p className="flex items-center gap-2"><Fingerprint/> {propertyOwner.emiratesId || 'N/A'}</p>
                                 </>
                             ) : (
-                                <p>No owner assigned.</p>
+                                <p>{t('propertyDetail.noOwner')}</p>
                             )}
                         </div>
                     </div>
                      <div>
-                        <h4 className="font-semibold text-md flex items-center gap-2 mb-2"><ShieldCheck /> Property Manager</h4>
+                        <h4 className="font-semibold text-md flex items-center gap-2 mb-2"><ShieldCheck /> {t('propertyDetail.propertyManager')}</h4>
                         <Separator/>
                          <div className="text-sm text-muted-foreground mt-3 space-y-2">
                            {propertyManager ? (
@@ -496,7 +498,7 @@ export default function PropertyDetailClient({
                                 <p className="flex items-center gap-2"><Mail/> {propertyManager.email || 'N/A'}</p>
                                 </>
                            ) : (
-                            <p>No manager assigned.</p>
+                            <p>{t('propertyDetail.noManager')}</p>
                            )}
                         </div>
                     </div>
@@ -504,8 +506,8 @@ export default function PropertyDetailClient({
             </Card>
             <Card>
                 <CardHeader>
-                    <CardTitle>Assigned Staff</CardTitle>
-                    <CardDescription>Manage staff responsible for this property.</CardDescription>
+                    <CardTitle>{t('propertyDetail.assignedStaff')}</CardTitle>
+                    <CardDescription>{t('propertyDetail.manageStaff')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {assignedEmployees.map(employee => (
@@ -528,16 +530,16 @@ export default function PropertyDetailClient({
                         </div>
                     ))}
                     {assignedEmployees.length === 0 && (
-                        <p className="text-sm text-center text-muted-foreground py-4">No staff assigned.</p>
+                        <p className="text-sm text-center text-muted-foreground py-4">{t('propertyDetail.noStaff')}</p>
                     )}
                 </CardContent>
                 {canAssignStaff && (
                   <CardFooter className="flex flex-col items-start gap-2">
-                        <p className="text-sm font-medium">Assign New Staff</p>
+                        <p className="text-sm font-medium">{t('propertyDetail.assignNewStaff')}</p>
                         <div className="flex w-full gap-2">
                         <Select value={employeeToAssign} onValueChange={setEmployeeToAssign}>
                             <SelectTrigger>
-                                <SelectValue placeholder="Select an employee" />
+                                <SelectValue placeholder={t('propertyDetail.selectEmployee')} />
                             </SelectTrigger>
                             <SelectContent>
                                 {unassignedEmployees.map(emp => (
