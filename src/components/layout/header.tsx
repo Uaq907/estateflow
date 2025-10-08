@@ -28,6 +28,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useState, useEffect, useRef } from 'react';
 import ChangePasswordDialog from '../change-password-dialog';
 import { useLanguage } from '../../contexts/language-context';
+import { NotificationsDropdown } from './notifications-dropdown';
 
 export function AppHeader({ loggedInEmployee }: { loggedInEmployee: Employee | null }) {
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
@@ -214,6 +215,8 @@ export function AppHeader({ loggedInEmployee }: { loggedInEmployee: Employee | n
             </nav>
           )}
 
+          {loggedInEmployee && <NotificationsDropdown language={language} t={t} />}
+          
           <ThemeSwitcher />
 
           {loggedInEmployee ? (

@@ -260,7 +260,8 @@ export default function PropertyDetailClient({
         tradeLicenseUrl = uploadResult.filePath;
     }
 
-    const leaseDetails: Omit<Lease, 'id' | 'unitId' | 'tenantId' | 'status'> = {
+    const leaseDetails: Omit<Lease, 'id' | 'unitId' | 'tenantId'> = {
+      status: 'Active',
       tenantSince: formData.get('tenantSince') ? new Date(formData.get('tenantSince') as string) : null,
       startDate: new Date(formData.get('startDate') as string),
       endDate: new Date(formData.get('endDate') as string),

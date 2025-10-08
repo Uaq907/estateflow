@@ -118,7 +118,179 @@ const petitionTemplates = [
     createdAt: '2024-01-08',
     lastModified: '2024-01-15',
     usageCount: 32
+  },
+  {
+    id: 4,
+    title: 'نموذج دعوى مستأجر - مطالبة بحقوق المستأجر',
+    category: 'سكنية',
+    emirate: 'دبي',
+    content: `لجنة فض المنازعات الإيجارية بإمارة دبي
+لائحة الدعوى رقم          لسنة / 2025 منازعات إيجارية دبي
+
+صحيفة دعوى
+
+مقدمة من المستأجر: [اسم_المدعى_عليه] - يحمل هوية رقم ([هوية_المدعى_عليه])
+العنوان: [عنوان_المدعى_عليه]
+رقم الهاتف: [هاتف_المدعى_عليه]
+البريد الإلكتروني: [ايميل_المدعى_عليه]
+
+ضــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــد
+
+المالك: [اسم_المدعي] – يحمل هوية رقم ([هوية_المدعي])
+العنوان: [عنوان_المدعي]
+رقم الهاتف: [هاتف_المدعي]
+البريد الإلكتروني: [ايميل_المدعي]
+
+الوقائع والأسانيد:
+
+أولاً: الوقــــائع
+
+1/ بموجب عقد الإيجار رقم ([رقم_العقد]) المؤرخ في [تاريخ_العقد]، استأجرت من المالك عقار يتكون من ([اسم_العقار]) الواقع في [عنوان_المدعى_عليه]، لمدة سنة واحدة تبدأ من [تاريخ_البداية] وتنتهي في [تاريخ_النهاية]، بقيمة إيجارية سنوية قدرها [قيمة_الايجار] درهم.
+
+(مستند رقم 1: صورة عن عقد الإيجار الموثق)
+
+2/ قمت بالوفاء بجميع التزاماتي المالية والعقدية، حيث سددت كامل القيمة الإيجارية في مواعيدها المحددة، والتزمت بالمحافظة على العين المؤجرة واستعمالها بالطريقة المتفق عليها.
+
+(مستند رقم 2: صور عن إيصالات السداد وكشف حساب بنكي)
+
+3/ إلا أن المالك قد امتنع عن القيام بالتزاماته التعاقدية المتمثلة في:
+   - عدم القيام بأعمال الصيانة الضرورية للعقار رغم الإخطار المتكرر
+   - عدم إصلاح الأعطال في المرافق الأساسية (الكهرباء/الماء/التكييف)
+   - المماطلة في رد مبلغ التأمين البالغ [المبلغ_المتأخر] درهم
+
+4/ وقد تسبب إهمال المالك في إلحاق أضرار مادية ومعنوية بالمستأجر، حيث أصبحت العين المؤجرة غير صالحة للاستعمال المخصص لها، مما اضطرني لتكبد نفقات إضافية لإصلاح الأعطال.
+
+5/ تم إنذار المالك بموجب إنذار رسمي بتاريخ [تاريخ_اليوم] للقيام بالتزاماته ورد مبلغ التأمين، إلا أنه لم يستجب، مما دفعني لإقامة هذه الدعوى.
+
+(مستند رقم 3: صورة عن الإنذار الرسمي وإشعار الاستلام)
+
+بناءً على ما تقدم
+
+يلتمس المستأجر من عدالة اللجنة الموقرة القضاء بالآتي:
+
+أولاً: من الناحية الشكلية
+1/ قبول الدعوى شكلاً لاستيفائها كافة الشروط القانونية والشكلية.
+
+ثانياً: من الناحية الموضوعية
+1/ إلزام المالك بالقيام بأعمال الصيانة الضرورية للعقار وإصلاح جميع الأعطال على نفقته الخاصة خلال مدة لا تزيد عن (15) يوماً من تاريخ صدور الحكم.
+
+2/ إلزام المالك بأن يؤدي للمستأجر مبلغ وقدره [المبلغ_المتأخر] درهم (مبلغ التأمين) فوراً وبدون أي تأخير.
+
+3/ إلزام المالك بأن يؤدي للمستأجر تعويضاً عن الأضرار المادية والمعنوية بمبلغ وقدره [قيمة_الايجار] درهم.
+
+4/ إلزام المالك بالرسوم والمصاريف القانونية وأتعاب المحاماة.
+
+وتفضلوا بقبول فائق الاحترام والتقدير
+
+مقدم الطلب (المستأجر)
+التوقيع:
+التاريخ: [تاريخ_اليوم]`,
+    createdAt: '2024-01-25',
+    lastModified: '2024-01-25',
+    usageCount: 8
+  },
+  {
+    id: 5,
+    title: 'نموذج دعوى - إلغاء أو تجديد رخصة تجارية',
+    category: 'تجارية',
+    emirate: 'الشارقة',
+    content: `محكمة الشارقة الابتدائية - الدائرة التجارية
+لائحة الدعوى رقم          لسنة / 2025 دائرة تجارية
+
+صحيفة دعوى تجارية
+
+مقدمة من المدعي: [اسم_المدعي]
+الجنسية: إماراتي
+رقم الهوية: [هوية_المدعي]
+العنوان: [عنوان_المدعي]
+رقم الهاتف: [هاتف_المدعي]
+البريد الإلكتروني: [ايميل_المدعي]
+الصفة: مالك المحل التجاري
+
+ضــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــد
+
+المدعى عليه: [اسم_المدعى_عليه]
+رقم الهوية: [هوية_المدعى_عليه]
+العنوان: [عنوان_المدعى_عليه]
+رقم الهاتف: [هاتف_المدعى_عليه]
+البريد الإلكتروني: [ايميل_المدعى_عليه]
+الصفة: مستأجر المحل التجاري
+
+الوقائع والأسانيد:
+
+أولاً: الوقــــائع
+
+1/ بموجب عقد إيجار تجاري موثق برقم ([رقم_العقد]) الصادر بتاريخ [تاريخ_العقد] من دائرة التنمية الاقتصادية بالشارقة، قام المدعى عليه باستئجار محل تجاري عبارة عن ([اسم_العقار]) الواقع في [عنوان_المدعى_عليه] - الشارقة.
+
+2/ تم الاتفاق على أن يمارس المستأجر نشاطاً تجارياً محدداً بموجب الرخصة التجارية رقم ([رقم_العقد]) الصادرة من دائرة التنمية الاقتصادية.
+
+(مستند رقم 1: صورة عن عقد الإيجار التجاري الموثق)
+(مستند رقم 2: صورة عن الرخصة التجارية)
+
+3/ إلا أن المستأجر قد قام بما يلي:
+   أ) مخالفة شروط الرخصة التجارية بممارسة نشاط غير مرخص
+   ب) عدم تجديد الرخصة التجارية في موعدها المحدد
+   ج) استخدام المحل لأغراض مخالفة للعقد والقانون
+   د) عدم الالتزام بسداد رسوم التجديد رغم انتهاء صلاحية الرخصة
+
+4/ وقد أدى ذلك إلى:
+   - تعليق نشاط المحل من قبل الجهات المختصة
+   - فرض غرامات إدارية على المالك بقيمة [المبلغ_المتأخر] درهم
+   - إلحاق أضرار بسمعة المالك التجارية
+   - خسارة الإيرادات المتوقعة من المحل
+
+5/ تم إنذار المستأجر بتاريخ [تاريخ_اليوم] بضرورة تصحيح الأوضاع وتجديد الرخصة وسداد الغرامات المستحقة، إلا أنه لم يستجب.
+
+(مستند رقم 3: صورة عن الإنذار الرسمي)
+(مستند رقم 4: صورة عن المخالفات والغرامات الإدارية)
+
+ثانياً: الأسانيد القانونية
+
+- قانون تنظيم العلاقات الإيجارية بإمارة الشارقة
+- قانون المعاملات التجارية الاتحادي
+- قانون تنظيم الأنشطة التجارية
+
+بناءً على ما تقدم
+
+يلتمس المدعي من عدالة المحكمة الموقرة القضاء بالآتي:
+
+أولاً: من الناحية الشكلية
+1/ قبول الدعوى شكلاً لتوافر شروط قبولها.
+
+ثانياً: من الناحية الموضوعية
+1/ إلزام المدعى عليه بتجديد الرخصة التجارية فوراً وعلى نفقته الخاصة، أو إلغاؤها نهائياً وإخلاء المحل.
+
+2/ إلزام المدعى عليه بسداد جميع الغرامات الإدارية المفروضة على المحل والبالغة [المبلغ_المتأخر] درهم.
+
+3/ إلزام المدعى عليه بسداد تعويض للمدعي عن الأضرار المادية والمعنوية بقيمة [قيمة_الايجار] درهم.
+
+4/ إلزام المدعى عليه بتسليم المحل التجاري خالياً من الأشخاص والأشياء في حالة عدم الالتزام بالتجديد خلال مدة (30) يوماً.
+
+5/ إلزام المدعى عليه بالرسوم والمصاريف القانونية وأتعاب المحاماة.
+
+مع حفظ كافة حقوق المدعي الأخرى القانونية والشرعية
+
+وتفضلوا بقبول فائق الاحترام والتقدير
+
+مقدم الطلب (المالك)
+التوقيع:
+التاريخ: [تاريخ_اليوم]`,
+    createdAt: '2024-01-26',
+    lastModified: '2024-01-26',
+    usageCount: 5
   }
+];
+
+// قوالب عناوين النماذج
+const templateTitles = [
+  'نموذج إخلاء سكني',
+  'نموذج إخلاء تجاري',
+  'نموذج دعوى سكني',
+  'نموذج دعوى تجاري',
+  'نموذج دعوى تنفيذ سكني',
+  'نموذج دعوى تنفيذ تجاري',
+  'نموذج زيادة سكني',
+  'نموذج زيادة تجاري'
 ];
 
 const categories = ['إخلاء', 'مالية', 'عقارية', 'تجارية', 'سكنية'];
@@ -192,6 +364,13 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
   const [showNewRequestDialog, setShowNewRequestDialog] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [requests, setRequests] = useState(petitionRequests);
+  const [isEditingEnabled, setIsEditingEnabled] = useState(() => {
+    // تحميل حالة التعديل من localStorage
+    const saved = localStorage.getItem('templatesEditingEnabled');
+    return saved ? JSON.parse(saved) : true; // افتراضياً مفعل
+  });
+  const [isCustomTitle, setIsCustomTitle] = useState(false);
+  const [customTitle, setCustomTitle] = useState('');
   const [formattingOptions, setFormattingOptions] = useState({
     bold: false,
     italic: false,
@@ -243,11 +422,29 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
     تاريخ_اليوم: new Date().toLocaleDateString('ar-SA')
   };
 
-  // تحميل النماذج من localStorage
+  // تحميل النماذج من localStorage مع دمج النماذج الجديدة
   useEffect(() => {
     const savedTemplates = localStorage.getItem('petitionTemplates');
     if (savedTemplates) {
-      setTemplates(JSON.parse(savedTemplates));
+      const parsed = JSON.parse(savedTemplates);
+      // دمج النماذج الافتراضية مع المحفوظة (إضافة النماذج الجديدة)
+      const defaultIds = petitionTemplates.map(t => t.id);
+      const savedIds = parsed.map((t: any) => t.id);
+      
+      // إضافة النماذج الافتراضية الجديدة التي لا توجد في المحفوظة
+      const newTemplates = petitionTemplates.filter(t => !savedIds.includes(t.id));
+      
+      if (newTemplates.length > 0) {
+        const merged = [...parsed, ...newTemplates];
+        setTemplates(merged);
+        localStorage.setItem('petitionTemplates', JSON.stringify(merged));
+      } else {
+        setTemplates(parsed);
+      }
+    } else {
+      // أول مرة: حفظ النماذج الافتراضية
+      setTemplates(petitionTemplates);
+      localStorage.setItem('petitionTemplates', JSON.stringify(petitionTemplates));
     }
   }, []);
 
@@ -286,6 +483,8 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
     saveTemplates(updatedTemplates);
     
     setNewTemplate({ title: '', category: '', emirate: '', content: '' });
+    setIsCustomTitle(false);
+    setCustomTitle('');
     setShowCreateDialog(false);
     alert('تم إنشاء النموذج بنجاح!');
   };
@@ -301,6 +500,8 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
     saveTemplates(updatedTemplates);
     setShowEditDialog(false);
     setSelectedTemplate(null);
+    setIsCustomTitle(false);
+    setCustomTitle('');
     alert('تم تحديث النموذج بنجاح!');
   };
 
@@ -337,7 +538,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
       );
       
       saveTemplates(updatedTemplates);
-      setSelectedTemplate(prev => ({ ...prev, content: previewEditingContent }));
+      setSelectedTemplate((prev: any) => ({ ...prev, content: previewEditingContent }));
       setIsPreviewEditing(false);
       alert('تم حفظ التعديل بنجاح!');
     }
@@ -401,7 +602,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
       const filledContent = Object.keys(filledData).reduce((content, key) => {
         return content.replace(new RegExp(`\\[${key}\\]`, 'g'), filledData[key as keyof typeof filledData]);
       }, selectedTemplate.content);
-      setSelectedTemplate(prev => ({ ...prev, content: filledContent }));
+      setSelectedTemplate((prev: any) => ({ ...prev, content: filledContent }));
     }
     
     alert(`تم ملء النموذج ببيانات الطلب: ${request.clientName}`);
@@ -514,6 +715,12 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
   // تعديل نموذج
   const handleEditTemplate = (template: any) => {
     setSelectedTemplate(template);
+    
+    // تحقق إذا كان العنوان من القائمة المحددة أو مخصص
+    const isInList = templateTitles.includes(template.title);
+    setIsCustomTitle(!isInList);
+    setCustomTitle(!isInList ? template.title : '');
+    
     setNewTemplate({
       title: template.title,
       category: template.category,
@@ -543,8 +750,47 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
   const handleResetTemplates = () => {
     if (confirm('هل أنت متأكد من إعادة تعيين جميع النماذج؟ سيتم حذف جميع التعديلات.')) {
       setTemplates(petitionTemplates);
-      localStorage.removeItem('petitionTemplates');
-      alert('تم إعادة تعيين النماذج بنجاح!');
+      localStorage.setItem('petitionTemplates', JSON.stringify(petitionTemplates));
+      alert('تم إعادة تعيين النماذج بنجاح! ✓');
+    }
+  };
+  
+  // تحديث النماذج (إضافة النماذج الجديدة فقط)
+  const handleUpdateTemplates = () => {
+    const savedTemplates = localStorage.getItem('petitionTemplates');
+    if (savedTemplates) {
+      const parsed = JSON.parse(savedTemplates);
+      const savedIds = parsed.map((t: any) => t.id);
+      const newTemplates = petitionTemplates.filter(t => !savedIds.includes(t.id));
+      
+      if (newTemplates.length > 0) {
+        const merged = [...parsed, ...newTemplates];
+        setTemplates(merged);
+        localStorage.setItem('petitionTemplates', JSON.stringify(merged));
+        alert(`تم إضافة ${newTemplates.length} نموذج جديد! ✓\n\n${newTemplates.map(t => '• ' + t.title).join('\n')}`);
+      } else {
+        alert('جميع النماذج محدثة! ✓');
+      }
+    } else {
+      setTemplates(petitionTemplates);
+      localStorage.setItem('petitionTemplates', JSON.stringify(petitionTemplates));
+      alert('تم تحميل النماذج الافتراضية! ✓');
+    }
+  };
+  
+  // تبديل حالة التعديل
+  const toggleEditingMode = () => {
+    const newState = !isEditingEnabled;
+    setIsEditingEnabled(newState);
+    localStorage.setItem('templatesEditingEnabled', JSON.stringify(newState));
+    
+    if (newState) {
+      alert('✅ تم تفعيل إمكانية التعديل\n\nيمكنك الآن تعديل وحذف النماذج');
+    } else {
+      alert('🔒 تم تعطيل إمكانية التعديل\n\nالنماذج محمية الآن من التعديل والحذف');
+      // إلغاء أي تعديل جاري
+      setEditingTemplateId(null);
+      setIsPreviewEditing(false);
     }
   };
 
@@ -820,7 +1066,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
     }
   };
 
-  if (!hasPermission(loggedInEmployee, 'legal')) {
+  if (!hasPermission(loggedInEmployee, 'legal:eviction:read')) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
@@ -836,11 +1082,37 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">نماذج الدعاوى</h1>
-          <p className="text-gray-600 mt-2">إدارة وتحرير نماذج الدعاوى القانونية</p>
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+            نماذج الدعاوى
+            {!isEditingEnabled && (
+              <span className="text-sm bg-green-100 text-green-700 px-3 py-1 rounded-full border border-green-300 flex items-center gap-1">
+                🔒 محمي من التعديل
+              </span>
+            )}
+          </h1>
+          <p className="text-gray-600 mt-2">
+            إدارة وتحرير نماذج الدعاوى القانونية
+            {!isEditingEnabled && (
+              <span className="text-green-600 font-medium"> (وضع القراءة فقط)</span>
+            )}
+          </p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={handleResetTemplates} variant="outline" className="flex items-center gap-2">
+        <div className="flex gap-2 flex-wrap">
+          <Button 
+            onClick={toggleEditingMode} 
+            variant={isEditingEnabled ? "default" : "outline"}
+            className={`flex items-center gap-2 ${
+              isEditingEnabled 
+                ? 'bg-red-600 hover:bg-red-700 text-white' 
+                : 'bg-green-50 hover:bg-green-100 border-green-300 text-green-700'
+            }`}
+          >
+            {isEditingEnabled ? '🔓 تعطيل التعديل' : '🔒 تفعيل التعديل'}
+          </Button>
+          <Button onClick={handleUpdateTemplates} variant="outline" className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 border-blue-300 text-blue-700">
+            ⬆️ تحديث النماذج
+          </Button>
+          <Button onClick={handleResetTemplates} variant="outline" className="flex items-center gap-2" disabled={!isEditingEnabled}>
             🔄 إعادة تعيين
           </Button>
           <Button onClick={() => setShowRequestsDialog(true)} variant="outline" className="flex items-center gap-2">
@@ -851,7 +1123,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
           </Button>
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
             <DialogTrigger asChild>
-              <Button className="flex items-center gap-2">
+              <Button className="flex items-center gap-2" disabled={!isEditingEnabled}>
                 <Plus className="h-4 w-4" />
                 إنشاء نموذج جديد
               </Button>
@@ -871,12 +1143,41 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="title">عنوان النموذج *</Label>
-                    <Input
-                      id="title"
-                      value={newTemplate.title}
-                      onChange={(e) => setNewTemplate(prev => ({ ...prev, title: e.target.value }))}
-                      placeholder="أدخل عنوان النموذج"
-                    />
+                    <Select 
+                      value={isCustomTitle ? 'مخصص' : newTemplate.title} 
+                      onValueChange={(value) => {
+                        if (value === 'مخصص') {
+                          setIsCustomTitle(true);
+                          setNewTemplate(prev => ({ ...prev, title: customTitle }));
+                        } else {
+                          setIsCustomTitle(false);
+                          setNewTemplate(prev => ({ ...prev, title: value }));
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر عنوان النموذج" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {templateTitles.map((title) => (
+                          <SelectItem key={title} value={title}>
+                            {title}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="مخصص">✏️ عنوان مخصص</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {isCustomTitle && (
+                      <Input
+                        value={customTitle}
+                        onChange={(e) => {
+                          setCustomTitle(e.target.value);
+                          setNewTemplate(prev => ({ ...prev, title: e.target.value }));
+                        }}
+                        placeholder="أدخل عنوان مخصص"
+                        className="mt-2"
+                      />
+                    )}
                   </div>
 
                   <div className="grid gap-2">
@@ -928,10 +1229,8 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                         className="min-h-[400px] resize-y border-0 bg-transparent text-red-600 font-medium"
                         rows={20}
                         style={{
-                          fontFamily: 'Arial, sans-serif',
                           lineHeight: '1.8',
                           direction: 'rtl',
-                          textAlign: 'right',
                           ...getFormattingStyle()
                         }}
                       />
@@ -1072,6 +1371,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                     onClick={() => handleDuplicateTemplate(template)}
                     className="h-8 w-8 p-0"
                     title="نسخ النموذج"
+                    disabled={!isEditingEnabled}
                   >
                     <Plus className="h-3 w-3" />
                   </Button>
@@ -1080,7 +1380,8 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                     size="sm"
                     onClick={() => handleEditTemplate(template)}
                     className="h-8 w-8 p-0"
-                    title="تعديل النموذج"
+                    title={isEditingEnabled ? "تعديل النموذج" : "التعديل معطل"}
+                    disabled={!isEditingEnabled}
                   >
                     <Edit className="h-3 w-3" />
                   </Button>
@@ -1089,7 +1390,8 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                     size="sm"
                     onClick={() => handleDeleteTemplate(template.id)}
                     className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                    title="حذف النموذج"
+                    title={isEditingEnabled ? "حذف النموذج" : "الحذف معطل"}
+                    disabled={!isEditingEnabled}
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
@@ -1122,10 +1424,8 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                             className="min-h-[200px] resize-y border-0 bg-transparent text-red-600 font-medium"
                             rows={8}
                             style={{
-                              fontFamily: 'Arial, sans-serif',
                               lineHeight: '1.8',
                               direction: 'rtl',
-                              textAlign: 'right',
                               ...getFormattingStyle()
                             }}
                           />
@@ -1177,6 +1477,8 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                     size="sm"
                     onClick={() => handleStartInlineEdit(template)}
                     className="flex-1 flex items-center gap-2"
+                    disabled={!isEditingEnabled}
+                    title={isEditingEnabled ? "تعديل مباشر" : "التعديل معطل"}
                   >
                     <Edit className="h-3 w-3" />
                     تعديل مباشر
@@ -1280,7 +1582,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                             const filledContent = Object.keys(sampleData).reduce((content, key) => {
                               return content.replace(new RegExp(`\\[${key}\\]`, 'g'), sampleData[key as keyof typeof sampleData]);
                             }, selectedTemplate.content);
-                            setSelectedTemplate(prev => ({ ...prev, content: filledContent }));
+                            setSelectedTemplate((prev: any) => ({ ...prev, content: filledContent }));
                           }}
                           className="h-8 px-3 text-xs"
                           title="ملء النموذج بالبيانات التجريبية"
@@ -1292,7 +1594,8 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                           size="sm"
                           onClick={handleStartPreviewEdit}
                           className="h-8 px-3 text-xs"
-                          title="تعديل النموذج"
+                          title={isEditingEnabled ? "تعديل النموذج" : "التعديل معطل"}
+                          disabled={!isEditingEnabled}
                         >
                           ✏️ تعديل
                         </Button>
@@ -1334,10 +1637,8 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                           className="min-h-[400px] resize-y border-0 bg-transparent text-red-600 font-medium"
                           rows={20}
                           style={{
-                            fontFamily: 'Arial, sans-serif',
                             lineHeight: '1.8',
                             direction: 'rtl',
-                            textAlign: 'right',
                             ...getFormattingStyle()
                           }}
                         />
@@ -1464,12 +1765,41 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="edit-title">عنوان النموذج *</Label>
-                  <Input
-                    id="edit-title"
-                    value={newTemplate.title}
-                    onChange={(e) => setNewTemplate(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="أدخل عنوان النموذج"
-                  />
+                  <Select 
+                    value={isCustomTitle ? 'مخصص' : newTemplate.title} 
+                    onValueChange={(value) => {
+                      if (value === 'مخصص') {
+                        setIsCustomTitle(true);
+                        setNewTemplate(prev => ({ ...prev, title: customTitle }));
+                      } else {
+                        setIsCustomTitle(false);
+                        setNewTemplate(prev => ({ ...prev, title: value }));
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="اختر عنوان النموذج" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {templateTitles.map((title) => (
+                        <SelectItem key={title} value={title}>
+                          {title}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="مخصص">✏️ عنوان مخصص</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {isCustomTitle && (
+                    <Input
+                      value={customTitle}
+                      onChange={(e) => {
+                        setCustomTitle(e.target.value);
+                        setNewTemplate(prev => ({ ...prev, title: e.target.value }));
+                      }}
+                      placeholder="أدخل عنوان مخصص"
+                      className="mt-2"
+                    />
+                  )}
                 </div>
 
                 <div className="grid gap-2">
@@ -1521,10 +1851,8 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                       className="min-h-[400px] resize-y border-0 bg-transparent text-red-600 font-medium"
                       rows={20}
                       style={{
-                        fontFamily: 'Arial, sans-serif',
                         lineHeight: '1.8',
                         direction: 'rtl',
-                        textAlign: 'right',
                         ...getFormattingStyle()
                       }}
                     />

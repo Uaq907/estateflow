@@ -16,6 +16,7 @@ import { FileText, Percent, Plus, RefreshCcw } from 'lucide-react';
 import { Switch } from './ui/switch';
 import { Separator } from './ui/separator';
 import { hasPermission } from '@/lib/permissions';
+import { useLanguage } from '@/contexts/language-context';
 
 interface ExpenseDialogProps {
   isOpen: boolean;
@@ -31,6 +32,7 @@ const expenseStatuses: Expense['status'][] = ['Pending', 'Approved', 'Rejected',
 
 export default function ExpenseDialog({ isOpen, onOpenChange, expense, properties, onSubmit, loggedInEmployee }: ExpenseDialogProps) {
   const formRef = useRef<HTMLFormElement>(null);
+  const { t } = useLanguage();
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | undefined>(expense?.propertyId);
   const [isVat, setIsVat] = useState(expense?.isVat ?? false);
   const [baseAmount, setBaseAmount] = useState<number | string>(expense?.baseAmount ?? '');
@@ -70,8 +72,8 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
         <>
           <div className="flex justify-between items-start">
             <div>
-              <DialogTitle>Add New Expense</DialogTitle>
-              <DialogDescription>Fill in the details for the new expense request.</DialogDescription>
+              <DialogTitle>{t('expenseForm.addNewExpense')}</DialogTitle>
+              <DialogDescription>{t('expenseForm.fillDetails')}</DialogDescription>
             </div>
             <div className="text-right mr-10">
               <div className="text-sm font-medium">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
@@ -88,8 +90,8 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
           <>
             <div className="flex justify-between items-start">
               <div>
-                <DialogTitle>Review Expense Request</DialogTitle>
-                <DialogDescription>Submitted by {expense.employeeName}.</DialogDescription>
+                <DialogTitle>{t('expenseForm.reviewExpense')}</DialogTitle>
+                <DialogDescription>{t('expenseForm.submittedBy')} {expense.employeeName}.</DialogDescription>
               </div>
               <div className="text-right mr-10">
                 <div className="text-sm font-medium">{new Date(expense.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
@@ -106,7 +108,7 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
               <>
                 <div className="flex justify-between items-start">
                   <div>
-                    <DialogTitle>Edit Expense Request</DialogTitle>
+                    <DialogTitle>{t('expenseForm.editExpense')}</DialogTitle>
                   </div>
                   <div className="text-right mr-10">
                     <div className="text-sm font-medium">{new Date(expense.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
@@ -120,7 +122,7 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
               <>
                 <div className="flex justify-between items-start">
                   <div>
-                    <DialogTitle>Correct and Resubmit Expense</DialogTitle>
+                    <DialogTitle>{t('expenseForm.editExpense')}</DialogTitle>
                   </div>
                   <div className="text-right mr-10">
                     <div className="text-sm font-medium">{new Date(expense.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
@@ -134,7 +136,7 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
                <>
                  <div className="flex justify-between items-start">
                    <div>
-                     <DialogTitle>Expense Details</DialogTitle>
+                     <DialogTitle>{t('expenseForm.viewExpense')}</DialogTitle>
                    </div>
                    <div className="text-right">
                      <div className="text-sm text-muted-foreground">Created Date & Time</div>
@@ -159,7 +161,7 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
           <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="expenseDate">Expense Date</Label>
+                <Label htmlFor="expenseDate">{t('expenseForm.expenseDate')}</Label>
                 <DatePicker 
                   name="expenseDate" 
                   value={expenseDate} 
@@ -169,9 +171,9 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="propertyId">Property</Label>
+                <Label htmlFor="propertyId">{t('expenseForm.property')}</Label>
                 <Select name="propertyId" defaultValue={expense?.propertyId} onValueChange={setSelectedPropertyId} required disabled={!isEditable}>
-                  <SelectTrigger><SelectValue placeholder="Select a property" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t('expenseForm.selectProperty')} /></SelectTrigger>
                   <SelectContent>
                     {properties.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
                   </SelectContent>
@@ -183,9 +185,9 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="unitId">Unit (Optional)</Label>
+                <Label htmlFor="unitId">{t('expenseForm.unit')} ({t('expenseForm.optional')})</Label>
                 <Select name="unitId" defaultValue={expense?.unitId ?? 'property-wide'} disabled={!selectedPropertyId || !isEditable}>
-                  <SelectTrigger><SelectValue placeholder="Select a unit" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t('expenseForm.selectUnit')} /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="property-wide">Property-wide Expense</SelectItem>
                     {availableUnits.map(u => <SelectItem key={u.id} value={u.id}>{u.unitNumber}</SelectItem>)}
@@ -193,7 +195,7 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="supplier">Supplier Name</Label>
+                <Label htmlFor="supplier">{t('expenseForm.supplier')}</Label>
                 <Input id="supplier" name="supplier" defaultValue={expense?.supplier ?? ''} placeholder="e.g., ACME Supplies" disabled={!isEditable}/>
               </div>
             </div>
@@ -201,11 +203,20 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
             <Separator className="my-2"/>
 
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">{t('expenseForm.category')}</Label>
               <Select name="category" defaultValue={expense?.category} required disabled={!isEditable}>
-                <SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t('expenseForm.selectCategory')} /></SelectTrigger>
                 <SelectContent>
-                  {expenseCategories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  {expenseCategories.map(c => {
+                    const categoryKey = c === 'Maintenance' ? 'expenseForm.maintenance' :
+                                       c === 'Utilities' ? 'expenseForm.utilities' :
+                                       c === 'Marketing' ? 'expenseForm.marketing' :
+                                       c === 'Supplies' ? 'expenseForm.supplies' :
+                                       c === 'Legal' ? 'expenseForm.legal' :
+                                       c === 'Other' ? 'expenseForm.other' :
+                                       c;
+                    return <SelectItem key={c} value={c}>{t(categoryKey)}</SelectItem>;
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -215,7 +226,7 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
             <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                     <Switch id="isVat" name="isVat" checked={isVat} onCheckedChange={setIsVat} disabled={!isEditable}/>
-                    <Label htmlFor="isVat">Add VAT (5%)</Label>
+                    <Label htmlFor="isVat">{t('expenseForm.includeVat')}</Label>
                 </div>
 
                 {isVat && (
@@ -226,18 +237,18 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
                 )}
                 
                 <div className="space-y-2">
-                    <Label htmlFor="baseAmount">Base Amount (AED)</Label>
+                    <Label htmlFor="baseAmount">{t('expenseForm.baseAmount')} (AED)</Label>
                     <Input id="baseAmount" name="baseAmount" type="number" step="0.01" value={baseAmount} onChange={e => setBaseAmount(e.target.value)} required disabled={!isEditable} />
                 </div>
 
                 {isVat && (
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label>Tax (5%)</Label>
+                            <Label>{t('expenseForm.vatAmount')}</Label>
                             <Input value={taxAmount.toFixed(2)} disabled className="bg-muted"/>
                         </div>
                          <div className="space-y-2">
-                            <Label>Grand Total</Label>
+                            <Label>{t('expenseForm.grandTotal')}</Label>
                             <Input value={grandTotal.toFixed(2)} disabled className="bg-muted font-bold"/>
                         </div>
                     </div>
@@ -247,12 +258,12 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
             <Separator className="my-2"/>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{t('expenseForm.description')}</Label>
               <Textarea id="description" name="description" defaultValue={expense?.description ?? ''} disabled={!isEditable} />
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="receiptFile">Upload Receipt / Invoice</Label>
+                <Label htmlFor="receiptFile">{t('expenseForm.uploadReceipt')}</Label>
                 <Input id="receiptFile" name="receiptFile" type="file" required={!expense} disabled={!isEditable} />
                 {expense?.receiptUrl && (
                     <div className="text-sm text-muted-foreground mt-2">
@@ -266,29 +277,29 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
 
             {expense?.status === 'Needs Correction' && (
                 <div className="p-4 bg-yellow-100 dark:bg-yellow-900/50 border border-yellow-300 dark:border-yellow-700 rounded-md">
-                    <h4 className="font-semibold text-yellow-800 dark:text-yellow-200">Manager's Notes for Correction</h4>
+                    <h4 className="font-semibold text-yellow-800 dark:text-yellow-200">{t('expenseForm.managerNotes')}</h4>
                     <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">{expense.managerNotes}</p>
                 </div>
             )}
             
             {showManagerActionButtons && (
                  <div className="space-y-2">
-                    <Label htmlFor="managerNotes">Manager Notes (optional)</Label>
+                    <Label htmlFor="managerNotes">{t('expenseForm.managerNotes')} ({t('expenseForm.optional')})</Label>
                     <Textarea id="managerNotes" name="managerNotes" placeholder="Reason for rejection or other notes..." />
                  </div>
             )}
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('expenseForm.cancel')}</Button>
             
-            {showSubmitterActionButtons && !isFinalStatus && <Button type="submit" value="submit">Submit Request</Button>}
+            {showSubmitterActionButtons && !isFinalStatus && <Button type="submit" value="submit">{t('expenseForm.submit')}</Button>}
 
             {showManagerActionButtons && (
                 <>
-                <Button type="submit" value="needs_correction" variant="secondary">Return for Correction</Button>
-                <Button type="submit" value="reject" variant="destructive">Reject</Button>
-                <Button type="submit" value="approve">Approve</Button>
+                <Button type="submit" value="needs_correction" variant="secondary">{t('expenseForm.requestCorrection')}</Button>
+                <Button type="submit" value="reject" variant="destructive">{t('expenseForm.reject')}</Button>
+                <Button type="submit" value="approve">{t('expenseForm.approve')}</Button>
                 </>
             )}
           </DialogFooter>

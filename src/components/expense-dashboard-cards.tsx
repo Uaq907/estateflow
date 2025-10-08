@@ -7,12 +7,14 @@ import type { Expense } from '@/lib/types';
 import { useMemo } from 'react';
 import { format, subDays } from 'date-fns';
 import { Area, AreaChart, ResponsiveContainer } from 'recharts';
+import { useLanguage } from '@/contexts/language-context';
 
 interface ExpenseDashboardCardsProps {
     expenses: Expense[];
 }
 
 export default function ExpenseDashboardCards({ expenses }: ExpenseDashboardCardsProps) {
+    const { t } = useLanguage();
     const { stats, chartData } = useMemo(() => {
         const totalAmount = expenses.reduce((acc, e) => acc + e.amount, 0);
         
@@ -59,12 +61,12 @@ export default function ExpenseDashboardCards({ expenses }: ExpenseDashboardCard
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Expense Amount</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('expenseCards.totalAmount')}</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">AED {stats.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                <p className="text-xs text-muted-foreground">Sum of all submitted expenses</p>
+                <p className="text-xs text-muted-foreground">{t('expenseCards.totalAmountDesc')}</p>
                  <div className="h-16 mt-4">
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
@@ -82,12 +84,12 @@ export default function ExpenseDashboardCards({ expenses }: ExpenseDashboardCard
         </Card>
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending Requests</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('expenseCards.pendingRequests')}</CardTitle>
                 <Hourglass className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">{stats.pendingRequests}</div>
-                <p className="text-xs text-muted-foreground">Total value: AED {stats.pendingAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                <p className="text-xs text-muted-foreground">{t('expenseCards.pendingValue')}: AED {stats.pendingAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                 <div className="h-16 mt-4">
                     <ResponsiveContainer width="100%" height="100%">
                          <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
@@ -105,12 +107,12 @@ export default function ExpenseDashboardCards({ expenses }: ExpenseDashboardCard
         </Card>
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Approved Amount</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('expenseCards.approvedAmount')}</CardTitle>
                 <CheckCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">AED {stats.approvedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                <p className="text-xs text-muted-foreground">Sum of all approved expenses</p>
+                <p className="text-xs text-muted-foreground">{t('expenseCards.approvedAmountDesc')}</p>
                  <div className="h-16 mt-4">
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
@@ -128,12 +130,12 @@ export default function ExpenseDashboardCards({ expenses }: ExpenseDashboardCard
         </Card>
         <Card>
              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Highest Category</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('expenseCards.highestCategory')}</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
              <CardContent>
                 <div className="text-2xl font-bold">{stats.highestCategory}</div>
-                <p className="text-xs text-muted-foreground">Highest spending category by value</p>
+                <p className="text-xs text-muted-foreground">{t('expenseCards.highestCategoryDesc')}</p>
                  <div className="h-16 mt-4">
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>

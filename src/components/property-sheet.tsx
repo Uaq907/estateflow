@@ -187,7 +187,7 @@ export default function PropertySheet({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2 col-span-2">
                   <Label htmlFor="name" className="block text-right">{t('propertySheet.propertyName')}</Label>
-                  <Input id="name" name="name" placeholder={t('propertySheet.propertyName')} defaultValue={currentValues.name} required />
+                  <Input id="name" name="name" placeholder={t('propertySheet.propertyName')} defaultValue={currentValues.name || ''} required />
                 </div>
                 
                 <div className="space-y-2">

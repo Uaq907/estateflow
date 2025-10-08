@@ -124,12 +124,12 @@ export default function PropertyList({ properties, onEdit, onDelete }: PropertyL
                 <TableRow key={property.id} onClick={() => handleRowClick(property)} className={rowIsClickable ? "cursor-pointer" : ""}>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <Avatar>
-                         <AvatarImage src={property.imageUrl ?? undefined} alt={property.name} />
+                       <Avatar>
+                         {property.imageUrl && <AvatarImage src={property.imageUrl!} alt={property.name || ''} />}
                          <AvatarFallback>
                            {typeIconMap[property.type] || <Building />}
                          </AvatarFallback>
-                      </Avatar>
+                       </Avatar>
                       <div>
                         <div className={`font-medium ${rowIsClickable ? 'hover:underline' : ''}`}>{property.name}</div>
                         <div className="text-xs text-muted-foreground">ID: {property.id}</div>

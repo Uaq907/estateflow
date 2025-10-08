@@ -101,10 +101,10 @@ export default function UnitSheet({
   useEffect(() => {
     if (isOpen) {
         hasSaved.current = false; // Reset on open
-        async function fetchConfigs() {
+        const fetchConfigs = async () => {
             const fetchedConfigs = await getUnitConfigurations();
             setAllConfigurations(fetchedConfigs);
-        }
+        };
         fetchConfigs();
         setSelectedUnitType(unit?.type || defaultValues.type);
     }

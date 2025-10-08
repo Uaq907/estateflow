@@ -37,6 +37,7 @@ import { ALL_PERMISSIONS, PERMISSION_GROUPS, type Permission } from '@/lib/permi
 import { DatePicker } from './date-picker';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import { useLanguage } from '@/contexts/language-context';
 
 interface EmployeeSheetProps {
   isOpen: boolean;
@@ -94,6 +95,7 @@ export default function EmployeeSheet({
   const formRef = useRef<HTMLFormElement>(null);
   const [activeTab, setActiveTab] = useState('personal');
   const { toast } = useToast();
+  const { t } = useLanguage();
   
   const [startDate, setStartDate] = useState<Date | undefined>(employee?.startDate ? new Date(employee.startDate) : new Date());
   const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>(employee?.dateOfBirth ? new Date(employee.dateOfBirth) : undefined);
@@ -301,10 +303,10 @@ export default function EmployeeSheet({
   };
 
 
-  const sheetTitle = employee ? 'Edit Employee' : 'Add New Employee';
+  const sheetTitle = employee ? t('employee.editEmployee') : t('employee.addNewEmployee');
   const sheetDescription = employee
-    ? "Update the employee's details below."
-    : 'Fill in the form to add a new employee to the system.';
+    ? t('employee.updateDetails')
+    : t('employee.fillForm');
 
   const potentialManagers = employees.filter(e => e.id !== employee?.id);
   
@@ -327,13 +329,13 @@ export default function EmployeeSheet({
               <div className="border-b">
                  <nav className="-mb-px flex space-x-6">
                     <Button type="button" variant="ghost" onClick={() => setActiveTab('personal')} className={cn("whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm", activeTab === 'personal' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border')}>
-                        <Briefcase className="mr-2"/> Personal & Job
+                        <Briefcase className="mr-2"/> {t('employee.personalInfo')}
                     </Button>
                      <Button type="button" variant="ghost" onClick={() => setActiveTab('salary')} className={cn("whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm", activeTab === 'salary' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border')}>
-                        <DollarSign className="mr-2"/> Salary
+                        <DollarSign className="mr-2"/> {t('employee.salaryInfo')}
                     </Button>
                     <Button type="button" variant="ghost" onClick={() => setActiveTab('permissions')} className={cn("whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm", activeTab === 'permissions' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border')}>
-                        <Lock className="mr-2"/> Permissions
+                        <Lock className="mr-2"/> {t('employee.permissions')}
                     </Button>
                  </nav>
               </div>
@@ -341,7 +343,7 @@ export default function EmployeeSheet({
             <div className={cn("space-y-6", activeTab !== 'personal' && 'hidden')}>
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="space-y-2 col-span-1 lg:col-span-3">
-                 <Label>Profile Picture</Label>
+                 <Label>{t('employeeForm.profilePicture')}</Label>
                  <div className="flex items-center gap-4">
                     <Avatar className="h-20 w-20">
                         <AvatarImage src={currentValues.profilePictureUrl ?? undefined} />
@@ -367,57 +369,57 @@ export default function EmployeeSheet({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="name">{t('employeeForm.name')}</Label>
                   <Input id="name" name="name" placeholder="John Doe" defaultValue={currentValues.name} required />
                 </div>
                 <div className="space-y-2">
-                   <Label htmlFor="email">Email</Label>
+                   <Label htmlFor="email">{t('employeeForm.email')}</Label>
                    <Input id="email" name="email" type="email" placeholder="john.doe@example.com" defaultValue={currentValues.email} required />
                 </div>
                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone</Label>
+                    <Label htmlFor="phone">{t('employeeForm.phone')}</Label>
                     <Input id="phone" name="phone" placeholder="123-456-7890" defaultValue={currentValues.phone ?? ''} />
                 </div>
                  <div className="space-y-2">
-                    <Label htmlFor="position">Position</Label>
+                    <Label htmlFor="position">{t('employeeForm.position')}</Label>
                     <Input id="position" name="position" placeholder="Software Engineer" defaultValue={currentValues.position} required />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="department">Department</Label>
+                    <Label htmlFor="department">{t('employeeForm.department')}</Label>
                     <Input id="department" name="department" placeholder="Technology" defaultValue={currentValues.department} required />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="startDate">Join Date</Label>
+                    <Label htmlFor="startDate">{t('employeeForm.startDate')}</Label>
                     <DatePicker name="startDate" value={startDate} onSelect={setStartDate} required />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                    <Label htmlFor="dateOfBirth">{t('employeeForm.dateOfBirth')}</Label>
                     <DatePicker name="dateOfBirth" value={dateOfBirth} onSelect={setDateOfBirth} />
                 </div>
                  <div className="space-y-2">
-                     <Label htmlFor="status">Status</Label>
+                     <Label htmlFor="status">{t('employeeForm.status')}</Label>
                      <Select name="status" defaultValue={currentValues.status ?? 'Active'}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select employee status" />
                           </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Active">Active</SelectItem>
-                          <SelectItem value="Inactive">Inactive</SelectItem>
+                          <SelectItem value="Active">{t('employees.active')}</SelectItem>
+                          <SelectItem value="Inactive">{t('employees.inactive')}</SelectItem>
                         </SelectContent>
                       </Select>
                  </div>
                  <div className="space-y-2">
-                    <Label htmlFor="nationality">Nationality</Label>
+                    <Label htmlFor="nationality">{t('employeeForm.nationality')}</Label>
                     <Input id="nationality" name="nationality" placeholder="Emirati" defaultValue={currentValues.nationality ?? ''} />
                  </div>
                  <div className="space-y-2 col-span-1 lg:col-span-3">
-                     <Label htmlFor="managerId">Manager</Label>
+                     <Label htmlFor="managerId">{t('employeeForm.manager')}</Label>
                       <Select name="managerId" defaultValue={currentValues.managerId ?? 'no-manager'}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a manager" />
                           </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="no-manager">No Manager</SelectItem>
+                          <SelectItem value="no-manager">{t('employeeForm.noManager')}</SelectItem>
                           {potentialManagers.map((manager) => (
                               <SelectItem key={manager.id} value={manager.id}>
                                   {manager.name}
@@ -431,15 +433,15 @@ export default function EmployeeSheet({
               <h3 className="text-lg font-medium pt-4 border-b pb-2">Identification & Emergency</h3>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                 <div className="space-y-2">
-                  <Label htmlFor="emiratesId">Emirates ID</Label>
+                  <Label htmlFor="emiratesId">{t('employeeForm.emiratesId')}</Label>
                   <Input id="emiratesId" name="emiratesId" placeholder="784-XXXX-XXXXXXX-X" defaultValue={currentValues.emiratesId ?? ''} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="passportNumber">Passport Number</Label>
+                  <Label htmlFor="passportNumber">{t('employeeForm.passportNumber')}</Label>
                   <Input id="passportNumber" name="passportNumber" placeholder="A12345678" defaultValue={currentValues.passportNumber ?? ''} />
                 </div>
                 <div className="space-y-2 col-span-1 md:col-span-2">
-                  <Label htmlFor="emergencyContact">Emergency Contact Details</Label>
+                  <Label htmlFor="emergencyContact">{t('employeeForm.emergencyContact')}</Label>
                   <Textarea id="emergencyContact" name="emergencyContact" placeholder="Name, Relationship, Phone Number" defaultValue={currentValues.emergencyContact ?? ''} />
                 </div>
               </div>
@@ -447,19 +449,19 @@ export default function EmployeeSheet({
               <h3 className="text-lg font-medium pt-4 border-b pb-2">Visa & Insurance</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                  <div className="space-y-2">
-                    <Label htmlFor="visaNumber">Visa Number</Label>
+                    <Label htmlFor="visaNumber">{t('employeeForm.visaNumber')}</Label>
                     <Input id="visaNumber" name="visaNumber" placeholder="Visa Number" defaultValue={currentValues.visaNumber ?? ''} />
                  </div>
                  <div className="space-y-2">
-                    <Label htmlFor="visaExpiryDate">Visa Expiry Date</Label>
+                    <Label htmlFor="visaExpiryDate">{t('employeeForm.visaExpiryDate')}</Label>
                     <DatePicker name="visaExpiryDate" value={visaExpiryDate} onSelect={setVisaExpiryDate} />
                  </div>
                  <div className="space-y-2">
-                    <Label htmlFor="insuranceNumber">Insurance Policy Number</Label>
+                    <Label htmlFor="insuranceNumber">{t('employeeForm.insuranceNumber')}</Label>
                     <Input id="insuranceNumber" name="insuranceNumber" placeholder="Policy Number" defaultValue={currentValues.insuranceNumber ?? ''} />
                  </div>
                  <div className="space-y-2">
-                    <Label htmlFor="insuranceExpiryDate">Insurance Expiry Date</Label>
+                    <Label htmlFor="insuranceExpiryDate">{t('employeeForm.insuranceExpiryDate')}</Label>
                     <DatePicker name="insuranceExpiryDate" value={insuranceExpiryDate} onSelect={setInsuranceExpiryDate} />
                  </div>
               </div>
@@ -467,11 +469,11 @@ export default function EmployeeSheet({
               <h3 className="text-lg font-medium pt-4 border-b pb-2">System & Alerts</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                  <div className="space-y-2">
-                    <Label htmlFor="telegramBotToken">Telegram Bot Token</Label>
+                    <Label htmlFor="telegramBotToken">{t('employeeForm.telegramBotToken')}</Label>
                     <Input id="telegramBotToken" name="telegramBotToken" placeholder="Bot Token" defaultValue={currentValues.telegramBotToken ?? ''} />
                  </div>
                  <div className="space-y-2">
-                    <Label htmlFor="telegramChannelId">Telegram Channel ID</Label>
+                    <Label htmlFor="telegramChannelId">{t('employeeForm.telegramChannelId')}</Label>
                     <Input id="telegramChannelId" name="telegramChannelId" placeholder="Channel ID" defaultValue={currentValues.telegramChannelId ?? ''} />
                  </div>
               </div>
@@ -480,25 +482,25 @@ export default function EmployeeSheet({
 
             <div className={cn("space-y-6", activeTab !== 'salary' && 'hidden')}>
                 <div className="space-y-2">
-                    <Label htmlFor="salary">Total Salary (read-only)</Label>
+                    <Label htmlFor="salary">{t('employeeForm.totalSalary')}</Label>
                     <Input id="salary" name="salary" type="number" placeholder="50000" defaultValue={currentValues.salary ?? ''} readOnly className="bg-muted"/>
                     <p className="text-xs text-muted-foreground">This is auto-calculated from the fields below.</p>
                 </div>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                      <div className="space-y-2">
-                        <Label htmlFor="basicSalary">Basic Salary</Label>
+                        <Label htmlFor="basicSalary">{t('employeeForm.basicSalary')}</Label>
                         <Input id="basicSalary" name="basicSalary" type="number" step="0.01" placeholder="30000" defaultValue={currentValues.basicSalary ?? 0} />
                     </div>
                      <div className="space-y-2">
-                        <Label htmlFor="housingAllowance">Housing Allowance</Label>
+                        <Label htmlFor="housingAllowance">{t('employeeForm.housingAllowance')}</Label>
                         <Input id="housingAllowance" name="housingAllowance" type="number" step="0.01" placeholder="15000" defaultValue={currentValues.housingAllowance ?? 0} />
                     </div>
                      <div className="space-y-2">
-                        <Label htmlFor="transportAllowance">Transport Allowance</Label>
+                        <Label htmlFor="transportAllowance">{t('employeeForm.transportAllowance')}</Label>
                         <Input id="transportAllowance" name="transportAllowance" type="number" step="0.01" placeholder="5000" defaultValue={currentValues.transportAllowance ?? 0} />
                     </div>
                      <div className="space-y-2">
-                        <Label htmlFor="otherAllowance">Other Allowances</Label>
+                        <Label htmlFor="otherAllowance">{t('employeeForm.otherAllowance')}</Label>
                         <Input id="otherAllowance" name="otherAllowance" type="number" step="0.01" placeholder="1000" defaultValue={currentValues.otherAllowance ?? 0} />
                     </div>
                  </div>
@@ -508,20 +510,20 @@ export default function EmployeeSheet({
               {canManagePermissions ? (
                  <>
                     <div className="space-y-2">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">{t('employeeForm.password')}</Label>
                         <Input id="password" name="password" type="password" placeholder={employee ? "Leave blank to keep unchanged" : "Set initial password"} required={!employee} />
                     </div>
                     <div className="flex flex-row items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
-                        <Label htmlFor="allowLogin" className="text-base">Allow Login</Label>
-                        <p className="text-sm text-muted-foreground">Allow this employee to log in to the system.</p>
+                        <Label htmlFor="allowLogin" className="text-base">{t('employeeForm.allowLogin')}</Label>
+                        <p className="text-sm text-muted-foreground">{t('employeeForm.allowLoginDesc')}</p>
                         </div>
                         <Switch id="allowLogin" name="allowLogin" defaultChecked={currentValues.allowLogin} />
                     </div>
                     <div className="flex flex-row items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
-                        <Label htmlFor="enableEmailAlerts" className="text-base">Enable Email Alerts</Label>
-                        <p className="text-sm text-muted-foreground">Send email notifications for important events.</p>
+                        <Label htmlFor="enableEmailAlerts" className="text-base">{t('employeeForm.enableEmailAlerts')}</Label>
+                        <p className="text-sm text-muted-foreground">{t('employeeForm.enableEmailAlertsDesc')}</p>
                         </div>
                         <Switch id="enableEmailAlerts" name="enableEmailAlerts" defaultChecked={currentValues.enableEmailAlerts} />
                     </div>
@@ -530,10 +532,10 @@ export default function EmployeeSheet({
                         <div className="space-y-0.5">
                             <Label htmlFor="adminQuickPermissions" className="text-base flex items-center gap-2 text-red-600">
                                 <Shield className="h-5 w-5" />
-                                Admin Quick Permissions
+                                {t('employee.adminQuickPermissions')}
                             </Label>
                             <p className="text-sm text-muted-foreground">
-                                Enable/disable all permissions at once (except delete when enabling, except login when disabling)
+                                {t('employee.adminQuickPermissionsDesc')}
                             </p>
                         </div>
                         <Switch 
@@ -548,38 +550,56 @@ export default function EmployeeSheet({
                         <div className="grid grid-cols-4 gap-4 text-center">
                             <div>
                                 <p className="text-2xl font-bold text-green-600" id="enabledPermissionsCount">0</p>
-                                <p className="text-xs text-gray-600">Enabled</p>
+                                <p className="text-xs text-gray-600">{t('employee.enabled')}</p>
                             </div>
                             <div>
                                 <p className="text-2xl font-bold text-red-600" id="disabledPermissionsCount">0</p>
-                                <p className="text-xs text-gray-600">Disabled</p>
+                                <p className="text-xs text-gray-600">{t('employee.disabled')}</p>
                             </div>
                             <div>
                                 <p className="text-2xl font-bold text-blue-600" id="totalPermissionsCount">0</p>
-                                <p className="text-xs text-gray-600">Total</p>
+                                <p className="text-xs text-gray-600">{t('employee.total')}</p>
                             </div>
                             <div>
                                 <p className="text-2xl font-bold text-orange-600" id="deletePermissionsCount">0</p>
-                                <p className="text-xs text-gray-600">Delete Restricted</p>
+                                <p className="text-xs text-gray-600">{t('employee.deleteRestricted')}</p>
                             </div>
                         </div>
                     </div>
                     
                     <div className="space-y-4 pt-2">
-                        {Object.entries(PERMISSION_GROUPS).map(([groupName, permissions]) => (
+                        {Object.entries(PERMISSION_GROUPS).map(([groupName, permissions]) => {
+                            // ترجمة أسماء المجموعات
+                            const groupNameKey = groupName.replace(/ /g, '').replace(/&/g, '');
+                            const translatedGroupName = groupName === 'Basic Control' ? t('employee.basicControl') :
+                                                       groupName === 'Employee Management' ? t('employee.employeeManagement') :
+                                                       groupName === 'Property Management' ? t('employee.propertyManagement') :
+                                                       groupName === 'Tenant Management' ? t('employee.tenantManagement') :
+                                                       groupName === 'Lease Management' ? t('employee.leaseManagement') :
+                                                       groupName === 'Financial Management' ? t('employee.financialManagement') :
+                                                       groupName === 'Maintenance & Assets' ? t('employee.maintenanceAssets') :
+                                                       groupName === 'Owner Management' ? t('employee.ownerManagement') :
+                                                       groupName === 'Legal Management' ? t('employee.legalManagement') :
+                                                       groupName === 'Data & Reporting' ? t('employee.dataReporting') :
+                                                       groupName;
+                            return (
                             <div key={groupName} className="space-y-3">
-                                <h4 className="font-semibold">{groupName}</h4>
+                                <h4 className="font-semibold">{translatedGroupName}</h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {permissions.map((permission: any) => {
                                     const isEnabled = permissionsState[permission] !== undefined 
                                         ? permissionsState[permission] 
                                         : (currentValues.permissions as any)?.includes(permission);
                                     
+                                    // الحصول على الترجمة للصلاحية
+                                    const permissionKey = `permission.${permission}`;
+                                    const permissionLabel = t(permissionKey) || permission.replace(/[:]/g, ' ');
+                                    
                                     return (
                                         <div key={permission} className={`flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm ${isEnabled ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
                                             <div className="space-y-0.5">
-                                                <Label htmlFor={permission} className={`text-base font-normal capitalize ${isEnabled ? 'text-green-800' : 'text-gray-600'}`}>
-                                                    {permission.replace(/[:]/g, ' ')}
+                                                <Label htmlFor={permission} className={`text-base font-normal ${isEnabled ? 'text-green-800' : 'text-gray-600'}`}>
+                                                    {permissionLabel}
                                                     {isEnabled && <span className="ml-2 text-green-600">✓</span>}
                                                 </Label>
                                             </div>
@@ -595,11 +615,12 @@ export default function EmployeeSheet({
                                 })}
                                 </div>
                             </div>
-                        ))}
+                        );
+                        })}
                     </div>
                 </>
               ) : (
-                <p className="text-muted-foreground text-center py-10">You do not have permission to manage permissions.</p>
+                <p className="text-muted-foreground text-center py-10">{t('employee.noPermissionsAccess')}</p>
               )}
             </div>
 
@@ -607,10 +628,10 @@ export default function EmployeeSheet({
             <SheetFooter className="mt-auto pt-6">
               <SheetClose asChild>
                 <Button type="button" variant="outline">
-                  Cancel
+                  {t('employeeForm.cancel')}
                 </Button>
               </SheetClose>
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit">{t('employeeForm.saveChanges')}</Button>
             </SheetFooter>
           </form>
       </SheetContent>

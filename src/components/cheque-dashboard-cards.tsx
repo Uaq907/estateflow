@@ -6,12 +6,14 @@ import { DollarSign, Hourglass, AlertCircle, CheckCircle, CalendarClock } from '
 import type { Cheque } from '@/lib/types';
 import { useMemo } from 'react';
 import { isPast } from 'date-fns';
+import { useLanguage } from '@/contexts/language-context';
 
 interface ChequeDashboardCardsProps {
     cheques: Cheque[];
 }
 
 export default function ChequeDashboardCards({ cheques }: ChequeDashboardCardsProps) {
+    const { t } = useLanguage();
     const stats = useMemo(() => {
         const now = new Date();
         now.setHours(0, 0, 0, 0); // Normalize to start of day for comparison
@@ -60,52 +62,52 @@ export default function ChequeDashboardCards({ cheques }: ChequeDashboardCardsPr
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Uncleared Cheques Value</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('cheques.unclearedValue')}</CardTitle>
                 <Hourglass className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">AED {stats.unclearedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                <p className="text-xs text-muted-foreground">Total value of all non-cleared cheques</p>
+                <p className="text-xs text-muted-foreground">{t('cheques.unclearedDesc')}</p>
             </CardContent>
         </Card>
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Overdue Cheques</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('cheques.overdueCheques')}</CardTitle>
                 <AlertCircle className="h-4 w-4 text-muted-foreground text-destructive" />
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold text-destructive">{stats.overdueCount}</div>
-                <p className="text-xs text-muted-foreground">Total Value: AED {stats.overdueAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                <p className="text-xs text-muted-foreground">{t('cheques.totalValue')}: AED {stats.overdueAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
             </CardContent>
         </Card>
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Bounced Cheques Value</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('cheques.bouncedValue')}</CardTitle>
                 <AlertCircle className="h-4 w-4 text-muted-foreground text-destructive" />
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold text-destructive">AED {stats.bouncedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                <p className="text-xs text-muted-foreground">Total value of bounced cheques</p>
+                <p className="text-xs text-muted-foreground">{t('cheques.bouncedDesc')}</p>
             </CardContent>
         </Card>
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Cheques Due in 30 Days</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('cheques.dueIn30Days')}</CardTitle>
                 <CalendarClock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">{stats.dueSoonCount}</div>
-                <p className="text-xs text-muted-foreground">Number of cheques due soon</p>
+                <p className="text-xs text-muted-foreground">{t('cheques.dueSoonDesc')}</p>
             </CardContent>
         </Card>
         <Card>
              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Cleared (Last 30 Days)</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('cheques.clearedLast30')}</CardTitle>
                 <CheckCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
              <CardContent>
                 <div className="text-2xl font-bold">AED {stats.clearedLast30Days.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                <p className="text-xs text-muted-foreground">Total value of cheques cleared recently</p>
+                <p className="text-xs text-muted-foreground">{t('cheques.clearedDesc')}</p>
             </CardContent>
         </Card>
     </div>

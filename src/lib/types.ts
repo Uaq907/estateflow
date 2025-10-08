@@ -29,6 +29,10 @@ export const notificationPreferencesSchema = z.object({
   contract_expiring_days: z.coerce.number().default(90),
   payment_due: z.boolean().default(true),
   payment_due_days: z.coerce.number().default(7),
+  cheque_due: z.boolean().default(true),
+  cheque_due_days: z.coerce.number().default(7),
+  contract_renewal: z.boolean().default(true),
+  contract_renewal_days: z.coerce.number().default(60),
 }).default({});
 
 export type NotificationPreferences = z.infer<typeof notificationPreferencesSchema>;

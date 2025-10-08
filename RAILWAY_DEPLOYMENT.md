@@ -161,3 +161,5 @@ To scale your application:
 
 **Note:** Remember to never commit your `.env` file to Git. Always use `.env.example` as a template.
 
+
+

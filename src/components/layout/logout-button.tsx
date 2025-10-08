@@ -14,12 +14,13 @@ export function LogoutButton() {
   const handleLogout = async () => {
     setIsLoading(true);
     try {
-      const result = await logout(null, null);
-      if (result?.success) {
-        window.location.href = '/login';
-      }
+      const formData = new FormData();
+      await logout(null, formData);
+      // redirect() is called in logout, which throws to perform the redirect
     } catch (error) {
       console.error('Logout error:', error);
+      // If redirect fails, manually navigate
+      window.location.href = '/login';
     } finally {
       setIsLoading(false);
     }

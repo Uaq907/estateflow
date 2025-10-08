@@ -126,11 +126,17 @@ export async function deleteEmployee(id: string): Promise<void> {
 
 // --- Property Functions ---
 
-export async function getProperties(): Promise<Property[]> {
+/**
+ * Get all properties, optionally filtered by employeeId
+ * If employeeId is provided and employee is not a general manager,
+ * only returns properties assigned to that employee
+ */
+export async function getProperties(employeeId?: string): Promise<Property[]> {
   let connection: mysql.Connection | null = null;
   try {
     connection = await getConnection();
-    const [rows] = await connection.query(`
+    
+    let query = `
         SELECT 
             p.*,
             o.name as ownerName,
@@ -140,8 +146,24 @@ export async function getProperties(): Promise<Property[]> {
             (SELECT COUNT(*) FROM leases l JOIN units u ON l.unitId = u.id WHERE u.propertyId = p.id AND l.status = 'Active' AND (l.contractUrl IS NULL OR l.contractUrl = '')) as leasesWithoutContract
         FROM properties p 
         LEFT JOIN owners o ON p.ownerId = o.id
-        ORDER BY p.name
-    `);
+    `;
+    
+    // Filter by employee if provided
+    if (employeeId) {
+      query += `
+        WHERE EXISTS (
+          SELECT 1 FROM employee_properties ep 
+          WHERE ep.propertyId = p.id AND ep.employeeId = ?
+        )
+      `;
+    }
+    
+    query += ` ORDER BY p.name`;
+    
+    const [rows] = employeeId 
+      ? await connection.query(query, [employeeId])
+      : await connection.query(query);
+      
     return (rows as any[]).map(row => propertySchema.parse({ ...row, id: String(row.id) }));
   } catch(e) {
     console.error("Error in getProperties", e);
@@ -496,11 +518,35 @@ export async function deleteUnit(id: string): Promise<{ success: boolean; messag
 
 // --- Tenant and Lease Functions ---
 
-export async function getTenants(): Promise<Tenant[]> {
+/**
+ * Get all tenants, optionally filtered by employeeId (property manager)
+ * If employeeId is provided, only returns tenants in properties assigned to that employee
+ */
+export async function getTenants(employeeId?: string): Promise<Tenant[]> {
     let connection: mysql.Connection | null = null;
     try {
         connection = await getConnection();
-        const [rows] = await connection.query('SELECT * FROM tenants ORDER BY name');
+        
+        let query = 'SELECT DISTINCT t.* FROM tenants t';
+        
+        // Filter by employee's assigned properties if provided
+        if (employeeId) {
+          query += `
+            WHERE EXISTS (
+              SELECT 1 FROM leases l
+              JOIN units u ON l.unitId = u.id
+              JOIN employee_properties ep ON u.propertyId = ep.propertyId
+              WHERE l.tenantId = t.id AND ep.employeeId = ?
+            )
+          `;
+        }
+        
+        query += ' ORDER BY t.name';
+        
+        const [rows] = employeeId 
+          ? await connection.query(query, [employeeId])
+          : await connection.query(query);
+          
         return (rows as any[]).map(row => tenantSchema.parse({ ...row, id: String(row.id) }));
     } catch(e) {
         console.error("Error getting tenants", e);
@@ -953,11 +999,16 @@ export async function getPaymentsForTenant(tenantId: string): Promise<LeasePayme
 }
 
 
-export async function getAllLeasePaymentsWithDetails(): Promise<LeasePayment[]> {
+/**
+ * Get all lease payments with details, optionally filtered by employeeId
+ * If employeeId is provided, only returns payments for properties assigned to that employee
+ */
+export async function getAllLeasePaymentsWithDetails(employeeId?: string): Promise<LeasePayment[]> {
     let connection: mysql.Connection | null = null;
     try {
         connection = await getConnection();
-        const [rows] = await connection.query(`
+        
+        let query = `
             SELECT 
                 lp.*,
                 p.name AS propertyName,
@@ -968,8 +1019,23 @@ export async function getAllLeasePaymentsWithDetails(): Promise<LeasePayment[]> 
             JOIN units u ON l.unitId = u.id
             JOIN properties p ON u.propertyId = p.id
             JOIN tenants t ON l.tenantId = t.id
-            ORDER BY lp.dueDate DESC
-        `);
+        `;
+        
+        // Filter by employee's assigned properties if provided
+        if (employeeId) {
+          query += `
+            WHERE EXISTS (
+              SELECT 1 FROM employee_properties ep 
+              WHERE ep.propertyId = p.id AND ep.employeeId = ?
+            )
+          `;
+        }
+        
+        query += ' ORDER BY lp.dueDate DESC';
+        
+        const [rows] = employeeId
+          ? await connection.query(query, [employeeId])
+          : await connection.query(query);
         
         const payments = (rows as any[]).map(row => leasePaymentSchema.parse({ ...row, id: String(row.id), transactions: [] }));
         
@@ -1231,6 +1297,24 @@ export async function getPropertiesForEmployee(employeeId: string): Promise<Prop
         return (rows as any[]).map(row => propertySchema.parse({ ...row, id: String(row.id) }));
     } catch(e) {
         console.error("Error getting properties for employee", e);
+        return [];
+    }
+}
+
+/**
+ * Get only property IDs assigned to an employee (lighter than getPropertiesForEmployee)
+ * Used for filtering other entities by property
+ */
+export async function getPropertyIdsForEmployee(employeeId: string): Promise<string[]> {
+    let connection: mysql.Connection | null = null;
+    try {
+        connection = await getConnection();
+        const [rows] = await connection.query(`
+            SELECT propertyId FROM employee_properties WHERE employeeId = ?
+        `, [employeeId]);
+        return (rows as any[]).map(row => row.propertyId);
+    } catch(e) {
+        console.error("Error getting property IDs for employee", e);
         return [];
     }
 }
@@ -1626,7 +1710,11 @@ export async function deleteBank(id: string): Promise<void> {
 
 // --- Cheque Functions ---
 
-export async function getCheques({ createdById }: { createdById?: string } = {}): Promise<Cheque[]> {
+/**
+ * Get cheques, optionally filtered by createdById or employeeId (property manager)
+ * If employeeId is provided, only returns cheques for tenants in properties assigned to that employee
+ */
+export async function getCheques({ createdById, employeeId }: { createdById?: string, employeeId?: string } = {}): Promise<Cheque[]> {
     let connection: mysql.Connection | null = null;
     try {
         connection = await getConnection();
@@ -1646,9 +1734,26 @@ export async function getCheques({ createdById }: { createdById?: string } = {})
         `;
 
         const params: string[] = [];
+        const conditions: string[] = [];
+        
         if (createdById) {
-            query += ' WHERE c.createdById = ?';
+            conditions.push('c.createdById = ?');
             params.push(createdById);
+        }
+        
+        // Filter by employee's assigned properties if provided
+        if (employeeId) {
+            conditions.push(`EXISTS (
+                SELECT 1 FROM leases l
+                JOIN units u ON l.unitId = u.id
+                JOIN employee_properties ep ON u.propertyId = ep.propertyId
+                WHERE l.tenantId = c.tenantId AND ep.employeeId = ?
+            )`);
+            params.push(employeeId);
+        }
+        
+        if (conditions.length > 0) {
+            query += ' WHERE ' + conditions.join(' AND ');
         }
 
         query += ' ORDER BY c.dueDate ASC';
@@ -2141,32 +2246,78 @@ export async function getCalendarEvents(): Promise<CalendarEvent[]> {
         connection = await getConnection();
         const allEvents: CalendarEvent[] = [];
 
-        // Lease Start/End Dates
+        // Lease End Dates with Arrears (نهاية العقد فقط)
         const [leases] = await connection.query(`
-            SELECT id, tenantId, startDate as date, 'Lease Start' as title, 'lease' as type FROM leases
-            UNION ALL
-            SELECT id, tenantId, endDate as date, 'Lease End' as title, 'lease' as type FROM leases
+            SELECT 
+                l.id, 
+                l.tenantId, 
+                l.endDate as date, 
+                'Lease End' as title, 
+                'lease' as type,
+                p.name as propertyName,
+                p.type as propertyType,
+                t.name as tenantName,
+                l.businessName,
+                COALESCE(SUM(CASE WHEN lp.status != 'Paid' AND lp.dueDate < CURDATE() THEN lp.amount ELSE 0 END), 0) as arrears
+            FROM leases l
+            JOIN units u ON l.unitId = u.id
+            JOIN properties p ON u.propertyId = p.id
+            JOIN tenants t ON l.tenantId = t.id
+            LEFT JOIN lease_payments lp ON l.id = lp.leaseId
+            GROUP BY l.id, l.tenantId, l.endDate, p.name, p.type, t.name, l.businessName
         `);
         for (const event of (leases as any[])) {
+            // إذا كان businessName موجود، فهو تجاري
+            const isCommercial = event.businessName && event.businessName.trim() !== '';
+            const ownerName = isCommercial ? event.businessName : event.tenantName;
+            const ownerType = isCommercial ? 'صاحب رخصة تجارية' : 'مستأجر';
+            
+            // إضافة المتأخرات إذا كانت موجودة
+            let detailsText = `${event.propertyName} - ${ownerType}: ${ownerName}`;
+            if (event.arrears > 0) {
+                detailsText += `\nالمتأخرات: AED ${event.arrears.toLocaleString()}`;
+            }
+            
             allEvents.push(calendarEventSchema.parse({
                 ...event,
-                id: `lease-${event.id}-${event.type.replace(/\s+/g, '')}`,
+                id: `lease-${event.id}-${event.title.replace(/\s+/g, '')}`,
                 link: `/dashboard/leases/${event.id}`,
-                details: `Tenant ID: ${event.tenantId}`
+                details: detailsText
             }));
         }
 
-        // Lease Payment Due Dates
+        // Lease Payment Due Dates with Tenant and Property Info
         const [payments] = await connection.query(`
-            SELECT id, leaseId, dueDate as date, 'Payment Due' as title, 'payment' as type, amount FROM lease_payments
-            WHERE status != 'Paid'
+            SELECT 
+                lp.id, 
+                lp.leaseId, 
+                lp.dueDate as date, 
+                'Payment Due' as title, 
+                'payment' as type, 
+                lp.amount,
+                p.name as propertyName,
+                p.type as propertyType,
+                t.name as tenantName,
+                l.businessName
+            FROM lease_payments lp
+            JOIN leases l ON lp.leaseId = l.id
+            JOIN units u ON l.unitId = u.id
+            JOIN properties p ON u.propertyId = p.id
+            JOIN tenants t ON l.tenantId = t.id
+            WHERE lp.status != 'Paid'
         `);
         for (const event of (payments as any[])) {
+            // تحديد نوع المستأجر
+            const isCommercial = event.businessName && event.businessName.trim() !== '';
+            const ownerName = isCommercial ? event.businessName : event.tenantName;
+            const ownerType = isCommercial ? 'صاحب رخصة تجارية' : 'مستأجر';
+            const propertyTypeAr = event.propertyType === 'residential' ? 'سكني' : 'تجاري';
+            
             allEvents.push(calendarEventSchema.parse({
                 ...event,
                 id: `payment-${event.id}`,
                 link: `/dashboard/leases/${event.leaseId}`,
-                details: `Amount: AED ${event.amount.toLocaleString()}`
+                details: `${event.propertyName} (${propertyTypeAr})\n${ownerType}: ${ownerName}\nالمبلغ: AED ${event.amount.toLocaleString()}`
             }));
         }
 
@@ -2187,36 +2338,31 @@ export async function getCalendarEvents(): Promise<CalendarEvent[]> {
         const [cheques] = await connection.query(`
             SELECT c.id, c.dueDate as date, 'Cheque Due' as title, 'cheque' as type, 
                    COALESCE(p.name, t.name, c.manualPayeeName) as payeeName, 
-                   c.amount 
+                   c.amount,
+                   c.chequeNumber,
+                   c.payeeType,
+                   p.type as payeeCategory
             FROM cheques c
             LEFT JOIN payees p ON c.payeeId = p.id AND c.payeeType = 'saved'
             LEFT JOIN tenants t ON c.tenantId = t.id AND c.payeeType = 'tenant'
             WHERE c.status NOT IN ('Cleared', 'Cancelled')
         `);
         for (const event of (cheques as any[])) {
+            // تحديد نوع الشيك (شخصي أو تجاري)
+            let chequeType = 'شخصي';
+            if (event.payeeType === 'saved' && event.payeeCategory === 'company') {
+                chequeType = 'شخصي';
+            } else if (event.payeeType === 'tenant') {
+                chequeType = 'شخصي';
+            }
+            
             allEvents.push(calendarEventSchema.parse({
                 ...event,
                 id: `cheque-${event.id}`,
                 link: `/dashboard/cheques?search=${event.id}`,
-                details: `Payee: ${event.payeeName}, Amount: AED ${event.amount.toLocaleString()}, ID: ${event.id}`
+                details: `${chequeType}: ${event.payeeName}, المبلغ: AED ${event.amount.toLocaleString()}, شيك ${event.chequeNumber}`
             }));
         }
-        
-        // Expenses
-        const [expenses] = await connection.query(`
-            SELECT ex.id, ex.createdAt as date, 'Expense Submitted' as title, 'expense' as type, ex.category, ex.amount, emp.name as employeeName 
-            FROM expenses ex
-            LEFT JOIN employees emp ON ex.employeeId = emp.id
-        `);
-        for (const event of (expenses as any[])) {
-            allEvents.push(calendarEventSchema.parse({
-                ...event,
-                id: `expense-${event.id}`,
-                link: `/dashboard/expenses`,
-                details: `${event.category}: AED ${event.amount.toLocaleString()} by ${event.employeeName}`
-            }));
-        }
-
 
         return allEvents;
     } catch(e) {
@@ -2234,9 +2380,10 @@ export async function getActivities(): Promise<ActivityLog[]> {
         const [rows] = await connection.query('SELECT * FROM activity_logs ORDER BY timestamp DESC LIMIT 1000');
         return (rows as any[]).map(row => {
             let details = row.details;
-            // Let the DB driver handle the conversion, just cast to any
-            if (details) {
-                details = JSON.stringify(details, null, 2);
+            // البيانات محفوظة بالفعل كـ JSON string في قاعدة البيانات
+            // نتأكد فقط أنها string وليست object
+            if (details && typeof details === 'object') {
+                details = JSON.stringify(details);
             }
             return activityLogSchema.parse({ ...row, id: String(row.id), details });
         });

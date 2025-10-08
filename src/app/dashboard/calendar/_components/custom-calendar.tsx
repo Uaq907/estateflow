@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import type { CalendarEvent } from '@/lib/types';
 import { format, isSameMonth, isToday } from 'date-fns';
+import { ar, enUS } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/language-context';
 
 interface CustomCalendarProps {
     date: Date;
@@ -16,6 +18,8 @@ interface CustomCalendarProps {
 }
 
 export function CustomCalendar({ date, setDate, eventsByDay, eventTypeConfig }: CustomCalendarProps) {
+    const { t, language } = useLanguage();
+    const locale = language === 'ar' ? ar : enUS;
 
     const handleMonthChange = (direction: 'prev' | 'next') => {
         setDate(new Date(date.getFullYear(), date.getMonth() + (direction === 'next' ? 1 : -1), 1));
@@ -24,13 +28,13 @@ export function CustomCalendar({ date, setDate, eventsByDay, eventTypeConfig }: 
     return (
         <div className="rounded-md border">
             <div className="flex justify-between items-center p-4">
-                <h3 className="text-xl font-semibold">{format(date, 'MMMM yyyy')}</h3>
+                <h3 className="text-xl font-semibold">{format(date, 'MMMM yyyy', { locale })}</h3>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" onClick={() => handleMonthChange('prev')}>
+                    <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => handleMonthChange('prev')}>
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => setDate(new Date())}>Today</Button>
-                    <Button variant="outline" size="icon" onClick={() => handleMonthChange('next')}>
+                    <Button variant="outline" size="sm" className="h-9 text-sm" onClick={() => setDate(new Date())}>{t('calendar.today')}</Button>
+                    <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => handleMonthChange('next')}>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>
@@ -49,7 +53,7 @@ export function CustomCalendar({ date, setDate, eventsByDay, eventTypeConfig }: 
                     head_row: 'flex border-b',
                     head_cell: 'w-full text-muted-foreground font-normal text-sm justify-center flex p-2',
                     row: 'flex w-full mt-0',
-                    cell: 'w-full h-24 border text-center text-sm p-0 relative',
+                    cell: 'w-full h-20 border text-center text-sm p-0 relative',
                     day: 'w-full h-full p-2 flex flex-col items-start justify-start font-normal',
                     day_selected: 'bg-primary/10 text-primary-foreground',
                 }}
@@ -66,7 +70,7 @@ export function CustomCalendar({ date, setDate, eventsByDay, eventTypeConfig }: 
                                 !isCurrentMonth && 'opacity-50'
                             )}>
                                 <p className={cn(
-                                    "mb-1",
+                                    "text-sm mb-1",
                                     isTodaysDate && 'bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center font-bold'
                                 )}>{format(dayDate, 'd')}</p>
                                 <div className="flex flex-wrap gap-1 mt-1">
@@ -75,7 +79,7 @@ export function CustomCalendar({ date, setDate, eventsByDay, eventTypeConfig }: 
                                         return <div key={event.id} title={event.title} className={cn("h-2 w-2 rounded-full", config.color)} />;
                                     })}
                                     {dayEvents.length > 3 && (
-                                        <div className="text-xs text-muted-foreground font-bold">+ {dayEvents.length - 3}</div>
+                                        <div className="text-xs text-muted-foreground font-bold">+{dayEvents.length - 3}</div>
                                     )}
                                 </div>
                             </div>

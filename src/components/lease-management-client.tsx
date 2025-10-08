@@ -33,11 +33,11 @@ export default function LeaseManagementClient({
         return leases.filter(item => {
             const searchLower = searchQuery.toLowerCase();
             const matchesSearch =
-                item.property.name.toLowerCase().includes(searchLower) ||
-                item.unit.unitNumber.toLowerCase().includes(searchLower) ||
-                item.tenant.name.toLowerCase().includes(searchLower) ||
+                item.property.name?.toLowerCase().includes(searchLower) ||
+                item.unit.unitNumber?.toLowerCase().includes(searchLower) ||
+                item.tenant.name?.toLowerCase().includes(searchLower) ||
                 (item.lease.businessName && item.lease.businessName.toLowerCase().includes(searchLower)) ||
-                item.lease.id.toLowerCase().includes(searchLower);
+                item.lease.id?.toLowerCase().includes(searchLower);
 
             const matchesStatus = statusFilter === 'all' || item.lease.status === statusFilter;
 

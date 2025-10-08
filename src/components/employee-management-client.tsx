@@ -227,7 +227,7 @@ export default function EmployeeManagementClient({ initialEmployees, loggedInEmp
                 <div>
                     <CardTitle>{t('employees.title')}</CardTitle>
                     <CardDescription>
-                        {loggedInEmployee ? t('employees.description') : 'You do not have permission to view this page.'}
+                        {loggedInEmployee ? t('employees.description') : t('employees.noPermissionPage')}
                     </CardDescription>
                 </div>
                  <div className="flex flex-col sm:flex-row w-full md:w-auto gap-2">
@@ -242,28 +242,28 @@ export default function EmployeeManagementClient({ initialEmployees, loggedInEmp
                     />
                      <Select value={departmentFilter} onValueChange={(value) => { setDepartmentFilter(value); setCurrentPage(1); }}>
                         <SelectTrigger className="w-full md:w-[180px]">
-                            <SelectValue placeholder="Filter by Department" />
+                            <SelectValue placeholder={t('employees.filterDepartment')} />
                         </SelectTrigger>
                         <SelectContent>
                             {departmentOptions.map(dept => (
-                                <SelectItem key={dept} value={dept} className="capitalize">{dept === 'all' ? 'All Departments' : dept}</SelectItem>
+                                <SelectItem key={dept} value={dept} className="capitalize">{dept === 'all' ? t('employees.allDepartments') : dept}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
                      <Select value={statusFilter} onValueChange={(value) => { setStatusFilter(value); setCurrentPage(1); }}>
                         <SelectTrigger className="w-full md:w-[150px]">
-                            <SelectValue placeholder="Filter by Status" />
+                            <SelectValue placeholder={t('employees.filterStatus')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Statuses</SelectItem>
-                            <SelectItem value="Active">Active</SelectItem>
-                            <SelectItem value="Inactive">Inactive</SelectItem>
+                            <SelectItem value="all">{t('employees.allStatuses')}</SelectItem>
+                            <SelectItem value="Active">{t('employees.active')}</SelectItem>
+                            <SelectItem value="Inactive">{t('employees.inactive')}</SelectItem>
                         </SelectContent>
                     </Select>
                     {canCreate && (
                         <Button onClick={handleAddNew} className="w-full md:w-auto mt-2 sm:mt-0">
                             <PlusCircle className="mr-2" />
-                            Add
+                            {t('employees.add')}
                         </Button>
                     )}
                  </div>
@@ -279,7 +279,7 @@ export default function EmployeeManagementClient({ initialEmployees, loggedInEmp
                     {totalPages > 1 && (
                         <div className="flex items-center justify-end space-x-2 py-4">
                             <span className="text-sm text-muted-foreground">
-                                Page {currentPage} of {totalPages}
+                                {t('employees.page')} {currentPage} {t('employees.of')} {totalPages}
                             </span>
                             <Button
                                 variant="outline"
@@ -287,7 +287,7 @@ export default function EmployeeManagementClient({ initialEmployees, loggedInEmp
                                 onClick={handlePreviousPage}
                                 disabled={currentPage === 1}
                             >
-                                Previous
+                                {t('employees.previous')}
                             </Button>
                             <Button
                                 variant="outline"
@@ -295,13 +295,13 @@ export default function EmployeeManagementClient({ initialEmployees, loggedInEmp
                                 onClick={handleNextPage}
                                 disabled={currentPage === totalPages}
                             >
-                                Next
+                                {t('employees.next')}
                             </Button>
                         </div>
                     )}
                   </>
                 ) : (
-                  <p className="text-center text-muted-foreground">You do not have permission to view employees.</p>
+                  <p className="text-center text-muted-foreground">{t('employees.noPermissionView')}</p>
                 )}
             </CardContent>
           </Card>

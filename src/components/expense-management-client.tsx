@@ -18,6 +18,7 @@ import { hasPermission } from '@/lib/permissions';
 import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Label } from './ui/label';
+import { useLanguage } from '@/contexts/language-context';
 
 const expenseCategories = ['Maintenance', 'Utilities', 'Marketing', 'Supplies', 'Legal', 'Other'];
 const expenseStatuses = ['Pending', 'Approved', 'Rejected', 'Needs Correction'];
@@ -36,6 +37,7 @@ export default function ExpenseManagementClient({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('Pending');
@@ -203,15 +205,15 @@ export default function ExpenseManagementClient({
       <main className="p-4 sm:p-6 lg:p-8 flex-grow pt-24 space-y-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div>
-                <h2 className="text-3xl font-bold tracking-tight">Expense Management</h2>
+                <h2 className="text-3xl font-bold tracking-tight">{t('expenses.title')}</h2>
                 <p className="text-muted-foreground mt-2">
-                    Submit, view, and manage property-related expenses.
+                    {t('expenses.description')}
                 </p>
             </div>
             {canCreate && (
                 <Button onClick={handleAddNew}>
                     <PlusCircle className="mr-2" />
-                    Add Expense
+                    {t('expenses.addExpense')}
                 </Button>
             )}
           </div>
@@ -221,16 +223,16 @@ export default function ExpenseManagementClient({
           <Card>
             <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
-                    <CardTitle>All Expense Requests</CardTitle>
+                    <CardTitle>{t('expenses.title')}</CardTitle>
                     <CardDescription>
-                        A log of all submitted expense requests.
+                        {t('expenses.description')}
                     </CardDescription>
                 </div>
                  <div className="flex flex-col sm:flex-row w-full md:w-auto gap-2">
                     <div className="relative flex-grow">
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input 
-                            placeholder="Search expenses..."
+                            placeholder={t('expenses.searchExpenses')}
                             value={searchQuery}
                             onChange={(e) => {
                                 setSearchQuery(e.target.value);
@@ -241,10 +243,10 @@ export default function ExpenseManagementClient({
                     </div>
                      <Select value={propertyFilter} onValueChange={(value) => { setPropertyFilter(value); setCurrentPage(1); }}>
                         <SelectTrigger className="w-full md:w-[180px]">
-                            <SelectValue placeholder="Filter by Property" />
+                            <SelectValue placeholder={t('expenses.filterProperty')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Properties</SelectItem>
+                            <SelectItem value="all">{t('expenses.allProperties')}</SelectItem>
                             {properties.map(p => (
                                 <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
                             ))}
@@ -252,13 +254,20 @@ export default function ExpenseManagementClient({
                     </Select>
                      <Select value={statusFilter} onValueChange={(value) => { setStatusFilter(value); setCurrentPage(1); }}>
                         <SelectTrigger className="w-full md:w-[200px]">
-                            <SelectValue placeholder="Filter by Status" />
+                            <SelectValue placeholder={t('expenses.filterStatus')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Statuses</SelectItem>
-                            {expenseStatuses.map(status => (
-                                <SelectItem key={status} value={status}>{status}</SelectItem>
-                            ))}
+                            <SelectItem value="all">{t('expenses.allStatuses')}</SelectItem>
+                            {expenseStatuses.map(status => {
+                                const statusKey = status === 'Pending' ? 'expenses.pending' :
+                                                 status === 'Approved' ? 'expenses.approved' :
+                                                 status === 'Rejected' ? 'expenses.rejected' :
+                                                 status === 'Needs Correction' ? 'expenses.needsCorrection' :
+                                                 status;
+                                return (
+                                    <SelectItem key={status} value={status}>{t(statusKey)}</SelectItem>
+                                );
+                            })}
                         </SelectContent>
                     </Select>
                  </div>
@@ -272,13 +281,13 @@ export default function ExpenseManagementClient({
                     onDelete={handleDelete}
                 />
               ) : (
-                <p className="text-center text-muted-foreground py-10">You do not have permission to view expenses.</p>
+                <p className="text-center text-muted-foreground py-10">{t('expenses.noPermission')}</p>
               )}
             </CardContent>
             {canRead && totalPages > 1 && (
                 <CardFooter className="flex items-center justify-between space-x-2 py-4">
                     <div className="flex items-center space-x-2">
-                        <Label htmlFor="rows" className="text-sm font-medium">Rows per page</Label>
+                        <Label htmlFor="rows" className="text-sm font-medium">{t('expenses.rowsPerPage')}</Label>
                         <Select
                             value={`${expensesPerPage}`}
                             onValueChange={(value) => {
@@ -300,7 +309,7 @@ export default function ExpenseManagementClient({
                     </div>
                     <div className="flex items-center space-x-2">
                         <span className="text-sm text-muted-foreground">
-                            Page {currentPage} of {totalPages}
+                            {t('expenses.page')} {currentPage} {t('expenses.of')} {totalPages}
                         </span>
                         <Button
                             variant="outline"
@@ -308,7 +317,7 @@ export default function ExpenseManagementClient({
                             onClick={handlePreviousPage}
                             disabled={currentPage === 1}
                         >
-                            Previous
+                            {t('expenses.previous')}
                         </Button>
                         <Button
                             variant="outline"
@@ -316,7 +325,7 @@ export default function ExpenseManagementClient({
                             onClick={handleNextPage}
                             disabled={currentPage === totalPages}
                         >
-                            Next
+                            {t('expenses.next')}
                         </Button>
                     </div>
                 </CardFooter>

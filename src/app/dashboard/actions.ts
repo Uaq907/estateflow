@@ -85,11 +85,6 @@ import { hasPermission } from '@/lib/permissions';
 import bcrypt from 'bcrypt';
 
 export async function logout(prevState: any, formData: FormData) {
-  const employee = await getEmployeeFromSession();
-  if (employee) {
-    await logActivity(employee.id, employee.name, 'LOGOUT_SUCCESS', 'Employee', employee.id);
-  }
-
   // To properly delete the cookie, all original attributes must match and expires must be in the past.
   const cookieStore = await cookies();
   cookieStore.set('session', '', {
@@ -1880,7 +1875,7 @@ export async function handleAddEvictionRequest(evictionData: {
 }
 
 export async function handleUpdateEvictionRequest(id: string, evictionData: Partial<{
-    status: string;
+    status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
     reason: string;
     description: string;
     dueAmount: number;

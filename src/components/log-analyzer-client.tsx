@@ -21,11 +21,28 @@ import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/language-context';
 
 function formatLogDetails(details: string | null | undefined, showAllVariables: boolean = false, t?: (key: string) => string) {
-    if (!details) {
-        return 'N/A';
+    if (!details || details === 'null' || details === 'undefined') {
+        return <span className="text-gray-400 italic text-xs">لا توجد تفاصيل</span>;
     }
+    
     try {
-        const parsed = JSON.parse(details);
+        // تنظيف البيانات قبل التحليل
+        const cleanDetails = typeof details === 'string' ? details.trim() : details;
+        if (cleanDetails === '' || cleanDetails === '{}' || cleanDetails === '[]') {
+            return <span className="text-gray-400 italic text-xs">لا توجد تفاصيل</span>;
+        }
+        
+        const parsed = JSON.parse(cleanDetails);
+        
+        // التحقق من أن parsed كائن صالح وليس array فارغ
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+            return <span className="text-gray-400 italic text-xs">لا توجد تفاصيل</span>;
+        }
+        
+        // التحقق من عدم وجود مفاتيح
+        if (Object.keys(parsed).length === 0) {
+            return <span className="text-gray-400 italic text-xs">لا توجد تفاصيل</span>;
+        }
         
         if (parsed.updatedFields) {
             const fields = parsed.updatedFields;
@@ -77,20 +94,32 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
             );
         }
 
-        // Generic JSON object formatting
+        // Generic JSON object formatting - عرض محسّن للتفاصيل
         return (
-             <ul className="list-disc pl-4 space-y-1">
+            <div className="space-y-1">
                 {Object.entries(parsed).map(([key, value], index) => (
-                    <li key={`${key}-${index}`} className="text-xs">
-                         <span className="font-semibold capitalize">{key.replace(/([A-Z])/g, ' $1')}:</span> {JSON.stringify(value)}
-                    </li>
+                    <div key={`${key}-${index}`} className="flex items-start gap-2">
+                        <span className="text-xs font-bold text-blue-700 min-w-[70px]">
+                            {key === 'email' ? '📧 البريد:' : 
+                             key === 'name' ? '👤 الاسم:' :
+                             key === 'amount' ? '💰 المبلغ:' :
+                             key === 'category' ? '📁 الفئة:' :
+                             key === 'dueDate' ? '📅 الاستحقاق:' :
+                             key === 'tenantId' ? '🏠 المستأجر:' :
+                             key.replace(/([A-Z])/g, ' $1') + ':'}
+                        </span>
+                        <span className="text-xs text-gray-800 font-medium break-all">
+                            {typeof value === 'string' ? value : JSON.stringify(value)}
+                        </span>
+                    </div>
                 ))}
-            </ul>
-        )
+            </div>
+        );
 
     } catch (e) {
-        // If it's not a JSON string, just return it as is.
-        return details;
+        // If it's not a JSON string or there's a parsing error, return a clean message
+        console.error('Error parsing log details:', e, 'Details:', details);
+        return <span className="text-gray-400 italic text-xs">تفاصيل غير صالحة</span>;
     }
 }
 

@@ -264,7 +264,7 @@ export default function ReportsClient({
       titleKey = 'reports.pendingChequesReport';
       descKey = 'reports.pendingChequesReportDesc';
     } else {
-      titleKey = `reports.${report.id.replace(/-([a-z])/g, (g) => g[1].toUpperCase())}`;
+      titleKey = `reports.${report.id.replace(/-([a-z])/g, (g: string) => g[1].toUpperCase())}`;
       descKey = `${titleKey}Desc`;
     }
     

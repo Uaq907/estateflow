@@ -75,3 +75,27 @@ html[lang="ar"] body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Calendar stability improvements */
+@layer components {
+  .calendar-container {
+    contain: layout style;
+  }
+  
+  /* Prevent layout shifts */
+  [data-calendar] {
+    min-height: 600px;
+  }
+  
+  /* Fix scrollbar width causing shifts */
+  .scrollarea-stable {
+    scrollbar-gutter: stable;
+  }
+  
+  /* Remove glow/shadow effects from calendar */
+  .calendar-container *,
+  [data-calendar] * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}

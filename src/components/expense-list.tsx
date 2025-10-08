@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
 import { Skeleton } from './ui/skeleton';
+import { useLanguage } from '@/contexts/language-context';
 
 interface ExpenseListProps {
   expenses: Expense[];
@@ -46,6 +47,7 @@ function ClientFormattedDate({ date }: { date: Date }) {
 
 
 export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDelete }: ExpenseListProps) {
+  const { t } = useLanguage();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null);
 
@@ -78,21 +80,21 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
 
   const canDelete = hasPermission(loggedInEmployee, 'expenses:delete');
 
-  const getActionDetails = (expense: Expense): { label: string; icon: React.ReactNode, isPrimary: boolean } => {
+  const getActionDetails = (expense: Expense, t: any): { label: string; icon: React.ReactNode, isPrimary: boolean } => {
     const isOwner = loggedInEmployee?.id === expense.employeeId;
     const canApprove = hasPermission(loggedInEmployee, 'expenses:approve');
 
     if (canApprove && expense.status === 'Pending') {
-        return { label: 'Review', icon: <FileWarning className="mr-2 h-4 w-4" />, isPrimary: true };
+        return { label: t('expenses.review'), icon: <FileWarning className="mr-2 h-4 w-4" />, isPrimary: true };
     }
     if (isOwner && expense.status === 'Needs Correction') {
-        return { label: 'Correct', icon: <Edit className="mr-2 h-4 w-4" />, isPrimary: true };
+        return { label: t('expenses.correct'), icon: <Edit className="mr-2 h-4 w-4" />, isPrimary: true };
     }
     if (isOwner && expense.status === 'Pending') {
-        return { label: 'Edit', icon: <Edit className="mr-2 h-4 w-4" />, isPrimary: false };
+        return { label: t('expenses.edit'), icon: <Edit className="mr-2 h-4 w-4" />, isPrimary: false };
     }
     // For Approved or Rejected statuses, the only action is to View.
-    return { label: 'View', icon: <Eye className="mr-2 h-4 w-4" />, isPrimary: false };
+    return { label: t('expenses.view'), icon: <Eye className="mr-2 h-4 w-4" />, isPrimary: false };
   }
 
   return (
@@ -101,21 +103,21 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Property / Unit</TableHead>
-              <TableHead>Submitted By</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Receipt</TableHead>
+              <TableHead>{t('expenses.propertyUnit')}</TableHead>
+              <TableHead>{t('expenses.submittedBy')}</TableHead>
+              <TableHead>{t('expenses.category')}</TableHead>
+              <TableHead>{t('expenses.amount')}</TableHead>
+              <TableHead>{t('expenses.status')}</TableHead>
+              <TableHead>{t('expenses.receipt')}</TableHead>
               <TableHead>
-                <span className="sr-only">Actions</span>
+                <span className="sr-only">{t('expenses.actions')}</span>
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {expenses.length > 0 ? (
               expenses.map((expense) => {
-                const actionDetails = getActionDetails(expense);
+                const actionDetails = getActionDetails(expense, t);
                 return (
                   <TableRow key={expense.id}>
                     <TableCell className="font-medium">
@@ -147,9 +149,15 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1">
-                        <Badge variant={getStatusBadgeVariant(expense.status)}>{expense.status}</Badge>
+                        <Badge variant={getStatusBadgeVariant(expense.status)}>
+                          {expense.status === 'Pending' ? t('expenses.pending') :
+                           expense.status === 'Approved' ? t('expenses.approved') :
+                           expense.status === 'Rejected' ? t('expenses.rejected') :
+                           expense.status === 'Needs Correction' ? t('expenses.needsCorrection') :
+                           expense.status}
+                        </Badge>
                         {expense.managerName && (
-                          <span className="text-xs text-muted-foreground">by {expense.managerName}</span>
+                          <span className="text-xs text-muted-foreground">{expense.managerName}</span>
                         )}
                       </div>
                     </TableCell>
@@ -157,11 +165,11 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
                         {expense.receiptUrl ? (
                             <Button asChild variant="outline" size="sm">
                                 <Link href={expense.receiptUrl} target="_blank">
-                                    <FileText className="mr-2 h-4 w-4" /> View
+                                    <FileText className="mr-2 h-4 w-4" /> {t('expenses.view')}
                                 </Link>
                             </Button>
                         ) : (
-                           <span className="text-xs text-muted-foreground">Not uploaded</span>
+                           <span className="text-xs text-muted-foreground">{t('expenses.notUploaded')}</span>
                         )}
                     </TableCell>
                     <TableCell>
@@ -186,7 +194,7 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
                             {canDelete && (
                               <DropdownMenuItem onClick={() => handleDeleteClick(expense)} className="text-destructive focus:text-destructive">
                                 <Trash2 className="mr-2 h-4 w-4" />
-                                <span>Delete</span>
+                                <span>{t('expenses.delete')}</span>
                               </DropdownMenuItem>
                             )}
                           </DropdownMenuContent>
@@ -199,7 +207,7 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
             ) : (
               <TableRow>
                 <TableCell colSpan={7} className="h-24 text-center">
-                  No expenses found.
+                  {t('expenses.noExpenses')}
                 </TableCell>
               </TableRow>
             )}
@@ -210,12 +218,12 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>This action cannot be undone. This will permanently delete the expense record.</AlertDialogDescription>
+            <AlertDialogTitle>{t('expenses.deleteConfirmTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('expenses.deleteConfirmDesc')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+            <AlertDialogCancel>{t('expenses.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive hover:bg-destructive/90">{t('expenses.delete')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

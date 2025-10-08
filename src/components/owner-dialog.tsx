@@ -144,7 +144,6 @@ export default function OwnerDialog({ isOpen, onOpenChange, owner, onSave, logge
             name: formData.get('name') as string,
             contact: formData.get('contact') as string || null,
             email: formData.get('email') as string || null,
-            phone: formData.get('contact') as string || null,
             nationality: formData.get('nationality') as string || null,
             emiratesId: formData.get('emiratesId') as string || null,
             emiratesIdUrl: null,

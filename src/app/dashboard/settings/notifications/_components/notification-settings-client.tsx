@@ -42,13 +42,17 @@ export default function NotificationSettingsClient({ loggedInEmployee }: { logge
             contract_expiring: true,
             contract_expiring_days: 90,
             payment_due: true,
-            payment_due_days: 7
+            payment_due_days: 7,
+            cheque_due: true,
+            cheque_due_days: 7,
+            contract_renewal: true,
+            contract_renewal_days: 90
         }
     );
     
     const telegramConfigured = loggedInEmployee?.telegramBotToken && loggedInEmployee?.telegramChannelId;
 
-    const handlePreferenceChange = (key: keyof NotificationPreferences, value: boolean) => {
+    const handlePreferenceChange = (key: keyof NotificationPreferences, value: boolean | number) => {
         setPreferences(prev => ({ ...prev, [key]: value }));
     };
 
@@ -126,7 +130,7 @@ export default function NotificationSettingsClient({ loggedInEmployee }: { logge
                                                                     type="number"
                                                                     min="1"
                                                                     max="365"
-                                                                    value={preferences[daysKey] ?? (type.key === 'payment_due' ? 7 : 90)}
+                                                                    value={typeof preferences[daysKey] === 'number' ? preferences[daysKey] : (type.key === 'payment_due' ? 7 : 90)}
                                                                     onChange={(e) => handlePreferenceChange(daysKey, parseInt(e.target.value) || 1)}
                                                                     className="w-16 h-7 text-center shrink-0 inline-block"
                                                                     lang="en"
@@ -138,7 +142,7 @@ export default function NotificationSettingsClient({ loggedInEmployee }: { logge
                                                 </div>
                                                 <Switch
                                                     id={type.key}
-                                                    checked={preferences[type.key] ?? false}
+                                                    checked={typeof preferences[type.key] === 'boolean' ? (preferences[type.key] as boolean) : false}
                                                     onCheckedChange={(checked) => handlePreferenceChange(type.key, checked)}
                                                     className="shrink-0"
                                                 />

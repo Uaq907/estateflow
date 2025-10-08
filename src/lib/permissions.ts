@@ -18,6 +18,7 @@ export const ALL_PERMISSIONS = [
 
   // Property Management
   'properties:read',
+  'properties:read-all', // General Manager: Can view all properties
   'properties:create',
   'properties:update',
   'properties:delete',
@@ -130,6 +131,7 @@ export const PERMISSION_GROUPS = {
     ],
     "Property Management": [
         'properties:read',
+        'properties:read-all',
         'properties:create',
         'properties:update',
         'properties:delete',
@@ -250,6 +252,54 @@ export function hasPermission(
   }
 
   return false;
+}
+
+/**
+ * Checks if employee is a General Manager (can view all properties)
+ */
+export function isGeneralManager(employee: Employee | null): boolean {
+  if (!employee) return false;
+  
+  // Admin is always general manager
+  if (employee.position?.toLowerCase().includes('administrator')) {
+    return true;
+  }
+  
+  // Check if has properties:read-all permission
+  return hasPermission(employee, 'properties:read-all');
+}
+
+/**
+ * Checks if employee is assigned to a specific property
+ */
+export function isPropertyManager(employee: Employee | null, propertyId: string, assignedPropertyIds: string[]): boolean {
+  if (!employee) return false;
+  
+  // General managers can manage all properties
+  if (isGeneralManager(employee)) return true;
+  
+  // Check if employee is assigned to this property
+  return assignedPropertyIds.includes(propertyId);
+}
+
+/**
+ * Filters properties based on employee's permissions
+ * Returns all properties if general manager, otherwise only assigned properties
+ */
+export function filterPropertiesByEmployee<T extends { id: string }>(
+  properties: T[],
+  employee: Employee | null,
+  assignedPropertyIds: string[]
+): T[] {
+  if (!employee) return [];
+  
+  // General managers see all properties
+  if (isGeneralManager(employee)) {
+    return properties;
+  }
+  
+  // Property managers see only their assigned properties
+  return properties.filter(p => assignedPropertyIds.includes(p.id));
 }
 
   

@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import PropertyList from '@/components/property-list';
 import { User } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
+import { useEffect } from 'react';
 
 interface DashboardHomeClientProps {
     loggedInEmployee: Employee;
@@ -21,6 +22,20 @@ export default function DashboardHomeClient({
     canViewAllProperties,
 }: DashboardHomeClientProps) {
   const { t } = useLanguage();
+  
+  // حفظ وقت تسجيل الدخول لإعادة تعيين الإشعارات
+  useEffect(() => {
+    const currentTime = new Date().getTime().toString();
+    const savedLoginTime = localStorage.getItem('lastLoginTime');
+    
+    // إذا لم يكن هناك وقت محفوظ أو مر وقت طويل (أكثر من ساعة)، سجل تسجيل دخول جديد
+    if (!savedLoginTime || (parseInt(currentTime) - parseInt(savedLoginTime) > 3600000)) {
+      localStorage.setItem('lastLoginTime', currentTime);
+      // إعادة تعيين حالة الإشعارات المقروءة عند تسجيل دخول جديد
+      localStorage.removeItem('notificationsMarkedAsRead');
+      localStorage.removeItem('notificationsReadTime');
+    }
+  }, []);
   
   return (
     <div className="flex flex-col min-h-screen">

@@ -68,11 +68,6 @@ export async function authenticate(
         const passwordsMatch = await bcrypt.compare(password, employee.password);
         if (passwordsMatch) {
             if (!employee.allowLogin) {
-                try {
-                    await logActivity(null, null, 'LOGIN_DISABLED', 'Employee', employee.id, { email });
-                } catch (logError) {
-                    console.error('Error logging activity:', logError);
-                }
                 return "Your login access has been disabled by an administrator.";
             }
             const sessionValue = await createSession(employee.id, 'employee');
@@ -85,6 +80,7 @@ export async function authenticate(
                 const forwarded = headersList.get('x-forwarded-for');
                 const ip = forwarded ? forwarded.split(',')[0] : headersList.get('x-real-ip') || 'Unknown';
                 
+                // تسجيل نجاح تسجيل الدخول فقط
                 await logActivity(employee.id, employee.name, 'LOGIN_SUCCESS', ip, employee.id, { email });
             } catch (logError) {
                 console.error('Error logging activity:', logError);
@@ -108,11 +104,6 @@ export async function authenticate(
         const passwordsMatch = await bcrypt.compare(password, tenant.password);
         if (passwordsMatch) {
             if (!tenant.allowLogin) {
-                try {
-                    await logActivity(null, null, 'LOGIN_DISABLED', 'Tenant', tenant.id, { email });
-                } catch (logError) {
-                    console.error('Error logging activity:', logError);
-                }
                 return "Your login access has been disabled by management.";
             }
             const sessionValue = await createSession(tenant.id, 'tenant');
@@ -125,6 +116,7 @@ export async function authenticate(
                 const forwarded = headersList.get('x-forwarded-for');
                 const ip = forwarded ? forwarded.split(',')[0] : headersList.get('x-real-ip') || 'Unknown';
                 
+                // تسجيل نجاح تسجيل الدخول فقط
                 await logActivity(tenant.id, tenant.name, 'LOGIN_SUCCESS', ip, tenant.id, { email });
             } catch (logError) {
                 console.error('Error logging activity:', logError);
@@ -133,12 +125,7 @@ export async function authenticate(
         }
     }
     
-    // 3. If both fail, return a generic error and log the failure
-    try {
-        await logActivity(null, null, 'LOGIN_FAILURE', undefined, undefined, { email });
-    } catch (logError) {
-        console.error('Error logging activity:', logError);
-    }
+    // 3. If both fail, return a generic error (without logging)
     return 'Invalid email or password.';
 
   } catch (error: any) {
@@ -147,21 +134,12 @@ export async function authenticate(
     }
     
     console.error('Authentication error:', error);
-    
-    // Try to log the error, but don't fail if logging fails
-    try {
-      await logActivity(null, null, 'LOGIN_ERROR', undefined, undefined, { email, error: error.message });
-    } catch (logError) {
-      console.error('Error logging activity:', logError);
-    }
-    
     return `An unexpected error occurred: ${error.message}`;
   }
 }
 
 export async function createAdminAction(prevState: any, formData: FormData) {
     try {
-        await logActivity(null, null, 'DB_SETUP_START');
         // This will create the DB if it doesn't exist and run migrations.
         await setupDatabase(); 
         
@@ -203,12 +181,10 @@ export async function createAdminAction(prevState: any, formData: FormData) {
 
         await addEmployee(adminData as any);
 
-        await logActivity(null, null, 'ADMIN_ACCOUNT_CREATED');
         revalidatePath('/login');
         return { success: true, message: 'Admin account created successfully. You can now log in.' };
     } catch (error: any) {
         console.error('Failed to create admin:', error);
-        await logActivity(null, null, 'DB_SETUP_FAILURE', undefined, undefined, { error: error.message });
         return { success: false, message: `An unexpected error occurred while setting up the admin: ${error.message}` };
     }
 }
