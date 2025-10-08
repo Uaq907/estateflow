@@ -33,13 +33,13 @@ export async function getSession(): Promise<SessionPayload | null> {
         const payload: SessionPayload = JSON.parse(sessionCookie);
         if (new Date(payload.expires) < new Date()) {
             // Cookie has expired
-            cookies().delete('session');
+            (await cookies()).delete('session');
             return null;
         }
         return payload;
     } catch {
         // Invalid cookie, delete it
-        cookies().delete('session');
+        (await cookies()).delete('session');
         return null;
     }
 }

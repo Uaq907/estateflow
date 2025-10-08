@@ -73,12 +73,15 @@ async function constraintExists(conn: mysql.Connection, tableName: string, const
 
 
 export async function getConnection() {
-  if (connection && connection.connection.stream.readable) {
-    // if (!migrationsHaveRun) {
-    //     await runMigrationsInternal();
-    //     migrationsHaveRun = true;
-    // }
-    return connection;
+  if (connection) {
+    try {
+      // Test if connection is still alive
+      await connection.ping();
+      return connection;
+    } catch {
+      // Connection is dead, will create a new one below
+      connection = null as any;
+    }
   }
   
   try {
