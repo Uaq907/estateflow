@@ -58,13 +58,12 @@ export function AppHeader({ loggedInEmployee }: { loggedInEmployee: Employee | n
   const canViewCalendar = hasPermission(loggedInEmployee, 'dashboard:view-calendar');
   const canManageSettings = hasPermission(loggedInEmployee, 'settings:manage');
   const canViewLogs = hasPermission(loggedInEmployee, 'settings:view-logs');
-  const canManageNotifications = hasPermission(loggedInEmployee, 'settings:manage-notifications');
 
 
   // Determine if the dropdown triggers should be shown
   const canViewManagementDropdown = canReadEmployees || canReadProperties || canReadTenants || canReadAssets || canBulkImport || canGenerateReports || canViewOverview;
   const canViewFinancialsDropdown = canReadExpenses || canReadCheques || canReadLeases;
-  const canViewSettingsDropdown = canManageSettings || canViewLogs || canManageNotifications;
+  const canViewSettingsDropdown = canManageSettings || canViewLogs;
 
   return (
     <>
@@ -208,7 +207,6 @@ export function AppHeader({ loggedInEmployee }: { loggedInEmployee: Employee | n
                         {canManageSettings && <DropdownMenuItem asChild><Link href="/dashboard/settings/unit-configurations"><Settings className="mr-2" />{t('settings.unitConfigurations')}</Link></DropdownMenuItem>}
                         {canViewLogs && <DropdownMenuItem asChild><Link href="/dashboard/settings/log-analyzer"><ListOrdered className="mr-2" />{t('settings.logAnalyzer')}</Link></DropdownMenuItem>}
                         {canManageSettings && <DropdownMenuItem asChild><Link href="/dashboard/settings/reports"><BarChart3 className="mr-2" />{t('settings.reports')}</Link></DropdownMenuItem>}
-                        {canManageNotifications && <DropdownMenuItem asChild><Link href="/dashboard/settings/notifications"><Bell className="mr-2" />{t('settings.notifications')}</Link></DropdownMenuItem>}
                       </DropdownMenuContent>
                     </DropdownMenu>
                  )}
