@@ -21,6 +21,7 @@ import { addUnit, getUnitConfigurations, updateUnit } from '@/lib/db';
 import { useFormStatus } from 'react-dom';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { ServerCrash } from 'lucide-react';
+import { useLanguage } from '@/contexts/language-context';
 
 interface UnitSheetProps {
   isOpen: boolean;
@@ -48,11 +49,11 @@ const unitTypeOptions: string[] = ['Residential', 'Commercial', 'Office', 'Retai
 const unitStatusOptions = ['Available', 'Under Maintenance'];
 const sizeUnits = ['sqft', 'sqm'];
 
-function SubmitButton() {
+function SubmitButton({ t }: { t: any }) {
     const { pending } = useFormStatus();
     return (
         <Button type="submit" disabled={pending}>
-            {pending ? 'Saving...' : 'Save Changes'}
+            {pending ? t('unitSheet.saving') : t('unitSheet.saveChanges')}
         </Button>
     )
 }
@@ -65,7 +66,7 @@ export default function UnitSheet({
   propertyType,
   onSave,
 }: UnitSheetProps) {
-  
+  const { t } = useLanguage();
   const [allConfigurations, setAllConfigurations] = useState<UnitConfiguration[]>([]);
   const [selectedUnitType, setSelectedUnitType] = useState<string>(unit?.type || defaultValues.type);
   const formRef = useRef<HTMLFormElement>(null);
@@ -121,10 +122,10 @@ export default function UnitSheet({
     return allConfigurations.filter(config => config.type === selectedUnitType);
   }, [allConfigurations, selectedUnitType]);
 
-  const sheetTitle = unit ? 'Edit Unit' : 'Add New Unit';
+  const sheetTitle = unit ? t('unitSheet.editTitle') : t('unitSheet.addTitle');
   const sheetDescription = unit
-    ? "Update the unit's details below."
-    : 'Fill in the form to add a new unit to the property.';
+    ? t('unitSheet.editDescription')
+    : t('unitSheet.addDescription');
     
   const currentValues = unit ? unit : defaultValues;
   const isRented = currentValues.status === 'Rented';
@@ -141,21 +142,21 @@ export default function UnitSheet({
             <div className="flex-1 py-6 space-y-4 overflow-y-auto pr-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="unitNumber">Unit Number / Name</Label>
-                        <Input id="unitNumber" name="unitNumber" placeholder="e.g., A-101, Plot 5" defaultValue={currentValues.unitNumber} required />
+                        <Label htmlFor="unitNumber">{t('unitSheet.unitNumber')}</Label>
+                        <Input id="unitNumber" name="unitNumber" placeholder={t('unitSheet.unitNumberPlaceholder')} defaultValue={currentValues.unitNumber} required />
                     </div>
 
                     {propertyType === 'Building' && (
                         <div className="space-y-2">
-                            <Label htmlFor="floor">Floor</Label>
-                            <Input id="floor" name="floor" type="number" placeholder="e.g., 0 for Ground Floor" defaultValue={currentValues.floor ?? ''} required />
+                            <Label htmlFor="floor">{t('unitSheet.floor')}</Label>
+                            <Input id="floor" name="floor" type="number" placeholder={t('unitSheet.floorPlaceholder')} defaultValue={currentValues.floor ?? ''} required />
                         </div>
                     )}
 
                     <div className="space-y-2">
-                        <Label htmlFor="type">Unit Type</Label>
+                        <Label htmlFor="type">{t('unitSheet.type')}</Label>
                         <Select name="type" value={selectedUnitType} onValueChange={setSelectedUnitType}>
-                            <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder={t('unitSheet.selectType')} /></SelectTrigger>
                             <SelectContent>
                                 {unitTypeOptions.map(type => <SelectItem key={type} value={type}>{type}</SelectItem>)}
                             </SelectContent>
@@ -163,9 +164,9 @@ export default function UnitSheet({
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="configuration">Configuration</Label>
+                        <Label htmlFor="configuration">{t('unitSheet.configuration')}</Label>
                         <Select name="configuration" defaultValue={currentValues.configuration ?? undefined} disabled={filteredConfigurations.length === 0}>
-                            <SelectTrigger><SelectValue placeholder="Select configuration" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder={t('unitSheet.selectConfiguration')} /></SelectTrigger>
                             <SelectContent>
                                 {filteredConfigurations.map(config => <SelectItem key={config.id} value={config.name}>{config.name}</SelectItem>)}
                             </SelectContent>
@@ -173,33 +174,33 @@ export default function UnitSheet({
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="status">Status</Label>
+                        <Label htmlFor="status">{t('unitSheet.status')}</Label>
                         {isRented && <input type="hidden" name="status" value="Rented" />}
                         <Select name="status" defaultValue={currentValues.status} disabled={isRented}>
-                            <SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder={t('unitSheet.selectStatus')} /></SelectTrigger>
                             <SelectContent>
                                 {isRented && (
-                                    <SelectItem value="Rented">Rented</SelectItem>
+                                    <SelectItem value="Rented">{t('propertyDetail.rented')}</SelectItem>
                                 )}
                                 {unitStatusOptions.map(status => <SelectItem key={status} value={status}>{status}</SelectItem>)}
                             </SelectContent>
                         </Select>
-                        {isRented && <p className="text-xs text-muted-foreground">Status cannot be changed for a rented unit. End the lease to make it available.</p>}
+                        {isRented && <p className="text-xs text-muted-foreground">{t('unitSheet.cannotEdit')}</p>}
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="price">Price (AED)</Label>
+                        <Label htmlFor="price">{t('unitSheet.price')} (AED)</Label>
                         <Input id="price" name="price" type="number" placeholder="100000" defaultValue={currentValues.price ?? ''} />
                     </div>
                 </div>
                 
                 <div className="flex gap-2 items-end">
                     <div className="space-y-2 flex-grow">
-                        <Label htmlFor="size">Size</Label>
+                        <Label htmlFor="size">{t('unitSheet.size')}</Label>
                         <Input id="size" name="size" type="number" placeholder="800" defaultValue={currentValues.size ?? ''} />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="sizeUnit">Unit</Label>
+                        <Label htmlFor="sizeUnit">{t('unitSheet.sizeUnit')}</Label>
                             <Select name="sizeUnit" defaultValue={currentValues.sizeUnit ?? 'sqft'}>
                             <SelectTrigger className="w-[100px]"><SelectValue /></SelectTrigger>
                             <SelectContent>
@@ -210,13 +211,13 @@ export default function UnitSheet({
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="accountNumber">Account Number</Label>
-                    <Input id="accountNumber" name="accountNumber" placeholder="Unit-specific account number" defaultValue={currentValues.accountNumber ?? ''} />
+                    <Label htmlFor="accountNumber">{t('unitSheet.accountNumber')}</Label>
+                    <Input id="accountNumber" name="accountNumber" placeholder={t('unitSheet.accountNumberPlaceholder')} defaultValue={currentValues.accountNumber ?? ''} />
                 </div>
 
                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea id="description" name="description" placeholder="A brief description of the unit..." defaultValue={currentValues.description ?? ''} />
+                    <Label htmlFor="description">{t('unitSheet.description')}</Label>
+                    <Textarea id="description" name="description" placeholder={t('unitSheet.descriptionPlaceholder')} defaultValue={currentValues.description ?? ''} />
                 </div>
                  {!state.success && state.message && (
                     <Alert variant="destructive">
@@ -228,9 +229,9 @@ export default function UnitSheet({
             </div>
             <SheetFooter className="mt-auto pt-6">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                  Cancel
+                  {t('unitSheet.cancel')}
                 </Button>
-              <SubmitButton />
+              <SubmitButton t={t} />
             </SheetFooter>
           </form>
       </SheetContent>

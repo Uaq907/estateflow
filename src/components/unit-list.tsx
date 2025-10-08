@@ -41,6 +41,7 @@ import type { Unit } from '@/lib/types';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useLanguage } from '@/contexts/language-context';
 
 interface UnitListProps {
   units: Unit[];
@@ -51,6 +52,7 @@ interface UnitListProps {
 }
 
 export default function UnitList({ units, propertyType, onEdit, onDelete, onAssignTenant }: UnitListProps) {
+  const { t } = useLanguage();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [unitToDelete, setUnitToDelete] = useState<Unit | null>(null);
   const router = useRouter();
@@ -84,16 +86,16 @@ export default function UnitList({ units, propertyType, onEdit, onDelete, onAssi
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Unit</TableHead>
-              <TableHead>Account No.</TableHead>
-              <TableHead className="hidden sm:table-cell">Type</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="hidden md:table-cell">Occupant</TableHead>
-              <TableHead className="hidden lg:table-cell">Lease End</TableHead>
-              <TableHead className="hidden sm:table-cell">Price</TableHead>
+              <TableHead>{t('unitList.unit')}</TableHead>
+              <TableHead>{t('unitList.accountNo')}</TableHead>
+              <TableHead className="hidden sm:table-cell">{t('unitList.type')}</TableHead>
+              <TableHead>{t('unitList.status')}</TableHead>
+              <TableHead className="hidden md:table-cell">{t('unitList.occupant')}</TableHead>
+              <TableHead className="hidden lg:table-cell">{t('unitList.leaseEnd')}</TableHead>
+              <TableHead className="hidden sm:table-cell">{t('unitList.price')}</TableHead>
               {(onEdit || onDelete) && (
                 <TableHead>
-                  <span className="sr-only">Actions</span>
+                  <span className="sr-only">{t('unitList.actions')}</span>
                 </TableHead>
               )}
             </TableRow>
@@ -105,7 +107,7 @@ export default function UnitList({ units, propertyType, onEdit, onDelete, onAssi
                   <TableCell>
                     <div className="font-medium">{unit.unitNumber}</div>
                     {unit.floor !== null && unit.floor !== undefined && (
-                        <div className="text-sm text-muted-foreground">Floor: {unit.floor === 0 ? 'Ground' : unit.floor}</div>
+                        <div className="text-sm text-muted-foreground">{t('unitList.floor')}: {unit.floor === 0 ? t('unitList.ground') : unit.floor}</div>
                     )}
                     <div className="text-xs text-muted-foreground">ID: {unit.id}</div>
                   </TableCell>
@@ -135,7 +137,7 @@ export default function UnitList({ units, propertyType, onEdit, onDelete, onAssi
                                         <AlertCircle className="h-4 w-4 text-yellow-500" />
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>Pending payment extension request</p>
+                                        <p>{t('unitList.pendingExtension')}</p>
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
@@ -143,7 +145,7 @@ export default function UnitList({ units, propertyType, onEdit, onDelete, onAssi
                     </div>
                     {unit.nextPaymentDueDate && (
                         <div className="text-xs text-muted-foreground">
-                            Next payment: {format(new Date(unit.nextPaymentDueDate), 'dd/MM/yyyy')}
+                            {t('unitList.nextPayment')}: {format(new Date(unit.nextPaymentDueDate), 'dd/MM/yyyy')}
                         </div>
                     )}
                   </TableCell>
@@ -154,7 +156,7 @@ export default function UnitList({ units, propertyType, onEdit, onDelete, onAssi
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
+                            <span className="sr-only">{t('unitList.openMenu')}</span>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -162,14 +164,14 @@ export default function UnitList({ units, propertyType, onEdit, onDelete, onAssi
                            {onAssignTenant && (unit.status === 'Available' || unit.status === 'متاح') && (
                                 <DropdownMenuItem onClick={() => onAssignTenant(unit)}>
                                     <UserPlus className="mr-2 h-4 w-4" />
-                                    <span>Assign Tenant</span>
+                                    <span>{t('unitList.assignTenant')}</span>
                                 </DropdownMenuItem>
                            )}
                            {(unit.status === 'Rented' || unit.status === 'مشغول') && unit.activeLeaseId && (
                             <>
                                 <DropdownMenuItem onClick={() => handleViewLease(unit.activeLeaseId!)}>
                                     <FileText className="mr-2 h-4 w-4" />
-                                    <span>View Lease</span>
+                                    <span>{t('unitList.viewLease')}</span>
                                 </DropdownMenuItem>
                             </>
                            )}
@@ -177,13 +179,13 @@ export default function UnitList({ units, propertyType, onEdit, onDelete, onAssi
                            {onEdit && (
                             <DropdownMenuItem onClick={() => onEdit(unit)}>
                               <Edit className="mr-2 h-4 w-4" />
-                              <span>Edit Unit</span>
+                              <span>{t('unitList.editUnit')}</span>
                             </DropdownMenuItem>
                            )}
                            {onDelete && (
                             <DropdownMenuItem onClick={() => handleDeleteClick(unit)} className="text-destructive focus:text-destructive">
                               <Trash2 className="mr-2 h-4 w-4" />
-                              <span>Delete Unit</span>
+                              <span>{t('unitList.deleteUnit')}</span>
                             </DropdownMenuItem>
                           )}
                         </DropdownMenuContent>
@@ -195,7 +197,7 @@ export default function UnitList({ units, propertyType, onEdit, onDelete, onAssi
             ) : (
               <TableRow>
                 <TableCell colSpan={8} className="h-24 text-center">
-                  No units found for the selected filters.
+                  {t('unitList.noUnits')}
                 </TableCell>
               </TableRow>
             )}
@@ -206,16 +208,15 @@ export default function UnitList({ units, propertyType, onEdit, onDelete, onAssi
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>{t('unitList.deleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the unit{' '}
-              <span className="font-semibold">{unitToDelete?.unitNumber}</span>. This action cannot be undone.
+              {t('unitList.deleteDescription')} <span className="font-semibold">{unitToDelete?.unitNumber}</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('unitList.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className="bg-destructive hover:bg-destructive/90">
-              Delete
+              {t('unitList.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
