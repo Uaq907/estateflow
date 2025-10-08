@@ -19,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Switch } from './ui/switch';
 import { Separator } from './ui/separator';
+import { useLanguage } from '@/contexts/language-context';
 
 interface MaintenanceContractDialogProps {
   isOpen: boolean;
@@ -40,6 +41,7 @@ const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 export default function MaintenanceContractDialog({ isOpen, onOpenChange, contract, properties, onSubmit, loggedInEmployee }: MaintenanceContractDialogProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const { toast } = useToast();
+  const { t } = useLanguage();
   
   const [startDate, setStartDate] = useState<Date | undefined>(contract?.startDate ? new Date(contract.startDate) : undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(contract?.endDate ? new Date(contract.endDate) : undefined);
@@ -111,33 +113,33 @@ export default function MaintenanceContractDialog({ isOpen, onOpenChange, contra
       <DialogContent className="sm:max-w-xl">
         <form ref={formRef} onSubmit={handleFormSubmit}>
           <DialogHeader>
-            <DialogTitle>{contract ? 'Edit' : 'Add New'} Contract</DialogTitle>
-            <DialogDescription>Fill in the details for the maintenance contract.</DialogDescription>
+            <DialogTitle>{contract ? t('maintenanceDialog.editTitle') : t('maintenanceDialog.addTitle')}</DialogTitle>
+            <DialogDescription>{t('maintenanceDialog.description')}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2 col-span-2">
-                <Label htmlFor="serviceType">Service Type</Label>
+                <Label htmlFor="serviceType">{t('maintenanceDialog.serviceType')}</Label>
                 <Select name="serviceType" defaultValue={contract?.serviceType}>
-                    <SelectTrigger><SelectValue placeholder="Select service type" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder={t('maintenanceDialog.selectServiceType')} /></SelectTrigger>
                     <SelectContent>
                         {serviceCategories.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                     </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2 col-span-2">
-                <Label htmlFor="vendorName">Vendor Name</Label>
-                <Input id="vendorName" name="vendorName" defaultValue={contract?.vendorName} placeholder="e.g., Global Elevators Inc." required />
+                <Label htmlFor="vendorName">{t('maintenanceDialog.vendorName')}</Label>
+                <Input id="vendorName" name="vendorName" defaultValue={contract?.vendorName} placeholder={t('maintenanceDialog.vendorPlaceholder')} required />
               </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="startDate">Start Date</Label>
+                <Label htmlFor="startDate">{t('maintenanceDialog.startDate')}</Label>
                 <DatePicker name="startDate" value={startDate} onSelect={setStartDate} required/>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="endDate">End Date</Label>
+                <Label htmlFor="endDate">{t('maintenanceDialog.endDate')}</Label>
                 <DatePicker name="endDate" value={endDate} onSelect={setEndDate} required/>
               </div>
             </div>
@@ -146,22 +148,22 @@ export default function MaintenanceContractDialog({ isOpen, onOpenChange, contra
             <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                     <Switch id="isVat" name="isVat" checked={isVat} onCheckedChange={setIsVat} />
-                    <Label htmlFor="isVat">Contract is subject to VAT (5%)</Label>
+                    <Label htmlFor="isVat">{t('maintenanceDialog.vatSubject')}</Label>
                 </div>
                 
                 <div className="space-y-2">
-                    <Label htmlFor="baseAmount">Base Amount (AED)</Label>
+                    <Label htmlFor="baseAmount">{t('maintenanceDialog.baseAmount')}</Label>
                     <Input id="baseAmount" name="baseAmount" type="number" step="0.01" value={baseAmount} onChange={e => setBaseAmount(e.target.value)} required />
                 </div>
 
                 {isVat && (
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label>Tax (5%)</Label>
+                            <Label>{t('maintenanceDialog.tax')}</Label>
                             <Input value={taxAmount.toFixed(2)} disabled className="bg-muted"/>
                         </div>
                          <div className="space-y-2">
-                            <Label>Grand Total</Label>
+                            <Label>{t('maintenanceDialog.grandTotal')}</Label>
                             <Input value={grandTotal.toFixed(2)} disabled className="bg-muted font-bold"/>
                         </div>
                     </div>
@@ -172,25 +174,25 @@ export default function MaintenanceContractDialog({ isOpen, onOpenChange, contra
 
              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <Label htmlFor="paymentSchedule">Payment Schedule</Label>
+                    <Label htmlFor="paymentSchedule">{t('maintenanceDialog.paymentSchedule')}</Label>
                     <Select name="paymentSchedule" defaultValue={contract?.paymentSchedule} required>
-                        <SelectTrigger><SelectValue placeholder="Select schedule" /></SelectTrigger>
+                        <SelectTrigger><SelectValue placeholder={t('maintenanceDialog.selectSchedule')} /></SelectTrigger>
                         <SelectContent>
                             {paymentSchedules.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                         </SelectContent>
                     </Select>
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="nextDueDate">Next Due Date</Label>
+                    <Label htmlFor="nextDueDate">{t('maintenanceDialog.nextDueDate')}</Label>
                      <DatePicker name="nextDueDate" value={nextDueDate} onSelect={setNextDueDate}/>
                 </div>
             </div>
 
              <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
-                    <Label htmlFor="propertyId">Property</Label>
+                    <Label htmlFor="propertyId">{t('maintenanceDialog.property')}</Label>
                     <Select name="propertyId" defaultValue={contract?.propertyId} required>
-                    <SelectTrigger><SelectValue placeholder="Select a property" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder={t('maintenanceDialog.selectProperty')} /></SelectTrigger>
                     <SelectContent>
                         {properties.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
                     </SelectContent>
@@ -199,21 +201,21 @@ export default function MaintenanceContractDialog({ isOpen, onOpenChange, contra
             </div>
 
              <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
-              <Textarea id="notes" name="notes" defaultValue={contract?.notes ?? ''} placeholder="Add any relevant notes here..." />
+              <Label htmlFor="notes">{t('maintenanceDialog.notes')}</Label>
+              <Textarea id="notes" name="notes" defaultValue={contract?.notes ?? ''} placeholder={t('maintenanceDialog.notesPlaceholder')} />
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="contractFile">Upload Contract</Label>
+                <Label htmlFor="contractFile">{t('maintenanceDialog.uploadContract')}</Label>
                 <Input id="contractFile" name="contractFile" type="file" disabled={!canUpdateDocuments} onChange={handleFileChange}/>
                 <div className="text-xs text-muted-foreground mt-1 flex justify-between">
-                    <span>Max file size: {MAX_FILE_SIZE_MB}MB.</span>
-                    {selectedFileSize && <span>Selected: {formatFileSize(selectedFileSize)}</span>}
+                    <span>{t('maintenanceDialog.maxFileSize', { size: MAX_FILE_SIZE_MB })}</span>
+                    {selectedFileSize && <span>{t('maintenanceDialog.selected')}: {formatFileSize(selectedFileSize)}</span>}
                 </div>
                 {fileError && (
                     <Alert variant="destructive" className="mt-2">
                         <ServerCrash className="h-4 w-4" />
-                        <AlertTitle>File Error</AlertTitle>
+                        <AlertTitle>{t('maintenanceDialog.fileError')}</AlertTitle>
                         <AlertDescription>{fileError}</AlertDescription>
                     </Alert>
                 )}
@@ -221,7 +223,7 @@ export default function MaintenanceContractDialog({ isOpen, onOpenChange, contra
                     <div className="text-sm text-muted-foreground mt-2">
                         <Link href={contract.contractUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
                             <FileText className="h-4 w-4" />
-                            View Current Document
+                            {t('maintenanceDialog.viewCurrent')}
                         </Link>
                     </div>
                 )}
@@ -229,8 +231,8 @@ export default function MaintenanceContractDialog({ isOpen, onOpenChange, contra
 
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit">Save Contract</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('maintenanceDialog.cancel')}</Button>
+            <Button type="submit">{t('maintenanceDialog.save')}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

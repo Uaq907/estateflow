@@ -75,18 +75,18 @@ export default function AssetList({ assets, onEdit, onDelete }: AssetListProps) 
 
   return (
     <>
-      <div className="rounded-md border">
+      <div className="rounded-md border" dir="rtl">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[50px]"></TableHead>
-              <TableHead>{t('assets.asset')}</TableHead>
-              <TableHead>{t('assets.id')}</TableHead>
-              <TableHead>{t('assets.location')}</TableHead>
-              <TableHead>{t('assets.category')}</TableHead>
-              <TableHead>{t('assets.status')}</TableHead>
-              <TableHead>{t('assets.warranty')}</TableHead>
-              <TableHead><span className="sr-only">{t('assets.actions')}</span></TableHead>
+              <TableHead className="w-[50px] text-right"></TableHead>
+              <TableHead className="text-right">{t('assets.asset')}</TableHead>
+              <TableHead className="text-right">{t('assets.id')}</TableHead>
+              <TableHead className="text-right">{t('assets.location')}</TableHead>
+              <TableHead className="text-right">{t('assets.category')}</TableHead>
+              <TableHead className="text-right">{t('assets.status')}</TableHead>
+              <TableHead className="text-right">{t('assets.warranty')}</TableHead>
+              <TableHead className="text-right"><span className="sr-only">{t('assets.actions')}</span></TableHead>
             </TableRow>
           </TableHeader>
           
@@ -95,7 +95,7 @@ export default function AssetList({ assets, onEdit, onDelete }: AssetListProps) 
                 <Collapsible asChild key={asset.id}>
                     <TableBody>
                         <TableRow>
-                            <TableCell>
+                            <TableCell className="text-right">
                                 <CollapsibleTrigger asChild>
                                     <Button variant="ghost" size="sm" className="w-9 p-0">
                                         <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
@@ -103,20 +103,20 @@ export default function AssetList({ assets, onEdit, onDelete }: AssetListProps) 
                                     </Button>
                                 </CollapsibleTrigger>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="text-right">
                                 <div className="font-medium">{asset.name}</div>
                                 <div className="text-sm text-muted-foreground">{asset.manufacturer} {asset.modelNumber}</div>
                             </TableCell>
-                            <TableCell className="text-xs text-muted-foreground">{asset.id}</TableCell>
-                            <TableCell>
+                            <TableCell className="text-xs text-muted-foreground text-right">{asset.id}</TableCell>
+                            <TableCell className="text-right">
                                 <div>{asset.propertyName}</div>
                                 {asset.unitNumber && <div className="text-sm text-muted-foreground">{t('assets.unit')}: {asset.unitNumber}</div>}
                             </TableCell>
-                            <TableCell>{asset.category}</TableCell>
-                            <TableCell>
+                            <TableCell className="text-right">{asset.category}</TableCell>
+                            <TableCell className="text-right">
                                 <Badge variant={getStatusBadgeVariant(asset.status)}>{asset.status}</Badge>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="text-right">
                                 {getWarrantyBadge(asset.warrantyExpiryDate)}
                             </TableCell>
                             <TableCell className="text-right">
@@ -124,14 +124,14 @@ export default function AssetList({ assets, onEdit, onDelete }: AssetListProps) 
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    {onEdit && <DropdownMenuItem onClick={() => onEdit(asset)}><Edit className="mr-2 h-4 w-4" />{t('assets.edit')}</DropdownMenuItem>}
+                                <DropdownMenuContent align="start">
+                                    {onEdit && <DropdownMenuItem onClick={() => onEdit(asset)}>{t('assets.edit')}<Edit className="ml-2 h-4 w-4" /></DropdownMenuItem>}
                                     {asset.invoiceUrl && (
                                         <DropdownMenuItem asChild>
-                                            <Link href={asset.invoiceUrl} target="_blank"><FileText className="mr-2 h-4 w-4" />{t('assets.viewInvoice')}</Link>
+                                            <Link href={asset.invoiceUrl} target="_blank">{t('assets.viewInvoice')}<FileText className="ml-2 h-4 w-4" /></Link>
                                         </DropdownMenuItem>
                                     )}
-                                    {onDelete && <DropdownMenuItem onClick={() => handleDeleteClick(asset)} className="text-destructive focus:text-destructive"><Trash2 className="mr-2 h-4 w-4" />{t('assets.delete')}</DropdownMenuItem>}
+                                    {onDelete && <DropdownMenuItem onClick={() => handleDeleteClick(asset)} className="text-destructive focus:text-destructive">{t('assets.delete')}<Trash2 className="ml-2 h-4 w-4" /></DropdownMenuItem>}
                                 </DropdownMenuContent>
                                 </DropdownMenu>
                             </TableCell>
@@ -172,7 +172,7 @@ export default function AssetList({ assets, onEdit, onDelete }: AssetListProps) 
             ) : (
              <TableBody>
               <TableRow>
-                <TableCell colSpan={8} className="h-24 text-center">
+                <TableCell colSpan={8} className="h-24 text-right">
                   {t('assets.noAssetsFound')}
                 </TableCell>
               </TableRow>

@@ -60,7 +60,7 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
 
   return (
     <>
-      <div className="rounded-md border">
+      <div className="rounded-md border" dir="rtl">
         <Table>
           <TableHeader>
             <TableRow>
@@ -81,18 +81,18 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
               employees.map((employee) => (
                 <TableRow key={employee.id}>
                   <TableCell className="text-right">
-                    <div className="flex items-center gap-3 justify-end">
-                      <div className="text-right">
-                        <div className="font-medium">{employee.name}</div>
-                        <div className="text-sm text-muted-foreground md:hidden">{employee.position}</div>
-                        <div className="text-sm text-muted-foreground">{employee.email}</div>
-                      </div>
+                    <div className="flex items-center gap-3">
                       <Avatar>
                          <AvatarImage src={employee.profilePictureUrl ?? undefined} alt={employee.name} />
                          <AvatarFallback>
                            <User/>
                          </AvatarFallback>
                       </Avatar>
+                      <div className="text-right">
+                        <div className="font-medium">{employee.name}</div>
+                        <div className="text-sm text-muted-foreground md:hidden">{employee.position}</div>
+                        <div className="text-sm text-muted-foreground">{employee.email}</div>
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell className="hidden lg:table-cell text-xs text-muted-foreground text-right">{employee.id}</TableCell>
@@ -112,17 +112,17 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="start">
                           {onEdit && (
                             <DropdownMenuItem onClick={() => onEdit(employee)}>
-                              <Edit className="mr-2 h-4 w-4" />
                               <span>Edit</span>
+                              <Edit className="ml-2 h-4 w-4" />
                             </DropdownMenuItem>
                           )}
                           {onDelete && (
                             <DropdownMenuItem onClick={() => handleDeleteClick(employee)} className="text-destructive focus:text-destructive">
-                              <Trash2 className="mr-2 h-4 w-4" />
                               <span>Delete</span>
+                              <Trash2 className="ml-2 h-4 w-4" />
                             </DropdownMenuItem>
                           )}
                         </DropdownMenuContent>
@@ -133,7 +133,7 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
+                <TableCell colSpan={6} className="h-24 text-right">
                   No employees found.
                 </TableCell>
               </TableRow>
