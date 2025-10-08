@@ -156,6 +156,17 @@ export default function EmployeeSheet({
         return;
     }
     const formData = new FormData(event.currentTarget);
+    
+    // حذف جميع الصلاحيات الموجودة من FormData
+    formData.delete('permissions');
+    
+    // إضافة الصلاحيات المفعلة فقط من permissionsState
+    Object.entries(permissionsState).forEach(([permission, isEnabled]) => {
+      if (isEnabled) {
+        formData.append('permissions', permission);
+      }
+    });
+    
     onSubmit(formData);
   };
   
