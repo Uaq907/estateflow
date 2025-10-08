@@ -1125,6 +1125,7 @@ const translations = {
     
     // Common UI elements
     'common.add': 'إضافة',
+    'common.addNewContract': 'إضافة عقد جديد',
     'common.edit': 'تعديل',
     'common.delete': 'حذف',
     'common.save': 'حفظ',
@@ -2720,6 +2721,7 @@ const translations = {
     
     // Common UI elements
     'common.add': 'Add',
+    'common.addNewContract': 'Add New Contract',
     'common.edit': 'Edit',
     'common.delete': 'Delete',
     'common.save': 'Save',
