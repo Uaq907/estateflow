@@ -1221,7 +1221,7 @@ const translations = {
     'unitConfig.addConfiguration': 'إضافة تكوين',
     'unitConfig.configurationName': 'اسم التكوين',
     'unitConfig.unitType': 'نوع الوحدة',
-    'unitConfig.description': 'الوصف',
+    'unitConfig.descriptionLabel': 'الوصف',
     'unitConfig.actions': 'الإجراءات',
     'unitConfig.edit': 'تعديل',
     'unitConfig.delete': 'حذف',
@@ -1233,27 +1233,6 @@ const translations = {
     'unitConfig.cancel': 'إلغاء',
     'unitConfig.confirmDelete': 'تأكيد الحذف',
     'unitConfig.deleteMessage': 'هل أنت متأكد من حذف هذا التكوين؟ لا يمكن التراجع عن هذا الإجراء.',
-    
-    // Employee Management
-    'employees.title': 'إدارة الموظفين',
-    'employees.description': 'إدارة معلومات الموظفين والأذونات',
-    'employees.addEmployee': 'إضافة موظف',
-    'employees.totalEmployees': 'إجمالي الموظفين',
-    'employees.activeEmployees': 'الموظفين النشطين',
-    'employees.departments': 'الأقسام',
-    'employees.searchEmployees': 'البحث في الموظفين...',
-    'employees.filterByDepartment': 'فلترة حسب القسم',
-    'employees.filterByStatus': 'فلترة حسب الحالة',
-    'employees.allDepartments': 'جميع الأقسام',
-    'employees.allStatus': 'جميع الحالات',
-    'employees.active': 'نشط',
-    'employees.inactive': 'غير نشط',
-    'employees.noEmployeesFound': 'لم يتم العثور على موظفين',
-    'employees.management': 'الإدارة',
-    'employees.accounting': 'المحاسبة',
-    'employees.maintenance': 'الصيانة',
-    'employees.humanResources': 'الموارد البشرية',
-    'employees.operations': 'العمليات',
     
     // Legal/Eviction
     'eviction.addNewRequest': 'إضافة طلب إخلاء جديد',
@@ -1285,34 +1264,6 @@ const translations = {
     'eviction.requests': 'طلبات الإخلاء',
     'eviction.viewManage': 'عرض وإدارة جميع طلبات الإخلاء المقدمة',
     'eviction.inProgress': 'قيد التنفيذ',
-    
-    // Eviction request table headers
-    'eviction.requestId': 'رقم الطلب',
-    'eviction.tenant': 'المستأجر',
-    'eviction.property': 'العقار',
-    'eviction.unit': 'الوحدة',
-    'eviction.dueAmount': 'المبلغ المستحق',
-    'eviction.reason': 'السبب',
-    'eviction.status': 'الحالة',
-    'eviction.submittedDate': 'تاريخ التقديم',
-    'eviction.actions': 'الإجراءات',
-    
-    // Eviction statuses
-    'eviction.statusPending': 'في الانتظار',
-    'eviction.statusInProgress': 'قيد التنفيذ',
-    'eviction.statusCompleted': 'مكتمل',
-    'eviction.statusCancelled': 'ملغي',
-    'eviction.statusApproved': 'موافق عليه',
-    'eviction.statusRejected': 'مرفوض',
-    
-    // Eviction actions
-    'eviction.view': 'عرض',
-    'eviction.edit': 'تعديل',
-    'eviction.delete': 'حذف',
-    'eviction.viewDetails': 'عرض التفاصيل',
-    'eviction.updateStatus': 'تحديث الحالة',
-    'eviction.generateReport': 'إنشاء تقرير',
-    'eviction.addDocument': 'إضافة مستند',
     
     // Eviction filters
     'eviction.filterByStatus': 'تصفية حسب الحالة',
@@ -1354,17 +1305,6 @@ const translations = {
     'eviction.achievementsReport': 'تقرير الإنجازات',
     'eviction.generateReport': 'توليد تقرير',
     'eviction.reportGenerated': 'سيتم تحضير التقرير وتحميله خلال لحظات',
-    'eviction.thisMonthRequests': 'طلبات هذا الشهر',
-    'eviction.completed': 'مكتملة',
-    'eviction.inProgress': 'قيد التنفيذ',
-    'eviction.pending': 'معلقة',
-    
-    // Settings
-    'settings.title': 'الإعدادات',
-    'settings.unitConfigurations': 'التكوينات',
-    'settings.logAnalyzer': 'محلل السجلات',
-    'settings.reports': 'التقارير',
-    'settings.notifications': 'الإشعارات',
     
     // Log Analyzer
     'logAnalyzer.title': 'محلل سجل الأنشطة',
@@ -3013,7 +2953,7 @@ const translations = {
     'unitConfig.addConfiguration': 'Add Configuration',
     'unitConfig.configurationName': 'Configuration Name',
     'unitConfig.unitType': 'Unit Type',
-    'unitConfig.description': 'Description',
+    'unitConfig.descriptionLabel': 'Description',
     'unitConfig.actions': 'Actions',
     'unitConfig.edit': 'Edit',
     'unitConfig.delete': 'Delete',
@@ -3146,17 +3086,6 @@ const translations = {
     'eviction.achievementsReport': 'Achievements Report',
     'eviction.generateReport': 'Generate Report',
     'eviction.reportGenerated': 'Report will be prepared and downloaded shortly',
-    'eviction.thisMonthRequests': 'This Month Requests',
-    'eviction.completed': 'Completed',
-    'eviction.inProgress': 'In Progress',
-    'eviction.pending': 'Pending',
-    
-    // Settings
-    'settings.title': 'Settings',
-    'settings.unitConfigurations': 'Unit Configurations',
-    'settings.logAnalyzer': 'Log Analyzer',
-    'settings.reports': 'Reports',
-    'settings.notifications': 'Notifications',
     
     // Log Analyzer
     'logAnalyzer.title': 'Activity Log Analyzer',
