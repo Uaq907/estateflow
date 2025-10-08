@@ -413,7 +413,7 @@ export default function LogAnalyzerClient({ initialLogs, loggedInEmployee }: { i
                         className="w-full sm:w-auto sm:w-[150px]"
                     />
                      <Button variant="ghost" onClick={() => { setSearchQuery(''); setActionFilter('all'); setDateFilter({}); }}>
-                        Clear Filters
+                        {t('logAnalyzer.clearFilters')}
                     </Button>
                 </div>
                 <div className="rounded-md border">
