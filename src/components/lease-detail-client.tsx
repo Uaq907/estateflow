@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { handleUpdateLease, uploadFile, handleRemoveTenant } from '@/app/dashboard/actions';
+import { handleUpdateLease, uploadFile, handleRemoveTenant, handleRenewLease } from '@/app/dashboard/actions';
 import PaymentPlan from '@/components/payment-plan';
 import { useToast } from '@/hooks/use-toast';
 import type { Employee, Lease, LeasePayment, LeaseWithDetails } from '@/lib/types';
@@ -32,6 +32,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useRouter } from 'next/navigation';
 import { Separator } from './ui/separator';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
+import { Label } from './ui/label';
+import { Input } from './ui/input';
+import { DatePicker } from './date-picker';
 import { useLanguage } from '@/contexts/language-context';
 
 export default function LeaseDetailClient({
@@ -47,6 +51,9 @@ export default function LeaseDetailClient({
   const { toast } = useToast();
   const [isLeaseDialogOpen, setIsLeaseDialogOpen] = useState(false);
   const [isEndLeaseAlertOpen, setIsEndLeaseAlertOpen] = useState(false);
+  const [isRenewLeaseDialogOpen, setIsRenewLeaseDialogOpen] = useState(false);
+  const [newStartDate, setNewStartDate] = useState<Date | undefined>();
+  const [newEndDate, setNewEndDate] = useState<Date | undefined>();
   const router = useRouter();
 
   const { lease, tenant, property, unit } = leaseWithDetails;
@@ -128,6 +135,39 @@ export default function LeaseDetailClient({
         toast({ variant: 'destructive', title: t('leaseDetail.error'), description: result.message });
     }
   }
+  
+  const handleRenewLeaseSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    
+    const renewalData = {
+      oldLeaseId: lease.id,
+      unitId: unit.id,
+      tenantId: tenant.id,
+      newStartDate: newStartDate!,
+      newEndDate: newEndDate!,
+      newRentAmount: Number(formData.get('newRentAmount')),
+      numberOfPayments: Number(formData.get('numberOfPayments')),
+      increasePercentage: formData.get('increasePercentage') ? Number(formData.get('increasePercentage')) : 0,
+      businessName: lease.businessName || null,
+      businessType: lease.businessType || null,
+      tradeLicenseNumber: lease.tradeLicenseNumber || null,
+    };
+    
+    const result = await handleRenewLease(renewalData);
+    if (result.success) {
+        toast({ title: t('leaseDetail.success'), description: t('leaseDetail.leaseRenewedSuccess') });
+        setIsRenewLeaseDialogOpen(false);
+        // Redirect to the new lease
+        if (result.newLeaseId) {
+          router.push(`/dashboard/leases/${result.newLeaseId}`);
+        } else {
+          router.refresh();
+        }
+    } else {
+        toast({ variant: 'destructive', title: t('leaseDetail.error'), description: result.message });
+    }
+  }
 
 
   return (
@@ -143,6 +183,9 @@ export default function LeaseDetailClient({
                     </CardDescription>
                 </div>
                 <div className="flex gap-2">
+                    {canUpdateLease && (lease.status === 'Active' || lease.status === 'Completed') && (
+                        <Button onClick={() => setIsRenewLeaseDialogOpen(true)} variant="outline">{t('leaseDetail.renewLease')}</Button>
+                    )}
                     {canEndLease && lease.status === 'Active' && isPast(new Date(lease.endDate)) && (
                         <Button onClick={() => setIsEndLeaseAlertOpen(true)} variant="destructive">{t('leaseDetail.endLease')}</Button>
                     )}
@@ -240,6 +283,86 @@ export default function LeaseDetailClient({
         onSubmit={handleLeaseSubmit}
         loggedInEmployee={loggedInEmployee}
       />
+
+       {/* Renew Lease Dialog */}
+       <Dialog open={isRenewLeaseDialogOpen} onOpenChange={setIsRenewLeaseDialogOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <form onSubmit={handleRenewLeaseSubmit}>
+            <DialogHeader>
+              <DialogTitle className="text-right">{t('leaseDetail.renewLeaseTitle')}</DialogTitle>
+              <DialogDescription className="text-right">
+                {t('leaseDetail.renewLeaseDescription')}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="newStartDate">{t('leaseDetail.newStartDate')}</Label>
+                  <DatePicker name="newStartDate" value={newStartDate} onSelect={setNewStartDate} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="newEndDate">{t('leaseDetail.newEndDate')}</Label>
+                  <DatePicker name="newEndDate" value={newEndDate} onSelect={setNewEndDate} required />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="newRentAmount">{t('leaseDetail.newRentAmount')}</Label>
+                  <Input 
+                    id="newRentAmount" 
+                    name="newRentAmount" 
+                    type="number" 
+                    step="0.01"
+                    defaultValue={lease.rentPaymentAmount || 0}
+                    required 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="increasePercentage">{t('leaseDetail.increasePercentage')}</Label>
+                  <Input 
+                    id="increasePercentage" 
+                    name="increasePercentage" 
+                    type="number" 
+                    step="0.01"
+                    placeholder="e.g., 5"
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="numberOfPayments">{t('leaseDetail.numberOfPayments')}</Label>
+                <Input 
+                  id="numberOfPayments" 
+                  name="numberOfPayments" 
+                  type="number"
+                  defaultValue={lease.numberOfPayments || 12}
+                  required 
+                />
+              </div>
+              
+              <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <h4 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
+                  {t('leaseDetail.unpaidPaymentsNotice')}
+                </h4>
+                <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                  {t('leaseDetail.unpaidPaymentsWillTransfer')
+                    .replace('{count}', initialPayments.filter(p => p.status !== 'Paid').length.toString())
+                    .replace('{year}', new Date(lease.endDate).getFullYear().toString())}
+                </p>
+              </div>
+            </div>
+            
+            <DialogFooter className="flex-row-reverse">
+              <Button type="submit">{t('leaseDetail.confirmRenew')}</Button>
+              <Button type="button" variant="outline" onClick={() => setIsRenewLeaseDialogOpen(false)}>
+                {t('leaseDetail.cancel')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+       </Dialog>
 
        <AlertDialog open={isEndLeaseAlertOpen} onOpenChange={setIsEndLeaseAlertOpen}>
         <AlertDialogContent>

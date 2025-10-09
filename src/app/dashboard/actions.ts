@@ -360,6 +360,123 @@ export async function handleRemoveTenant(unitId: string, leaseId: string) {
     }
 }
 
+export async function handleRenewLease(renewalData: {
+    oldLeaseId: string;
+    unitId: string;
+    tenantId: string;
+    newStartDate: Date;
+    newEndDate: Date;
+    newRentAmount: number;
+    numberOfPayments: number;
+    increasePercentage: number;
+    businessName: string | null;
+    businessType: string | null;
+    tradeLicenseNumber: string | null;
+}): Promise<{ success: boolean; message: string; newLeaseId?: string }> {
+    const loggedInEmployee = await getEmployeeFromSession();
+    if (!hasPermission(loggedInEmployee, 'leases:update')) {
+        return { success: false, message: 'Permission denied.' };
+    }
+    
+    try {
+        const connection = require('@/lib/db-connection').getConnection();
+        const conn = await connection;
+        
+        // 1. Get old lease details
+        const [oldLeaseRows] = await conn.query('SELECT * FROM leases WHERE id = ?', [renewalData.oldLeaseId]);
+        const oldLease = (oldLeaseRows as any[])[0];
+        
+        if (!oldLease) {
+            return { success: false, message: 'Old lease not found.' };
+        }
+        
+        // 2. Get unpaid payments from old lease
+        const [unpaidPayments] = await conn.query(
+            `SELECT * FROM lease_payments WHERE leaseId = ? AND status != 'Paid'`,
+            [renewalData.oldLeaseId]
+        );
+        
+        // 3. Calculate new lease amounts
+        const totalNewAmount = renewalData.newRentAmount * renewalData.numberOfPayments;
+        const taxedAmount = totalNewAmount * 0.05; // Assuming 5% VAT
+        
+        // 4. Create new lease
+        const newLeaseId = `lease-${Date.now()}`;
+        await conn.execute(
+            `INSERT INTO leases 
+            (id, unitId, tenantId, startDate, endDate, status, totalLeaseAmount, taxedAmount, 
+             rentPaymentAmount, numberOfPayments, renewalIncreasePercentage, 
+             businessName, businessType, tradeLicenseNumber, tenantSince) 
+            VALUES (?, ?, ?, ?, ?, 'Active', ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                newLeaseId, renewalData.unitId, renewalData.tenantId,
+                renewalData.newStartDate, renewalData.newEndDate,
+                totalNewAmount, taxedAmount, renewalData.newRentAmount,
+                renewalData.numberOfPayments, renewalData.increasePercentage,
+                renewalData.businessName, renewalData.businessType, renewalData.tradeLicenseNumber,
+                oldLease.tenantSince || oldLease.startDate
+            ]
+        );
+        
+        // 5. Transfer unpaid payments to new lease with year label
+        const oldLeaseYear = new Date(oldLease.endDate).getFullYear();
+        for (const payment of (unpaidPayments as any[])) {
+            const newPaymentId = `payment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            const description = payment.description 
+                ? `متأخرات ${oldLeaseYear} - ${payment.description}`
+                : `متأخرات من عقد ${oldLeaseYear}`;
+            
+            await conn.execute(
+                `INSERT INTO lease_payments 
+                (id, leaseId, dueDate, amount, status, description, paymentMethod, chequeNumber, chequeImageUrl) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    newPaymentId, newLeaseId, payment.dueDate, payment.amount,
+                    payment.status, description, payment.paymentMethod,
+                    payment.chequeNumber, payment.chequeImageUrl
+                ]
+            );
+        }
+        
+        // 6. Update old lease status
+        const oldLeaseStatus = (unpaidPayments as any[]).length > 0 
+            ? 'Completed with Dues' 
+            : 'Completed';
+        await conn.execute(
+            `UPDATE leases SET status = ? WHERE id = ?`,
+            [oldLeaseStatus, renewalData.oldLeaseId]
+        );
+        
+        // 7. Log activity
+        await logActivity(
+            loggedInEmployee!.id, 
+            loggedInEmployee!.name, 
+            'RENEW_LEASE', 
+            'Lease', 
+            newLeaseId, 
+            { 
+                oldLeaseId: renewalData.oldLeaseId, 
+                unpaidTransferred: (unpaidPayments as any[]).length,
+                oldLeaseYear 
+            }
+        );
+        
+        revalidatePath(`/dashboard/leases/${newLeaseId}`);
+        revalidatePath(`/dashboard/leases/${renewalData.oldLeaseId}`);
+        revalidatePath(`/dashboard/properties`);
+        revalidatePath(`/dashboard/units/${renewalData.unitId}`);
+        
+        return { 
+            success: true, 
+            message: 'Lease renewed successfully.', 
+            newLeaseId 
+        };
+    } catch (error) {
+        console.error('Failed to renew lease:', error);
+        return { success: false, message: 'Failed to renew lease.' };
+    }
+}
+
 export async function handleUpdateLease(leaseId: string, leaseData: Partial<Omit<Lease, 'id' | 'unitId' | 'tenantId'>>): Promise<{success: boolean, message: string}> {
     const loggedInEmployee = await getEmployeeFromSession();
     if (!hasPermission(loggedInEmployee, 'leases:update')) {
