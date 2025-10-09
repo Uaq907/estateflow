@@ -231,6 +231,8 @@ export default function ReportsClient({
       'bounced-cheques-report': t('reports.bouncedChequesReport'),
       'cleared-cheques-report': t('reports.clearedChequesReport'),
       'pending-cheques-report': t('reports.pendingChequesReport'),
+      'taxable-revenue-report': t('reports.taxableRevenueReport'),
+      'taxable-expenses-report': t('reports.taxableExpensesReport'),
       'expense-analysis': t('reports.expenseAnalysis'),
       'property-occupancy': t('reports.propertyOccupancy'),
       'maintenance-summary': t('reports.maintenanceSummary'),
@@ -900,6 +902,8 @@ export default function ReportsClient({
                     <SelectItem value="bounced-cheques-report">{t('reports.bouncedChequesReport')}</SelectItem>
                     <SelectItem value="cleared-cheques-report">{t('reports.clearedChequesReport')}</SelectItem>
                     <SelectItem value="pending-cheques-report">{t('reports.pendingChequesReport')}</SelectItem>
+                    <SelectItem value="taxable-revenue-report">{t('reports.taxableRevenueReport')}</SelectItem>
+                    <SelectItem value="taxable-expenses-report">{t('reports.taxableExpensesReport')}</SelectItem>
                     <SelectItem value="expense-analysis">{t('reports.expenseAnalysis')}</SelectItem>
                     <SelectItem value="property-occupancy">{t('reports.propertyOccupancy')}</SelectItem>
                     <SelectItem value="maintenance-summary">{t('reports.maintenanceSummary')}</SelectItem>
