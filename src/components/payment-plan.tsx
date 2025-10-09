@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 import { handleAddLeasePayment, handleUpdateLeasePayment, handleDeleteLeasePayment, handleAddTransaction, handleUpdateTransaction, handleDeleteTransaction, uploadFile, reviewPaymentExtension } from '@/app/dashboard/actions';
 import { useToast } from '@/hooks/use-toast';
 import { getLeasePayments } from '@/lib/db';
+import { useLanguage } from '@/contexts/language-context';
 import {
   Dialog,
   DialogContent,
@@ -58,6 +59,7 @@ interface PaymentPlanProps {
 const paymentMethods = ['Cash', 'Cheque', 'Bank Transfer', 'Credit Card', 'Other'];
 
 export default function PaymentPlan({ lease, initialPayments, loggedInEmployee }: PaymentPlanProps) {
+    const { t } = useLanguage();
     const [payments, setPayments] = useState(initialPayments);
     const [isAddPaymentDialogOpen, setIsAddPaymentDialogOpen] = useState(false);
     const [isEditPaymentDialogOpen, setIsEditPaymentDialogOpen] = useState(false);
@@ -398,18 +400,18 @@ export default function PaymentPlan({ lease, initialPayments, loggedInEmployee }
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                    <CardTitle>Payment Plan</CardTitle>
-                    <CardDescription>Track and manage lease payments and transactions.</CardDescription>
+                    <CardTitle>{t('paymentPlan.title')}</CardTitle>
+                    <CardDescription>{t('paymentPlan.description')}</CardDescription>
                 </div>
                 {loggedInEmployee && (
                     <div className="flex gap-2">
                         {payments.length === 0 && (
-                            <Button onClick={handleGeneratePlan}><PlusCircle />Generate Plan</Button>
+                            <Button onClick={handleGeneratePlan}><PlusCircle />{t('paymentPlan.generatePlan')}</Button>
                         )}
                         <Dialog open={isAddPaymentDialogOpen} onOpenChange={setIsAddPaymentDialogOpen}>
-                            <DialogTrigger asChild><Button variant="outline"><PlusCircle/>Add Payment</Button></DialogTrigger>
+                            <DialogTrigger asChild><Button variant="outline"><PlusCircle/>{t('paymentPlan.addPayment')}</Button></DialogTrigger>
                             <DialogContent className="sm:max-w-md">
-                                <DialogHeader><DialogTitle>Add Manual Payment</DialogTitle><DialogDescription>Add a single payment installment.</DialogDescription></DialogHeader>
+                                <DialogHeader><DialogTitle>{t('paymentPlan.addManualPayment')}</DialogTitle><DialogDescription>{t('paymentPlan.addSinglePayment')}</DialogDescription></DialogHeader>
                                 <form onSubmit={handleAddPaymentSubmit}>
                                 <div className="grid gap-4 py-4">
                                      <div className="space-y-2"><Label htmlFor="description">Description</Label><Input id="description" name="description" required placeholder="e.g. Rent Installment" /></div>
@@ -437,14 +439,14 @@ export default function PaymentPlan({ lease, initialPayments, loggedInEmployee }
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="w-[50px]"></TableHead>
-                                <TableHead>Due Date</TableHead>
-                                <TableHead>Description</TableHead>
-                                <TableHead>Amount Due</TableHead>
-                                <TableHead>Cheque Details</TableHead>
-                                <TableHead>Amount Paid</TableHead>
-                                <TableHead>Balance</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead><span className="sr-only">Actions</span></TableHead>
+                                <TableHead>{t('paymentPlan.dueDate')}</TableHead>
+                                <TableHead>{t('paymentPlan.description_label')}</TableHead>
+                                <TableHead>{t('paymentPlan.amountDue')}</TableHead>
+                                <TableHead>{t('paymentPlan.chequeDetails')}</TableHead>
+                                <TableHead>{t('paymentPlan.amountPaid')}</TableHead>
+                                <TableHead>{t('paymentPlan.remainingBalance')}</TableHead>
+                                <TableHead>{t('paymentPlan.status')}</TableHead>
+                                <TableHead><span className="sr-only">{t('paymentPlan.actions')}</span></TableHead>
                             </TableRow>
                         </TableHeader>
                         
@@ -511,7 +513,7 @@ export default function PaymentPlan({ lease, initialPayments, loggedInEmployee }
                                                 <TableCell colSpan={9} className="p-0">
                                                     <div className="p-4 space-y-4">
                                                         <div>
-                                                            <h4 className="font-semibold mb-2">Payment Progress</h4>
+                                                            <h4 className="font-semibold mb-2">{t('paymentPlan.paymentProgress')}</h4>
                                                             <Progress value={progress} className="h-2"/>
                                                         </div>
                                                         {payment.extensionStatus === 'Pending' && loggedInEmployee && (
@@ -524,8 +526,8 @@ export default function PaymentPlan({ lease, initialPayments, loggedInEmployee }
                                                             </div>
                                                         )}
                                                         <div className="flex justify-between items-center">
-                                                            <h4 className="font-semibold">Recorded Transactions</h4>
-                                                            <Button size="sm" variant="outline" onClick={() => openAddTransactionDialog(payment)}><PlusCircle className="mr-2"/>Add Transaction</Button>
+                                                            <h4 className="font-semibold">{t('paymentPlan.recordedTransactions')}</h4>
+                                                            <Button size="sm" variant="outline" onClick={() => openAddTransactionDialog(payment)}><PlusCircle className="mr-2"/>{t('paymentPlan.addTransaction')}</Button>
                                                         </div>
                                                         {payment.transactions && payment.transactions.length > 0 ? (
                                                             <Table>

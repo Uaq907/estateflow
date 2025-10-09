@@ -56,6 +56,14 @@ export default function LeaseDetailClient({
   const isCommercial = unit.type === 'Commercial';
 
   const paymentPlanSubtotal = initialPayments.reduce((acc, payment) => acc + payment.amount, 0);
+  
+  // حساب المبلغ المدفوع والمتبقي
+  const totalPaid = initialPayments.reduce((acc, payment) => {
+    const paidAmount = payment.transactions?.reduce((sum, t) => sum + t.amountPaid, 0) || 0;
+    return acc + paidAmount;
+  }, 0);
+  
+  const remainingBalance = (lease.totalLeaseAmount || paymentPlanSubtotal) - totalPaid;
 
   const handleLeaseSubmit = async (formData: FormData) => {
     let contractUrl = lease.contractUrl;
@@ -174,6 +182,8 @@ export default function LeaseDetailClient({
                         <p><strong>{t('leaseDetail.totalAmount')}:</strong> AED {lease.totalLeaseAmount?.toLocaleString() ?? 'N/A'}</p>
                         <p><strong>{t('leaseDetail.subTotal')}:</strong> AED {paymentPlanSubtotal.toLocaleString() ?? 'N/A'}</p>
                         <p><strong>{t('leaseDetail.taxedAmount')}:</strong> AED {lease.taxedAmount?.toLocaleString() ?? 'N/A'}</p>
+                        <p><strong>{t('leaseDetail.totalPaid')}:</strong> AED {totalPaid.toLocaleString()}</p>
+                        <p><strong>{t('leaseDetail.remainingBalance')}:</strong> <span className={remainingBalance > 0 ? 'text-red-600 font-semibold' : 'text-green-600'}>AED {remainingBalance.toLocaleString()}</span></p>
                         <p><strong>{t('leaseDetail.payments')}:</strong> {lease.numberOfPayments ?? 'N/A'}</p>
                     </div>
                 </div>
