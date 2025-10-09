@@ -49,6 +49,9 @@ export default function LeaseDetailClient({
 }) {
   const { t } = useLanguage();
   const { toast } = useToast();
+  const router = useRouter();
+  const { lease, tenant, property, unit } = leaseWithDetails;
+  
   const [isLeaseDialogOpen, setIsLeaseDialogOpen] = useState(false);
   const [isEndLeaseAlertOpen, setIsEndLeaseAlertOpen] = useState(false);
   const [isRenewLeaseDialogOpen, setIsRenewLeaseDialogOpen] = useState(false);
@@ -73,9 +76,6 @@ export default function LeaseDetailClient({
   // فقط الأدمن يمكنه تعديل التواريخ
   const isAdmin = loggedInEmployee?.email === 'uaq907@gmail.com';
   const canEditDates = isAdmin;
-  const router = useRouter();
-
-  const { lease, tenant, property, unit } = leaseWithDetails;
   
   const canUpdateLease = hasPermission(loggedInEmployee, 'leases:update');
   const canEndLease = hasPermission(loggedInEmployee, 'leases:delete');
