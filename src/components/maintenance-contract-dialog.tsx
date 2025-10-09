@@ -209,7 +209,7 @@ export default function MaintenanceContractDialog({ isOpen, onOpenChange, contra
                 <Label htmlFor="contractFile">{t('maintenanceDialog.uploadContract')}</Label>
                 <Input id="contractFile" name="contractFile" type="file" disabled={!canUpdateDocuments} onChange={handleFileChange}/>
                 <div className="text-xs text-muted-foreground mt-1 flex justify-between">
-                    <span>{t('maintenanceDialog.maxFileSize', { size: MAX_FILE_SIZE_MB })}</span>
+                    <span>{t('maintenanceDialog.maxFileSize').replace('{size}', MAX_FILE_SIZE_MB.toString())}</span>
                     {selectedFileSize && <span>{t('maintenanceDialog.selected')}: {formatFileSize(selectedFileSize)}</span>}
                 </div>
                 {fileError && (
