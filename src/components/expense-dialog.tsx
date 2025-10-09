@@ -54,13 +54,23 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
         // Fetch expense history if viewing existing expense
         if (expense?.id) {
             fetch(`/api/expense-history?expenseId=${expense.id}`)
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Failed to fetch');
+                    }
+                    return res.json();
+                })
                 .then(data => {
-                    if (data.success) {
+                    if (data.success && Array.isArray(data.history)) {
                         setExpenseHistory(data.history);
+                    } else {
+                        setExpenseHistory([]);
                     }
                 })
-                .catch(err => console.error('Error fetching expense history:', err));
+                .catch(err => {
+                    console.error('Error fetching expense history:', err);
+                    setExpenseHistory([]);
+                });
         } else {
             setExpenseHistory([]);
         }
