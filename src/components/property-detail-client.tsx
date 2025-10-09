@@ -476,8 +476,8 @@ export default function PropertyDetailClient({
                         <div className="text-sm text-muted-foreground mt-3 space-y-2">
                             {propertyOwner ? (
                                 <>
-                                    <p><strong>Name:</strong> {propertyOwner.name}</p>
-                                    <p><strong>Nationality:</strong> {propertyOwner.nationality || 'N/A'}</p>
+                                    <p><strong>{t('propertyDetail.name')}:</strong> {propertyOwner.name}</p>
+                                    <p><strong>{t('propertyDetail.nationality')}:</strong> {propertyOwner.nationality || 'N/A'}</p>
                                     <p className="flex items-center gap-2"><Phone/> {propertyOwner.contact || 'N/A'}</p>
                                     <p className="flex items-center gap-2"><Mail/> {propertyOwner.email || 'N/A'}</p>
                                     <p className="flex items-center gap-2"><Fingerprint/> {propertyOwner.emiratesId || 'N/A'}</p>
@@ -493,7 +493,7 @@ export default function PropertyDetailClient({
                          <div className="text-sm text-muted-foreground mt-3 space-y-2">
                            {propertyManager ? (
                                 <>
-                                <p><strong>Name:</strong> {propertyManager.name}</p>
+                                <p><strong>{t('propertyDetail.name')}:</strong> {propertyManager.name}</p>
                                 <p className="flex items-center gap-2"><Phone/> {propertyManager.phone || 'N/A'}</p>
                                 <p className="flex items-center gap-2"><Mail/> {propertyManager.email || 'N/A'}</p>
                                 </>
