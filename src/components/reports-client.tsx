@@ -314,13 +314,24 @@ export default function ReportsClient({
   const filteredReports = useMemo(() => {
     let reports = reportTypes;
     
-    // If cheques report is selected from category filter, show only cheques-related reports
+    // If cheques report is selected from category filter, show cheques-related reports based on status
     if (selectedCategory === 'cheques-report') {
       reports = reportTypes.filter(report => 
         report.id === 'cheques-report' || 
         report.title.toLowerCase().includes('cheque') ||
         report.description.toLowerCase().includes('cheque')
       );
+      
+      // Filter by cheque status if not 'all'
+      if (selectedChequeStatus !== 'all') {
+        reports = reports.filter(report => {
+          if (selectedChequeStatus === 'cleared') return report.id === 'cleared-cheques-report';
+          if (selectedChequeStatus === 'pending') return report.id === 'pending-cheques-report';
+          if (selectedChequeStatus === 'bounced') return report.id === 'bounced-cheques-report';
+          if (selectedChequeStatus === 'submitted') return report.id === 'cheques-report';
+          return true;
+        });
+      }
     } else if (selectedCategory === 'tax') {
       // If tax category is selected, filter based on tax type
       reports = reportTypes.filter(report => report.category === 'tax');
@@ -350,7 +361,7 @@ export default function ReportsClient({
     }
     
     return reports.map(report => getTranslatedReport(report));
-  }, [selectedCategory, selectedFrequency, selectedTaxType, t]);
+  }, [selectedCategory, selectedFrequency, selectedTaxType, selectedChequeStatus, t]);
 
   // Filter properties based on selected owner
   const filteredProperties = useMemo(() => {
