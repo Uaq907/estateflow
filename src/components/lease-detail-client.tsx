@@ -55,13 +55,13 @@ export default function LeaseDetailClient({
   const canEndLease = hasPermission(loggedInEmployee, 'leases:delete');
   const isCommercial = unit.type === 'Commercial';
 
-  const paymentPlanSubtotal = initialPayments.reduce((acc, payment) => acc + payment.amount, 0);
+  const paymentPlanSubtotal = initialPayments?.reduce((acc, payment) => acc + payment.amount, 0) || 0;
   
   // حساب المبلغ المدفوع والمتبقي
-  const totalPaid = initialPayments.reduce((acc, payment) => {
+  const totalPaid = initialPayments?.reduce((acc, payment) => {
     const paidAmount = payment.transactions?.reduce((sum, t) => sum + t.amountPaid, 0) || 0;
     return acc + paidAmount;
-  }, 0);
+  }, 0) || 0;
   
   const remainingBalance = (lease.totalLeaseAmount || paymentPlanSubtotal) - totalPaid;
 
