@@ -297,6 +297,20 @@ const translations = {
     'expenses.needsCorrection': 'يحتاج تصحيح',
     'expenses.conditionallyApproved': 'موافقة مبدئية',
     'expenses.conditionalApprove': 'موافقة مبدئية',
+    
+    // Expense History
+    'expenseHistory.title': 'سجل المصروف',
+    'expenseHistory.noHistory': 'لا يوجد سجل لهذا المصروف',
+    'expenseHistory.notes': 'ملاحظات',
+    'expenseHistory.created': 'تم الإنشاء',
+    'expenseHistory.submitted': 'تم التقديم',
+    'expenseHistory.approved': 'تمت الموافقة',
+    'expenseHistory.conditionallyApproved': 'موافقة مبدئية',
+    'expenseHistory.rejected': 'تم الرفض',
+    'expenseHistory.needsCorrection': 'يحتاج تصحيح',
+    'expenseHistory.corrected': 'تم التصحيح',
+    'expenseHistory.resubmitted': 'تم إعادة التقديم',
+    
     'expenses.totalExpenses': 'إجمالي المصروفات',
     'expenses.pendingExpenses': 'المصروفات المعلقة',
     'expenses.approvedExpenses': 'المصروفات الموافق عليها',
@@ -2124,6 +2138,20 @@ const translations = {
     'expenses.needsCorrection': 'Needs Correction',
     'expenses.conditionallyApproved': 'Conditionally Approved',
     'expenses.conditionalApprove': 'Conditional Approve',
+    
+    // Expense History
+    'expenseHistory.title': 'Expense History',
+    'expenseHistory.noHistory': 'No history for this expense',
+    'expenseHistory.notes': 'Notes',
+    'expenseHistory.created': 'Created',
+    'expenseHistory.submitted': 'Submitted',
+    'expenseHistory.approved': 'Approved',
+    'expenseHistory.conditionallyApproved': 'Conditionally Approved',
+    'expenseHistory.rejected': 'Rejected',
+    'expenseHistory.needsCorrection': 'Needs Correction',
+    'expenseHistory.corrected': 'Corrected',
+    'expenseHistory.resubmitted': 'Resubmitted',
+    
     'expenses.totalExpenses': 'Total Expenses',
     'expenses.pendingExpenses': 'Pending Expenses',
     'expenses.approvedExpenses': 'Approved Expenses',

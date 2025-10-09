@@ -273,6 +273,20 @@ export const expenseSchema = z.object({
 
 export type Expense = z.infer<typeof expenseSchema>;
 
+export const expenseHistorySchema = z.object({
+    id: z.string(),
+    expenseId: z.string(),
+    action: z.enum(['Created', 'Submitted', 'Approved', 'Conditionally Approved', 'Rejected', 'Needs Correction', 'Corrected', 'Resubmitted']),
+    performedBy: z.string(),
+    performedByName: z.string().optional().nullable(),
+    notes: z.string().optional().nullable(),
+    previousStatus: z.string().optional().nullable(),
+    newStatus: z.string().optional().nullable(),
+    createdAt: z.coerce.date(),
+});
+
+export type ExpenseHistory = z.infer<typeof expenseHistorySchema>;
+
 export const maintenanceContractSchema = z.object({
     id: z.string(),
     propertyId: z.string(),

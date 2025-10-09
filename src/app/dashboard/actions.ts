@@ -33,6 +33,8 @@ import {
     addExpense as dbAddExpense,
     updateExpense as dbUpdateExpense,
     deleteExpense as dbDeleteExpense,
+    getExpenseHistory,
+    addExpenseHistory,
     addMaintenanceContract as dbAddMaintenanceContract,
     updateMaintenanceContract as dbUpdateMaintenanceContract,
     deleteMaintenanceContract as dbDeleteMaintenanceContract,
@@ -742,6 +744,17 @@ export async function handleAddExpense(expenseData: Partial<Omit<Expense, 'id' |
         const addedExpense = await dbAddExpense(dataToSave as Omit<Expense, 'id' | 'createdAt' | 'updatedAt'>);
         await logActivity(loggedInEmployee!.id, loggedInEmployee!.name, 'CREATE_EXPENSE', 'Expense', addedExpense.id, { category: expenseData.category, amount: finalAmount });
         
+        // Add to expense history
+        await addExpenseHistory({
+            expenseId: addedExpense.id,
+            action: 'Created',
+            performedBy: loggedInEmployee!.id,
+            performedByName: loggedInEmployee!.name,
+            notes: `Created expense: ${expenseData.category} - AED ${finalAmount.toLocaleString()}`,
+            previousStatus: null,
+            newStatus: 'Pending'
+        });
+        
         // Send notification after successful submission to the admin channel
         const message = `*New Expense Submitted*
         
@@ -809,15 +822,46 @@ export async function handleUpdateExpense(id: string, expenseData: Partial<Omit<
         await dbUpdateExpense(id, dataToUpdate);
         await logActivity(loggedInEmployee!.id, loggedInEmployee!.name, 'UPDATE_EXPENSE', 'Expense', id, { updatedFields: updatedFieldsForLog });
 
+        // --- Add to expense history ---
+        if (dataToUpdate.status && dataToUpdate.status !== originalExpense.status) {
+            const actionMap: Record<string, string> = {
+                'Approved': 'Approved',
+                'Conditionally Approved': 'Conditionally Approved',
+                'Rejected': 'Rejected',
+                'Needs Correction': 'Needs Correction',
+                'Pending': 'Resubmitted'
+            };
+            
+            await addExpenseHistory({
+                expenseId: id,
+                action: actionMap[dataToUpdate.status] || 'Submitted',
+                performedBy: loggedInEmployee!.id,
+                performedByName: loggedInEmployee!.name,
+                notes: dataToUpdate.managerNotes || null,
+                previousStatus: originalExpense.status,
+                newStatus: dataToUpdate.status
+            });
+        }
+
         // --- Send Notifications based on status change ---
         if (dataToUpdate.status && dataToUpdate.status !== originalExpense.status) {
             if (dataToUpdate.status === 'Approved') {
                 const message = `*Expense Approved!*
 Your expense request for *${originalExpense.category}* (AED ${originalExpense.amount.toLocaleString()}) has been approved.`;
                 await sendNotification(originalExpense.employeeId, 'expense_approved', message);
+            } else if (dataToUpdate.status === 'Conditionally Approved') {
+                const message = `*Expense Conditionally Approved!*
+Your expense request for *${originalExpense.category}* (AED ${originalExpense.amount.toLocaleString()}) has been conditionally approved.
+${dataToUpdate.managerNotes ? `Notes: ${dataToUpdate.managerNotes}` : ''}`;
+                await sendNotification(originalExpense.employeeId, 'expense_approved', message);
             } else if (dataToUpdate.status === 'Rejected') {
                  const message = `*Expense Rejected*
 Your expense request for *${originalExpense.category}* (AED ${originalExpense.amount.toLocaleString()}) was rejected.
+Manager Notes: ${dataToUpdate.managerNotes || 'No notes provided.'}`;
+                await sendNotification(originalExpense.employeeId, 'expense_rejected', message);
+            } else if (dataToUpdate.status === 'Needs Correction') {
+                const message = `*Expense Needs Correction*
+Your expense request for *${originalExpense.category}* (AED ${originalExpense.amount.toLocaleString()}) needs correction.
 Manager Notes: ${dataToUpdate.managerNotes || 'No notes provided.'}`;
                 await sendNotification(originalExpense.employeeId, 'expense_rejected', message);
             }

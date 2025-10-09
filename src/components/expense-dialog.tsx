@@ -17,6 +17,7 @@ import { Switch } from './ui/switch';
 import { Separator } from './ui/separator';
 import { hasPermission } from '@/lib/permissions';
 import { useLanguage } from '@/contexts/language-context';
+import ExpenseHistory from './expense-history';
 
 interface ExpenseDialogProps {
   isOpen: boolean;
@@ -37,6 +38,7 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
   const [isVat, setIsVat] = useState(expense?.isVat ?? false);
   const [baseAmount, setBaseAmount] = useState<number | string>(expense?.baseAmount ?? '');
   const [expenseDate, setExpenseDate] = useState<Date | undefined>(expense?.createdAt ? new Date(expense.createdAt) : new Date());
+  const [expenseHistory, setExpenseHistory] = useState<any[]>([]);
 
   const numericBaseAmount = Number(baseAmount) || 0;
   const taxAmount = isVat ? numericBaseAmount * 0.05 : 0;
@@ -48,6 +50,20 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
         setIsVat(expense?.isVat ?? false);
         setBaseAmount(expense?.baseAmount ?? '');
         setExpenseDate(expense?.createdAt ? new Date(expense.createdAt) : new Date());
+        
+        // Fetch expense history if viewing existing expense
+        if (expense?.id) {
+            fetch(`/api/expense-history?expenseId=${expense.id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        setExpenseHistory(data.history);
+                    }
+                })
+                .catch(err => console.error('Error fetching expense history:', err));
+        } else {
+            setExpenseHistory([]);
+        }
     }
   }, [isOpen, expense]);
 
@@ -287,6 +303,13 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
                     <Label htmlFor="managerNotes">{t('expenseForm.managerNotes')} ({t('expenseForm.optional')})</Label>
                     <Textarea id="managerNotes" name="managerNotes" placeholder="Reason for rejection or other notes..." />
                  </div>
+            )}
+            
+            {/* Expense History - Show when viewing existing expense */}
+            {expense && expenseHistory.length > 0 && (
+              <div className="mt-4">
+                <ExpenseHistory expenseId={expense.id} history={expenseHistory} />
+              </div>
             )}
           </div>
 

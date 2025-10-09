@@ -1360,6 +1360,62 @@ export async function getExpenses({ employeeId }: { employeeId?: string } = {}):
     }
 }
 
+export async function getExpenseHistory(expenseId: string): Promise<any[]> {
+    let connection: mysql.Connection | null = null;
+    try {
+        connection = await getConnection();
+        
+        const [rows] = await connection.query(
+            `SELECT * FROM expense_history 
+             WHERE expenseId = ? 
+             ORDER BY createdAt DESC`,
+            [expenseId]
+        );
+        
+        return rows as any[];
+    } catch (e) {
+        console.error("Error getting expense history", e);
+        return [];
+    }
+}
+
+export async function addExpenseHistory(historyData: {
+    expenseId: string;
+    action: string;
+    performedBy: string;
+    performedByName?: string;
+    notes?: string;
+    previousStatus?: string;
+    newStatus?: string;
+}): Promise<{id: string}> {
+    let connection: mysql.Connection | null = null;
+    try {
+        connection = await getConnection();
+        const newId = randomUUID();
+        
+        await connection.execute(
+            `INSERT INTO expense_history 
+            (id, expenseId, action, performedBy, performedByName, notes, previousStatus, newStatus, createdAt) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+            [
+                newId,
+                historyData.expenseId,
+                historyData.action,
+                historyData.performedBy,
+                historyData.performedByName || null,
+                historyData.notes || null,
+                historyData.previousStatus || null,
+                historyData.newStatus || null
+            ]
+        );
+        
+        return { id: newId };
+    } catch (e) {
+        console.error("Error adding expense history", e);
+        throw e;
+    }
+}
+
 export async function addExpense(expense: Omit<Expense, 'id' | 'createdAt' | 'updatedAt'>): Promise<{id: string}> {
     let connection: mysql.Connection | null = null;
     try {
