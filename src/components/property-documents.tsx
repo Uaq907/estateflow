@@ -16,6 +16,7 @@ import { getPropertyDocuments } from '@/lib/db';
 import { format, formatDistanceToNow } from 'date-fns';
 import { hasPermission } from '@/lib/permissions';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
+import { useLanguage } from '@/contexts/language-context';
 
 interface PropertyDocumentsProps {
   propertyId: string;
@@ -28,6 +29,7 @@ const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 
 export default function PropertyDocuments({ propertyId, initialDocuments, loggedInEmployee }: PropertyDocumentsProps) {
+  const { t } = useLanguage();
   const [documents, setDocuments] = useState(initialDocuments);
   const [isUploading, setIsUploading] = useState(false);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -111,17 +113,17 @@ export default function PropertyDocuments({ propertyId, initialDocuments, logged
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Property Documents</CardTitle>
-        <CardDescription>Manage floor plans, diagrams, and other property-specific files.</CardDescription>
+        <CardTitle>{t('propertyDocuments.title')}</CardTitle>
+        <CardDescription>{t('propertyDocuments.description')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Document Name</TableHead>
-                <TableHead>Uploaded</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t('propertyDocuments.documentName')}</TableHead>
+                <TableHead>{t('propertyDocuments.uploaded')}</TableHead>
+                <TableHead className="text-right">{t('propertyDocuments.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -133,16 +135,16 @@ export default function PropertyDocuments({ propertyId, initialDocuments, logged
                         {doc.documentName}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                        {doc.createdAt ? formatDistanceToNow(new Date(doc.createdAt), { addSuffix: true }) : 'Unknown'}
+                        {doc.createdAt ? formatDistanceToNow(new Date(doc.createdAt), { addSuffix: true }) : t('propertyDocuments.unknown')}
                     </TableCell>
                     <TableCell className="text-right">
                        {doc.documentUrl ? (
                          <Button asChild variant="outline" size="sm" className="mr-2">
-                           <Link href={doc.documentUrl} target="_blank">View</Link>
+                           <Link href={doc.documentUrl} target="_blank">{t('propertyDocuments.view')}</Link>
                          </Button>
                        ) : (
                          <Button variant="outline" size="sm" className="mr-2" disabled>
-                           No Link
+                           {t('propertyDocuments.noLink')}
                          </Button>
                        )}
                       {canDelete && (
@@ -156,7 +158,7 @@ export default function PropertyDocuments({ propertyId, initialDocuments, logged
               ) : (
                 <TableRow>
                   <TableCell colSpan={3} className="text-center h-24">
-                    No documents uploaded yet.
+                    {t('propertyDocuments.noDocuments')}
                   </TableCell>
                 </TableRow>
               )}
@@ -167,30 +169,30 @@ export default function PropertyDocuments({ propertyId, initialDocuments, logged
         {canUpload && (
           <form onSubmit={handleUpload} className="space-y-4 pt-4 border-t">
              <input type="hidden" name="propertyId" value={propertyId} />
-             <h4 className="font-medium">Upload New Document</h4>
+             <h4 className="font-medium">{t('propertyDocuments.uploadNew')}</h4>
              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <Label htmlFor="documentName">Document Name</Label>
+                    <Label htmlFor="documentName">{t('propertyDocuments.documentNameLabel')}</Label>
                     <Input 
                         id="documentName" 
                         name="documentName"
-                        placeholder="e.g., Ground Floor Plan"
+                        placeholder={t('propertyDocuments.documentNamePlaceholder')}
                         required
                     />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="document">File</Label>
+                    <Label htmlFor="document">{t('propertyDocuments.file')}</Label>
                     <Input id="document" name="document" type="file" onChange={handleFileChange} required />
                 </div>
              </div>
               <div className="text-xs text-muted-foreground mt-1 flex justify-between">
-                <span>Max file size: {MAX_FILE_SIZE_MB}MB.</span>
-                {selectedFileSize && <span>Selected: {formatFileSize(selectedFileSize)}</span>}
+                <span>{t('propertyDocuments.maxFileSize').replace('{size}', MAX_FILE_SIZE_MB.toString())}</span>
+                {selectedFileSize && <span>{t('propertyDocuments.selected')}: {formatFileSize(selectedFileSize)}</span>}
               </div>
-             {fileError && <p className="text-sm text-destructive">{fileError}</p>}
+             {fileError && <p className="text-sm text-destructive">{t('propertyDocuments.fileError')}: {fileError}</p>}
              <Button type="submit" disabled={isUploading || !!fileError}>
                 <Upload className="mr-2" />
-                {isUploading ? 'Uploading...' : 'Upload Document'}
+                {isUploading ? t('unitSheet.saving') : t('propertyDocuments.uploadDocument')}
              </Button>
           </form>
         )}
@@ -199,15 +201,15 @@ export default function PropertyDocuments({ propertyId, initialDocuments, logged
        <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>{t('propertyDocuments.deleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the document: <span className="font-semibold">{docToDelete?.documentName}</span>.
+              {t('propertyDocuments.deleteDescription')} <span className="font-semibold">{docToDelete?.documentName}</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('propertyDocuments.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={() => handleDelete(docToDelete!.id)} className="bg-destructive hover:bg-destructive/90">
-              Delete
+              {t('propertyDocuments.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
