@@ -55,6 +55,10 @@ export default function LeaseDetailClient({
   const [isLeaseDialogOpen, setIsLeaseDialogOpen] = useState(false);
   const [isEndLeaseAlertOpen, setIsEndLeaseAlertOpen] = useState(false);
   const [isRenewLeaseDialogOpen, setIsRenewLeaseDialogOpen] = useState(false);
+  const [showPaymentSchedule, setShowPaymentSchedule] = useState(false);
+  const [scheduledPayments, setScheduledPayments] = useState<Array<{dueDate: Date, amount: number, description: string}>>([]);
+  const [numberOfPayments, setNumberOfPayments] = useState(lease.numberOfPayments || 12);
+  const [monthlyRent, setMonthlyRent] = useState(lease.rentPaymentAmount || 0);
   
   // حساب التواريخ الجديدة تلقائياً
   const calculateNewDates = () => {
@@ -76,6 +80,43 @@ export default function LeaseDetailClient({
   // فقط الأدمن يمكنه تعديل التواريخ
   const isAdmin = loggedInEmployee?.email === 'uaq907@gmail.com';
   const canEditDates = isAdmin;
+  
+  // حساب جدول الدفعات
+  const generatePaymentSchedule = (numPayments: number, rentAmount: number, startDate: Date) => {
+    const payments = [];
+    const totalAmount = numPayments * rentAmount;
+    
+    for (let i = 0; i < numPayments; i++) {
+      const dueDate = new Date(startDate);
+      dueDate.setMonth(dueDate.getMonth() + i);
+      
+      payments.push({
+        dueDate,
+        amount: rentAmount,
+        description: `دفعة ${i + 1} من ${numPayments}`
+      });
+    }
+    
+    return payments;
+  };
+  
+  const handleGenerateSchedule = () => {
+    if (newStartDate && monthlyRent > 0 && numberOfPayments > 0) {
+      const schedule = generatePaymentSchedule(numberOfPayments, monthlyRent, newStartDate);
+      setScheduledPayments(schedule);
+      setShowPaymentSchedule(true);
+    }
+  };
+  
+  const handlePaymentChange = (index: number, field: 'amount' | 'description', value: any) => {
+    const updated = [...scheduledPayments];
+    updated[index] = { ...updated[index], [field]: value };
+    setScheduledPayments(updated);
+  };
+  
+  const totalScheduledAmount = scheduledPayments.reduce((sum, p) => sum + p.amount, 0);
+  const expectedTotal = monthlyRent * numberOfPayments;
+  const amountDifference = totalScheduledAmount - expectedTotal;
   
   const canUpdateLease = hasPermission(loggedInEmployee, 'leases:update');
   const canEndLease = hasPermission(loggedInEmployee, 'leases:delete');
@@ -157,6 +198,17 @@ export default function LeaseDetailClient({
   
   const handleRenewLeaseSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    
+    // التحقق من تطابق المبالغ
+    if (showPaymentSchedule && amountDifference !== 0) {
+      toast({ 
+        variant: 'destructive', 
+        title: t('leaseDetail.error'), 
+        description: t('leaseDetail.pleaseFixMismatch') 
+      });
+      return;
+    }
+    
     const formData = new FormData(event.currentTarget);
     
     const renewalData = {
@@ -165,12 +217,13 @@ export default function LeaseDetailClient({
       tenantId: tenant.id,
       newStartDate: newStartDate!,
       newEndDate: newEndDate!,
-      newRentAmount: Number(formData.get('newRentAmount')),
-      numberOfPayments: Number(formData.get('numberOfPayments')),
+      newRentAmount: monthlyRent,
+      numberOfPayments: numberOfPayments,
       increasePercentage: formData.get('increasePercentage') ? Number(formData.get('increasePercentage')) : 0,
       businessName: lease.businessName || null,
       businessType: lease.businessType || null,
       tradeLicenseNumber: lease.tradeLicenseNumber || null,
+      customPayments: showPaymentSchedule ? scheduledPayments : null,
     };
     
     const result = await handleRenewLease(renewalData);
@@ -372,7 +425,8 @@ export default function LeaseDetailClient({
                     name="newRentAmount" 
                     type="number" 
                     step="0.01"
-                    defaultValue={lease.rentPaymentAmount || 0}
+                    value={monthlyRent}
+                    onChange={(e) => setMonthlyRent(Number(e.target.value))}
                     required 
                   />
                 </div>
@@ -388,16 +442,81 @@ export default function LeaseDetailClient({
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="numberOfPayments">{t('leaseDetail.numberOfPayments')}</Label>
-                <Input 
-                  id="numberOfPayments" 
-                  name="numberOfPayments" 
-                  type="number"
-                  defaultValue={lease.numberOfPayments || 12}
-                  required 
-                />
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="numberOfPayments">{t('leaseDetail.numberOfPayments')}</Label>
+                  <Input 
+                    id="numberOfPayments" 
+                    name="numberOfPayments" 
+                    type="number"
+                    value={numberOfPayments}
+                    onChange={(e) => setNumberOfPayments(Number(e.target.value))}
+                    required 
+                  />
+                </div>
+                <div className="flex items-end">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={handleGenerateSchedule}
+                  >
+                    {t('leaseDetail.viewSchedule')}
+                  </Button>
+                </div>
               </div>
+              
+              {/* جدول الدفعات المجدولة */}
+              {showPaymentSchedule && scheduledPayments.length > 0 && (
+                <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-semibold">{t('leaseDetail.paymentSchedule')}</h4>
+                    <Badge variant={amountDifference === 0 ? 'default' : 'destructive'}>
+                      {t('leaseDetail.total')}: AED {totalScheduledAmount.toLocaleString()}
+                    </Badge>
+                  </div>
+                  
+                  {amountDifference !== 0 && (
+                    <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+                      <p className="text-sm text-red-700 dark:text-red-300 font-semibold">
+                        ⚠️ {t('leaseDetail.amountMismatch')}: 
+                        {amountDifference > 0 ? ' +' : ' -'}AED {Math.abs(amountDifference).toLocaleString()}
+                      </p>
+                      <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                        {t('leaseDetail.expectedTotal')}: AED {expectedTotal.toLocaleString()}
+                      </p>
+                    </div>
+                  )}
+                  
+                  <div className="max-h-[300px] overflow-y-auto space-y-2">
+                    {scheduledPayments.map((payment, index) => (
+                      <div key={index} className="grid grid-cols-3 gap-2 p-2 border rounded bg-background">
+                        <div className="text-sm">
+                          <div className="text-muted-foreground text-xs mb-1">{t('leaseDetail.dueDate')}</div>
+                          <div className="font-medium">{format(payment.dueDate, 'dd/MM/yyyy')}</div>
+                        </div>
+                        <div>
+                          <Input 
+                            type="number"
+                            step="0.01"
+                            value={payment.amount}
+                            onChange={(e) => handlePaymentChange(index, 'amount', Number(e.target.value))}
+                            className="h-8"
+                          />
+                        </div>
+                        <div>
+                          <Input 
+                            value={payment.description}
+                            onChange={(e) => handlePaymentChange(index, 'description', e.target.value)}
+                            className="h-8 text-sm"
+                            placeholder={t('leaseDetail.description')}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               
               <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                 <h4 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">

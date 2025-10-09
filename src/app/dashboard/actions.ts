@@ -372,6 +372,7 @@ export async function handleRenewLease(renewalData: {
     businessName: string | null;
     businessType: string | null;
     tradeLicenseNumber: string | null;
+    customPayments?: Array<{dueDate: Date, amount: number, description: string}> | null;
 }): Promise<{ success: boolean; message: string; newLeaseId?: string }> {
     const loggedInEmployee = await getEmployeeFromSession();
     if (!hasPermission(loggedInEmployee, 'leases:update')) {
@@ -436,6 +437,37 @@ export async function handleRenewLease(renewalData: {
                     payment.chequeNumber, payment.chequeImageUrl
                 ]
             );
+        }
+        
+        // 5b. Create new lease payments (custom or auto-generated)
+        if (renewalData.customPayments && renewalData.customPayments.length > 0) {
+            // استخدام الجدول المخصص
+            for (const payment of renewalData.customPayments) {
+                const newPaymentId = `payment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                await conn.execute(
+                    `INSERT INTO lease_payments 
+                    (id, leaseId, dueDate, amount, status, description) 
+                    VALUES (?, ?, ?, ?, 'Pending', ?)`,
+                    [newPaymentId, newLeaseId, payment.dueDate, payment.amount, payment.description]
+                );
+            }
+        } else {
+            // إنشاء دفعات تلقائية
+            for (let i = 0; i < renewalData.numberOfPayments; i++) {
+                const paymentDueDate = new Date(renewalData.newStartDate);
+                paymentDueDate.setMonth(paymentDueDate.getMonth() + i);
+                
+                const newPaymentId = `payment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                await conn.execute(
+                    `INSERT INTO lease_payments 
+                    (id, leaseId, dueDate, amount, status, description) 
+                    VALUES (?, ?, ?, ?, 'Pending', ?)`,
+                    [
+                        newPaymentId, newLeaseId, paymentDueDate, renewalData.newRentAmount,
+                        `دفعة ${i + 1} من ${renewalData.numberOfPayments}`
+                    ]
+                );
+            }
         }
         
         // 6. Update old lease status
