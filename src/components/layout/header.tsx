@@ -124,6 +124,7 @@ export function AppHeader({ loggedInEmployee }: { loggedInEmployee: Employee | n
                        {canReadLeases && <DropdownMenuItem asChild><Link href="/dashboard/financials/overview"><BarChart3 className="mr-2" />{t('nav.financialsDashboard')}</Link></DropdownMenuItem>}
                        {canReadLeases && <DropdownMenuItem asChild><Link href="/dashboard/financials"><FileSignature className="mr-2" />{t('nav.leasesPayments')}</Link></DropdownMenuItem>}
                        {canReadExpenses && <DropdownMenuItem asChild><Link href="/dashboard/expenses"><Receipt className="mr-2" />{t('nav.expenses')}</Link></DropdownMenuItem>}
+                       {canReadExpenses && <DropdownMenuItem asChild><Link href="/dashboard/purchase-requests"><DollarSign className="mr-2" />{t('nav.purchaseRequests')}</Link></DropdownMenuItem>}
                        {canReadCheques && <DropdownMenuItem asChild><Link href="/dashboard/cheques"><WalletCards className="mr-2"/>{t('nav.cheques')}</Link></DropdownMenuItem>}
                     </DropdownMenuContent>
                   </DropdownMenu>
