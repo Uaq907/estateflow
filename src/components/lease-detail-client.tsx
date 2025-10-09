@@ -179,12 +179,13 @@ export default function LeaseDetailClient({
 
                     <div className="space-y-2 text-right">
                         <h4 className="font-semibold text-lg flex items-center gap-2 justify-end flex-row-reverse"><Banknote /> {t('leaseDetail.financials')}</h4>
-                        <p><strong>{t('leaseDetail.totalAmount')}:</strong> AED {lease.totalLeaseAmount?.toLocaleString() ?? 'N/A'}</p>
-                        <p><strong>{t('leaseDetail.subTotal')}:</strong> AED {paymentPlanSubtotal.toLocaleString() ?? 'N/A'}</p>
-                        <p><strong>{t('leaseDetail.taxedAmount')}:</strong> AED {lease.taxedAmount?.toLocaleString() ?? 'N/A'}</p>
+                        <p><strong>{t('leaseDetail.subTotal')}:</strong> AED {paymentPlanSubtotal.toLocaleString()}</p>
+                        {lease.taxedAmount && lease.taxedAmount > 0 && (
+                            <p><strong>{t('leaseDetail.taxedAmount')}:</strong> AED {lease.taxedAmount?.toLocaleString()}</p>
+                        )}
+                        <p><strong>{t('leaseDetail.totalAmount')}:</strong> AED {(lease.totalLeaseAmount ?? paymentPlanSubtotal).toLocaleString()}</p>
                         <p><strong>{t('leaseDetail.totalPaid')}:</strong> AED {totalPaid.toLocaleString()}</p>
                         <p><strong>{t('leaseDetail.remainingBalance')}:</strong> <span className={remainingBalance > 0 ? 'text-red-600 font-semibold' : 'text-green-600'}>AED {remainingBalance.toLocaleString()}</span></p>
-                        <p><strong>{t('leaseDetail.payments')}:</strong> {lease.numberOfPayments ?? 'N/A'}</p>
                     </div>
                 </div>
 
