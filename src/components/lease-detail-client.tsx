@@ -61,19 +61,14 @@ export default function LeaseDetailClient({
   const [monthlyRent, setMonthlyRent] = useState(lease.rentPaymentAmount || 0);
   
   // حساب التواريخ الجديدة تلقائياً
-  const calculateNewDates = () => {
-    const oldEndDate = new Date(lease.endDate);
-    const newStart = new Date(oldEndDate);
-    newStart.setDate(newStart.getDate() + 1); // اليوم التالي
-    
-    const newEnd = new Date(newStart);
-    newEnd.setFullYear(newEnd.getFullYear() + 1); // سنة كاملة
-    newEnd.setDate(newEnd.getDate() - 1); // ناقص يوم
-    
-    return { newStart, newEnd };
-  };
+  const oldEndDate = new Date(lease.endDate);
+  const autoNewStartDate = new Date(oldEndDate);
+  autoNewStartDate.setDate(autoNewStartDate.getDate() + 1); // اليوم التالي
   
-  const { newStart: autoNewStartDate, newEnd: autoNewEndDate } = calculateNewDates();
+  const autoNewEndDate = new Date(autoNewStartDate);
+  autoNewEndDate.setFullYear(autoNewEndDate.getFullYear() + 1); // سنة كاملة
+  autoNewEndDate.setDate(autoNewEndDate.getDate() - 1); // ناقص يوم
+  
   const [newStartDate, setNewStartDate] = useState<Date | undefined>(autoNewStartDate);
   const [newEndDate, setNewEndDate] = useState<Date | undefined>(autoNewEndDate);
   
