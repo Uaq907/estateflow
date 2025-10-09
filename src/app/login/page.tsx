@@ -79,16 +79,18 @@ function LoginForm() {
               type={showPassword ? "text" : "password"} 
               name="password" 
               required 
+              className="pr-10"
             />
             <button
               type="button"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none z-10"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "إخفاء كلمة السر" : "إظهار كلمة السر"}
             >
               {showPassword ? (
-                <EyeOff className="h-4 w-4" />
+                <EyeOff className="h-5 w-5" />
               ) : (
-                <Eye className="h-4 w-4" />
+                <Eye className="h-5 w-5" />
               )}
             </button>
           </div>
@@ -98,10 +100,23 @@ function LoginForm() {
         <Button type="submit" disabled={isLoading} className="w-full">
           {isLoading ? 'Logging in...' : 'Login'}
         </Button>
+        
+        {/* Demo Credentials Info */}
+        <Alert className="w-full bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+          <LogIn className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <AlertTitle className="text-blue-800 dark:text-blue-200">بيانات الدخول التجريبية</AlertTitle>
+          <AlertDescription className="text-blue-700 dark:text-blue-300">
+            <div className="space-y-1 mt-2">
+              <div><strong>البريد:</strong> uaq907@gmail.com</div>
+              <div><strong>كلمة السر:</strong> demo123</div>
+            </div>
+          </AlertDescription>
+        </Alert>
+        
         {errorMessage && (
           <Alert variant="destructive" className="w-full">
             <ServerCrash className="h-4 w-4" />
-            <AlertTitle>Login Failed</AlertTitle>
+            <AlertTitle>فشل تسجيل الدخول</AlertTitle>
             <AlertDescription>{errorMessage}</AlertDescription>
           </Alert>
         )}

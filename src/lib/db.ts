@@ -2817,5 +2817,127 @@ export async function deletePurchaseRequest(id: string): Promise<{success: boole
     }
 }
 
+// ====== Lease History Functions ======
 
+export interface LeaseHistoryItem extends LeaseWithDetails {
+    totalPaidAmount: number;
+    totalDueAmount: number;
+    paymentsCount: number;
+    completedPaymentsCount: number;
+}
 
+export async function getCompletedLeasesHistory(): Promise<LeaseHistoryItem[]> {
+    let connection: mysql.Connection | null = null;
+    try {
+        connection = await getConnection();
+        const [rows] = await connection.query(`
+            SELECT 
+                l.*,
+                t.id as tenantId, t.name as tenantName, t.email as tenantEmail, 
+                t.phone as tenantPhone, t.allowLogin as tenantAllowLogin,
+                u.unitNumber as unitNumber, u.type as unitType, u.id as unitId,
+                u.bedrooms, u.bathrooms, u.squareFeet,
+                p.name as propertyName, p.id as propertyId, p.location as propertyLocation,
+                COALESCE(SUM(CASE WHEN lp.status = 'Paid' THEN lp.amount ELSE 0 END), 0) as totalPaidAmount,
+                COALESCE(SUM(lp.amount), 0) as totalDueAmount,
+                COUNT(lp.id) as paymentsCount,
+                COUNT(CASE WHEN lp.status = 'Paid' THEN 1 END) as completedPaymentsCount
+            FROM leases l
+            LEFT JOIN tenants t ON l.tenantId = t.id
+            LEFT JOIN units u ON l.unitId = u.id
+            LEFT JOIN properties p ON u.propertyId = p.id
+            LEFT JOIN lease_payments lp ON l.id = lp.leaseId
+            WHERE l.status IN ('Completed', 'Completed with Dues', 'Cancelled', 'Cancelled with Dues')
+            GROUP BY l.id, t.id, u.id, p.id
+            ORDER BY l.endDate DESC
+        `);
+        
+        const data = rows as any[];
+        return data.map(row => ({
+            lease: leaseSchema.parse({
+                id: String(row.id),
+                unitId: String(row.unitId),
+                tenantId: String(row.tenantId),
+                startDate: row.startDate,
+                endDate: row.endDate,
+                rentPaymentAmount: row.rentPaymentAmount,
+                numberOfPayments: row.numberOfPayments,
+                rentIncreasePercentage: row.rentIncreasePercentage,
+                securityDeposit: row.securityDeposit,
+                status: row.status,
+                leaseDocument: row.leaseDocument,
+                businessName: row.businessName,
+                businessType: row.businessType,
+                tradeLicenseNumber: row.tradeLicenseNumber,
+                tenantSince: row.tenantSince,
+                subtotalAmount: row.subtotalAmount,
+                taxedAmount: row.taxedAmount,
+                totalAmount: row.totalAmount
+            }),
+            tenant: tenantSchema.parse({
+                id: String(row.tenantId),
+                name: row.tenantName,
+                email: row.tenantEmail,
+                phone: row.tenantPhone,
+                allowLogin: row.tenantAllowLogin,
+                nationality: row.nationality || 'N/A',
+                passportNumber: row.passportNumber || 'N/A',
+                emiratesId: row.emiratesId || 'N/A',
+                visaFile: row.visaFile || null,
+                dateOfBirth: row.dateOfBirth || new Date(),
+                notes: row.notes || null,
+                password: row.password || null,
+                telegramBotToken: row.telegramBotToken || null,
+                telegramChannelId: row.telegramChannelId || null,
+                enableEmailAlerts: row.enableEmailAlerts || false,
+                profilePictureUrl: row.profilePictureUrl || null,
+                createdAt: row.createdAt || new Date(),
+                updatedAt: row.updatedAt || new Date()
+            }),
+            unit: {
+                id: String(row.unitId),
+                unitNumber: row.unitNumber,
+                type: row.unitType,
+                bedrooms: row.bedrooms || null,
+                bathrooms: row.bathrooms || null,
+                squareFeet: row.squareFeet || null,
+                propertyId: String(row.propertyId),
+                status: 'Occupied' as any,
+                rentAmount: row.rentPaymentAmount,
+                accountNo: row.accountNo || null,
+                floor: row.floor || null,
+                notes: row.notes || null,
+                createdAt: row.createdAt || new Date(),
+                updatedAt: row.updatedAt || new Date()
+            },
+            property: {
+                id: String(row.propertyId),
+                name: row.propertyName,
+                location: row.propertyLocation || 'N/A',
+                type: row.propertyType || 'N/A',
+                address: row.address || 'N/A',
+                description: row.description || null,
+                yearBuilt: row.yearBuilt || null,
+                totalUnits: row.totalUnits || 0,
+                ownerId: row.ownerId || null,
+                propertyManagerId: row.propertyManagerId || null,
+                latitude: row.latitude || null,
+                longitude: row.longitude || null,
+                imageUrl: row.imageUrl || null,
+                createdAt: row.createdAt || new Date(),
+                updatedAt: row.updatedAt || new Date()
+            },
+            totalPaidAmount: Number(row.totalPaidAmount) || 0,
+            totalDueAmount: Number(row.totalDueAmount) || 0,
+            paymentsCount: Number(row.paymentsCount) || 0,
+            completedPaymentsCount: Number(row.completedPaymentsCount) || 0
+        }));
+    } catch(e) {
+        console.error("Error fetching lease history", e);
+        throw e;
+    } finally {
+        if (connection) {
+            await connection.end();
+        }
+    }
+}

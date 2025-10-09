@@ -59,7 +59,7 @@ export async function authenticate(
       employee = await getEmployeeByEmail(email);
     } catch (dbError: any) {
       if (dbError.message.includes('ECONNREFUSED') || dbError.message.includes('connect')) {
-        return 'Database connection error. Please use demo credentials: uaq907@gmail.com / demo123';
+        return 'خطأ في الاتصال بقاعدة البيانات. الرجاء استخدام بيانات الدخول التجريبية المعروضة أدناه';
       }
       throw dbError;
     }
@@ -95,7 +95,7 @@ export async function authenticate(
       tenant = await getTenantByEmail(email);
     } catch (dbError: any) {
       if (dbError.message.includes('ECONNREFUSED') || dbError.message.includes('connect')) {
-        return 'Database connection error. Please use demo credentials: uaq907@gmail.com / demo123';
+        return 'خطأ في الاتصال بقاعدة البيانات. الرجاء استخدام بيانات الدخول التجريبية المعروضة أدناه';
       }
       throw dbError;
     }
