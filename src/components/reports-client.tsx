@@ -44,7 +44,7 @@ interface ReportData {
   id: string;
   title: string;
   description: string;
-  category: 'financial' | 'operational' | 'analytical' | 'compliance';
+  category: 'financial' | 'operational' | 'analytical' | 'compliance' | 'tax';
   icon: React.ElementType;
   color: string;
   lastGenerated?: Date;
@@ -111,7 +111,7 @@ const reportTypes: ReportData[] = [
     id: 'taxable-revenue-report',
     title: 'Taxable Revenue Report',
     description: 'VAT report for revenue based on paid invoices within selected period',
-    category: 'financial',
+    category: 'tax',
     icon: DollarSign,
     color: 'bg-emerald-600',
     frequency: 'quarterly'
@@ -120,7 +120,7 @@ const reportTypes: ReportData[] = [
     id: 'taxable-expenses-report',
     title: 'Taxable Expenses Report',
     description: 'VAT report for expenses based on approved expenses within selected period',
-    category: 'financial',
+    category: 'tax',
     icon: WalletCards,
     color: 'bg-rose-600',
     frequency: 'quarterly'
@@ -222,6 +222,7 @@ export default function ReportsClient({
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedChequeStatus, setSelectedChequeStatus] = useState<string>('all');
+  const [selectedTaxType, setSelectedTaxType] = useState<string>('all');
   
   // Translation functions for categories and frequencies
   const getCategoryLabel = (category: string) => {
@@ -252,7 +253,8 @@ export default function ReportsClient({
       financial: t('reports.financial'),
       operational: t('reports.operational'),
       analytical: t('reports.analytical'),
-      compliance: t('reports.compliance')
+      compliance: t('reports.compliance'),
+      tax: t('reports.tax')
     };
     return categoryTranslations[category] || category;
   };
@@ -337,8 +339,18 @@ export default function ReportsClient({
       });
     }
     
+    // Apply tax type filter when tax category is selected
+    if (selectedCategory === 'tax') {
+      if (selectedTaxType === 'revenue') {
+        reports = reports.filter(report => report.id === 'taxable-revenue-report');
+      } else if (selectedTaxType === 'expenses') {
+        reports = reports.filter(report => report.id === 'taxable-expenses-report');
+      }
+      // If 'all', show both tax reports (no additional filtering needed)
+    }
+    
     return reports.map(report => getTranslatedReport(report));
-  }, [selectedCategory, selectedFrequency, t]);
+  }, [selectedCategory, selectedFrequency, selectedTaxType, t]);
 
   // Filter properties based on selected owner
   const filteredProperties = useMemo(() => {
@@ -604,6 +616,8 @@ export default function ReportsClient({
     setSelectedOwner('all');
     setSelectedProperty('all');
     setSelectedUnit('all');
+    setSelectedChequeStatus('all');
+    setSelectedTaxType('all');
     setDateRange({});
   };
 
@@ -763,7 +777,7 @@ export default function ReportsClient({
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid gap-4 md:grid-cols-4" dir={t('common.direction') || 'rtl'}>
+        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5" dir={t('common.direction') || 'rtl'}>
           <Card dir={t('common.direction') || 'rtl'}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t('reports.totalReports')}</CardTitle>
@@ -798,6 +812,15 @@ export default function ReportsClient({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{reportStats.byCategory.analytical || 0}</div>
+            </CardContent>
+          </Card>
+          <Card dir={t('common.direction') || 'rtl'}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{t('reports.taxReports')}</CardTitle>
+              <Percent className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{reportStats.byCategory.tax || 0}</div>
             </CardContent>
           </Card>
         </div>
@@ -888,31 +911,20 @@ export default function ReportsClient({
                 </Select>
               </div>
 
-              {/* 4. Report Type - أقصى اليمين في الصف الثاني */}
+              {/* 4. Report Category - أقصى اليمين في الصف الثاني */}
               <div>
                 <label className="text-sm font-medium mb-2 block">{t('reports.filterByCategory')}</label>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                   <SelectTrigger>
-                    <SelectValue placeholder={t('reports.selectReportType')} />
+                    <SelectValue placeholder={t('reports.selectCategory')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">{t('reports.allCategories')}</SelectItem>
-                    <SelectItem value="revenue-summary">{t('reports.revenueSummaryReport')}</SelectItem>
-                    <SelectItem value="cheques-report">{t('reports.chequesReport')}</SelectItem>
-                    <SelectItem value="bounced-cheques-report">{t('reports.bouncedChequesReport')}</SelectItem>
-                    <SelectItem value="cleared-cheques-report">{t('reports.clearedChequesReport')}</SelectItem>
-                    <SelectItem value="pending-cheques-report">{t('reports.pendingChequesReport')}</SelectItem>
-                    <SelectItem value="taxable-revenue-report">{t('reports.taxableRevenueReport')}</SelectItem>
-                    <SelectItem value="taxable-expenses-report">{t('reports.taxableExpensesReport')}</SelectItem>
-                    <SelectItem value="expense-analysis">{t('reports.expenseAnalysis')}</SelectItem>
-                    <SelectItem value="property-occupancy">{t('reports.propertyOccupancy')}</SelectItem>
-                    <SelectItem value="maintenance-summary">{t('reports.maintenanceSummary')}</SelectItem>
-                    <SelectItem value="tenant-analysis">{t('reports.tenantAnalysis')}</SelectItem>
-                    <SelectItem value="performance-dashboard">{t('reports.performanceDashboard')}</SelectItem>
-                    <SelectItem value="trend-analysis">{t('reports.trendAnalysis')}</SelectItem>
-                    <SelectItem value="comparative-analysis">{t('reports.comparativeAnalysis')}</SelectItem>
-                    <SelectItem value="compliance-report">{t('reports.complianceReport')}</SelectItem>
-                    <SelectItem value="audit-trail">{t('reports.auditTrail')}</SelectItem>
+                    <SelectItem value="financial">{t('reports.financial')}</SelectItem>
+                    <SelectItem value="operational">{t('reports.operational')}</SelectItem>
+                    <SelectItem value="analytical">{t('reports.analytical')}</SelectItem>
+                    <SelectItem value="compliance">{t('reports.compliance')}</SelectItem>
+                    <SelectItem value="tax">{t('reports.tax')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -973,6 +985,23 @@ export default function ReportsClient({
                       <SelectItem value="pending">{t('reports.pending')}</SelectItem>
                       <SelectItem value="bounced">{t('reports.bounced')}</SelectItem>
                       <SelectItem value="submitted">{t('reports.submitted')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Tax Type Filter - Show when tax category is selected */}
+              {selectedCategory === 'tax' && (
+                <div>
+                  <label className="text-sm font-medium mb-2 block">{t('reports.filterByTaxType')}</label>
+                  <Select value={selectedTaxType} onValueChange={setSelectedTaxType}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('reports.selectTaxType')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t('reports.allTaxTypes')}</SelectItem>
+                      <SelectItem value="revenue">{t('reports.taxRevenue')}</SelectItem>
+                      <SelectItem value="expenses">{t('reports.taxExpenses')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

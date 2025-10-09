@@ -601,8 +601,16 @@ const translations = {
     'reports.financialReports': 'تقارير مالية',
     'reports.operationalReports': 'تقارير تشغيلية',
     'reports.analyticalReports': 'تقارير تحليلية',
+    'reports.taxReports': 'تقارير الضرائب',
     'reports.selectDateRangeError': 'الرجاء اختيار نطاق التاريخ (من - إلى) في الفلاتر أولاً',
     'reports.taxReportGenerated': 'تم إنشاء التقرير الضريبي بنجاح',
+    'reports.tax': 'الضريبة',
+    'reports.filterByTaxType': 'تصفية حسب نوع الضريبة',
+    'reports.selectTaxType': 'اختر نوع الضريبة',
+    'reports.allTaxTypes': 'الكل',
+    'reports.taxRevenue': 'المستلمة',
+    'reports.taxExpenses': 'المدفوعة',
+    'reports.selectCategory': 'اختر الفئة',
     
     // Dashboard home page
     'dashboard.welcomeBack': 'مرحباً بعودتك',
@@ -2365,8 +2373,16 @@ const translations = {
     'reports.financialReports': 'Financial Reports',
     'reports.operationalReports': 'Operational Reports',
     'reports.analyticalReports': 'Analytical Reports',
+    'reports.taxReports': 'Tax Reports',
     'reports.selectDateRangeError': 'Please select date range (from - to) in filters first',
     'reports.taxReportGenerated': 'Tax report generated successfully',
+    'reports.tax': 'Tax',
+    'reports.filterByTaxType': 'Filter by Tax Type',
+    'reports.selectTaxType': 'Select Tax Type',
+    'reports.allTaxTypes': 'All',
+    'reports.taxRevenue': 'Revenue',
+    'reports.taxExpenses': 'Expenses',
+    'reports.selectCategory': 'Select Category',
     
     // Dashboard home page
     'dashboard.welcomeBack': 'Welcome back',
