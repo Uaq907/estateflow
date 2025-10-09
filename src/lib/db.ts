@@ -4,8 +4,8 @@
 
 import type mysql from 'mysql2/promise';
 import { getConnection } from './db-connection';
-import type { Employee, Property, Unit, Tenant, Lease, LeaseWithDetails, LeasePayment, PaymentTransaction, Expense, MaintenanceContract, Asset, Payee, Cheque, Bank, Owner, UnitConfiguration, ChequeTransaction, PropertyDocument, CalendarEvent, ActivityLog, PushSubscription, EvictionRequest } from './types';
-import { employeeSchema, propertySchema, unitSchema, tenantSchema, leaseSchema, leasePaymentSchema, paymentTransactionSchema, expenseSchema, maintenanceContractSchema, assetSchema, payeeSchema, chequeSchema, bankSchema, ownerSchema, unitConfigurationSchema, chequeTransactionSchema, propertyDocumentSchema, calendarEventSchema, activityLogSchema, pushSubscriptionSchema, evictionRequestSchema } from './types';
+import type { Employee, Property, Unit, Tenant, Lease, LeaseWithDetails, LeasePayment, PaymentTransaction, Expense, MaintenanceContract, Asset, Payee, Cheque, Bank, Owner, UnitConfiguration, ChequeTransaction, PropertyDocument, CalendarEvent, ActivityLog, PushSubscription, EvictionRequest, PurchaseRequest } from './types';
+import { employeeSchema, propertySchema, unitSchema, tenantSchema, leaseSchema, leasePaymentSchema, paymentTransactionSchema, expenseSchema, maintenanceContractSchema, assetSchema, payeeSchema, chequeSchema, bankSchema, ownerSchema, unitConfigurationSchema, chequeTransactionSchema, propertyDocumentSchema, calendarEventSchema, activityLogSchema, pushSubscriptionSchema, evictionRequestSchema, purchaseRequestSchema } from './types';
 import bcrypt from 'bcrypt';
 import { format } from 'date-fns';
 import { randomUUID } from 'crypto';
@@ -2630,6 +2630,134 @@ export async function getEvictionRequestsByTenant(tenantId: string): Promise<Evi
     } catch(e) {
         console.error("Error getting eviction requests by tenant", e);
         return [];
+    }
+}
+
+// ====== Purchase Request Functions ======
+
+export async function getPurchaseRequests({ employeeId }: { employeeId?: string } = {}): Promise<PurchaseRequest[]> {
+    let connection: mysql.Connection | null = null;
+    try {
+        connection = await getConnection();
+        
+        let query = `
+            SELECT 
+                pr.*,
+                e.name as employeeName,
+                p.name as propertyName,
+                approver.name as approvedByName
+            FROM purchase_requests pr
+            LEFT JOIN employees e ON pr.employeeId = e.id
+            LEFT JOIN properties p ON pr.propertyId = p.id
+            LEFT JOIN employees approver ON pr.approvedBy = approver.id
+        `;
+        
+        const params: any[] = [];
+        
+        if (employeeId) {
+            query += ' WHERE pr.employeeId = ?';
+            params.push(employeeId);
+        }
+        
+        query += ' ORDER BY pr.createdAt DESC';
+        
+        const [rows] = await connection.query(query, params);
+        return (rows as any[]).map(row => purchaseRequestSchema.parse({ 
+            ...row, 
+            id: String(row.id)
+        }));
+    } catch(e) {
+        console.error("Error getting purchase requests", e);
+        return [];
+    }
+}
+
+export async function getPurchaseRequestById(id: string): Promise<PurchaseRequest | null> {
+    let connection: mysql.Connection | null = null;
+    try {
+        connection = await getConnection();
+        const [rows] = await connection.query(`
+            SELECT 
+                pr.*,
+                e.name as employeeName,
+                p.name as propertyName,
+                approver.name as approvedByName
+            FROM purchase_requests pr
+            LEFT JOIN employees e ON pr.employeeId = e.id
+            LEFT JOIN properties p ON pr.propertyId = p.id
+            LEFT JOIN employees approver ON pr.approvedBy = approver.id
+            WHERE pr.id = ?
+        `, [id]);
+        
+        if ((rows as any[]).length === 0) return null;
+        return purchaseRequestSchema.parse({ ...(rows as any[])[0], id: String((rows as any[])[0].id) });
+    } catch(e) {
+        console.error("Error getting purchase request by id", e);
+        return null;
+    }
+}
+
+export async function addPurchaseRequest(request: Partial<PurchaseRequest>): Promise<{success: boolean, message: string}> {
+    let connection: mysql.Connection | null = null;
+    try {
+        connection = await getConnection();
+        const id = request.id || `pr-${Date.now()}`;
+        
+        const fields = ['id', 'employeeId', 'title', 'description', 'category', 'estimatedAmount', 'propertyId', 'unitId', 'status'];
+        const values = [
+            id,
+            request.employeeId,
+            request.title,
+            request.description || null,
+            request.category || null,
+            request.estimatedAmount || 0,
+            request.propertyId || null,
+            request.unitId || null,
+            request.status || 'Pending'
+        ];
+        
+        const placeholders = fields.map(() => '?').join(', ');
+        const query = `INSERT INTO purchase_requests (${fields.join(', ')}) VALUES (${placeholders})`;
+        
+        await connection.execute(query, values);
+        
+        return { success: true, message: 'Purchase request added successfully.' };
+    } catch(e: any) {
+        console.error("Error adding purchase request", e);
+        return { success: false, message: e.message || "An unexpected error occurred." };
+    }
+}
+
+export async function updatePurchaseRequest(id: string, request: Partial<PurchaseRequest>): Promise<{success: boolean, message: string}> {
+    let connection: mysql.Connection | null = null;
+    try {
+        connection = await getConnection();
+        const fields = Object.keys(request).filter(key => key !== 'id');
+        const values = fields.map(field => (request as any)[field]);
+        
+        if (fields.length === 0) return { success: false, message: 'No fields to update' };
+        
+        const setClause = fields.map(field => `\`${field}\` = ?`).join(', ');
+        const query = `UPDATE purchase_requests SET ${setClause} WHERE id = ?`;
+        
+        await connection.execute(query, [...values, id]);
+        
+        return { success: true, message: 'Purchase request updated successfully.' };
+    } catch(e: any) {
+        console.error("Error updating purchase request", e);
+        return { success: false, message: e.message || "An unexpected error occurred." };
+    }
+}
+
+export async function deletePurchaseRequest(id: string): Promise<{success: boolean, message: string}> {
+    let connection: mysql.Connection | null = null;
+    try {
+        connection = await getConnection();
+        await connection.execute('DELETE FROM purchase_requests WHERE id = ?', [id]);
+        return { success: true, message: 'Purchase request deleted successfully.' };
+    } catch(e: any) {
+        console.error("Error deleting purchase request", e);
+        return { success: false, message: e.message || "An unexpected error occurred." };
     }
 }
 

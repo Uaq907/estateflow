@@ -443,3 +443,25 @@ export const evictionRequestSchema = z.object({
 });
 
 export type EvictionRequest = z.infer<typeof evictionRequestSchema>;
+
+export const purchaseRequestSchema = z.object({
+  id: z.string(),
+  employeeId: z.string(),
+  employeeName: z.string().optional().nullable(),
+  title: z.string().min(3, "Title is required."),
+  description: z.string().optional().nullable(),
+  category: z.string().optional().nullable(),
+  estimatedAmount: z.coerce.number().min(0, "Amount must be positive."),
+  propertyId: z.string().optional().nullable(),
+  propertyName: z.string().optional().nullable(),
+  unitId: z.string().optional().nullable(),
+  status: z.enum(['Pending', 'Approved', 'Rejected', 'Completed', 'Cancelled']).default('Pending'),
+  approvedBy: z.string().optional().nullable(),
+  approvedByName: z.string().optional().nullable(),
+  approvedAt: z.coerce.date().optional().nullable(),
+  rejectionReason: z.string().optional().nullable(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+export type PurchaseRequest = z.infer<typeof purchaseRequestSchema>;
