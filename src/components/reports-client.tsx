@@ -28,8 +28,7 @@ import {
   Maximize2,
   FileSpreadsheet,
   ChevronDown,
-  CreditCard,
-  Percent
+  CreditCard
 } from 'lucide-react';
 import { generatePDFReport, generatePDFFromHTML, type PDFReportData } from '@/lib/pdf-generator';
 import * as XLSX from 'xlsx';
@@ -322,6 +321,16 @@ export default function ReportsClient({
         report.title.toLowerCase().includes('cheque') ||
         report.description.toLowerCase().includes('cheque')
       );
+    } else if (selectedCategory === 'tax') {
+      // If tax category is selected, filter based on tax type
+      reports = reportTypes.filter(report => report.category === 'tax');
+      
+      if (selectedTaxType === 'revenue') {
+        reports = reports.filter(report => report.id === 'taxable-revenue-report');
+      } else if (selectedTaxType === 'expenses') {
+        reports = reports.filter(report => report.id === 'taxable-expenses-report');
+      }
+      // If 'all', show both tax reports (no additional filtering)
     } else {
       reports = reportTypes.filter(report => {
         // Category filter - now supports specific report IDs
@@ -338,16 +347,6 @@ export default function ReportsClient({
         const matchesFrequency = selectedFrequency === 'all' || report.frequency === selectedFrequency;
         return matchesFrequency;
       });
-    }
-    
-    // Apply tax type filter when tax category is selected
-    if (selectedCategory === 'tax') {
-      if (selectedTaxType === 'revenue') {
-        reports = reports.filter(report => report.id === 'taxable-revenue-report');
-      } else if (selectedTaxType === 'expenses') {
-        reports = reports.filter(report => report.id === 'taxable-expenses-report');
-      }
-      // If 'all', show both tax reports (no additional filtering needed)
     }
     
     return reports.map(report => getTranslatedReport(report));
@@ -617,7 +616,6 @@ export default function ReportsClient({
     setSelectedOwner('all');
     setSelectedProperty('all');
     setSelectedUnit('all');
-    setSelectedChequeStatus('all');
     setSelectedTaxType('all');
     setDateRange({});
   };
@@ -778,7 +776,7 @@ export default function ReportsClient({
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5" dir={t('common.direction') || 'rtl'}>
+        <div className="grid gap-4 md:grid-cols-4" dir={t('common.direction') || 'rtl'}>
           <Card dir={t('common.direction') || 'rtl'}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t('reports.totalReports')}</CardTitle>
@@ -813,15 +811,6 @@ export default function ReportsClient({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{reportStats.byCategory.analytical || 0}</div>
-            </CardContent>
-          </Card>
-          <Card dir={t('common.direction') || 'rtl'}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('reports.taxReports')}</CardTitle>
-              <Percent className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{reportStats.byCategory.tax || 0}</div>
             </CardContent>
           </Card>
         </div>
@@ -912,20 +901,27 @@ export default function ReportsClient({
                 </Select>
               </div>
 
-              {/* 4. Report Category - أقصى اليمين في الصف الثاني */}
+              {/* 4. Report Type - أقصى اليمين في الصف الثاني */}
               <div>
                 <label className="text-sm font-medium mb-2 block">{t('reports.filterByCategory')}</label>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                   <SelectTrigger>
-                    <SelectValue placeholder={t('reports.selectCategory')} />
+                    <SelectValue placeholder={t('reports.selectReportType')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">{t('reports.allCategories')}</SelectItem>
-                    <SelectItem value="financial">{t('reports.financial')}</SelectItem>
-                    <SelectItem value="operational">{t('reports.operational')}</SelectItem>
-                    <SelectItem value="analytical">{t('reports.analytical')}</SelectItem>
-                    <SelectItem value="compliance">{t('reports.compliance')}</SelectItem>
+                    <SelectItem value="revenue-summary">{t('reports.revenueSummaryReport')}</SelectItem>
+                    <SelectItem value="cheques-report">{t('reports.chequesReport')}</SelectItem>
                     <SelectItem value="tax">{t('reports.tax')}</SelectItem>
+                    <SelectItem value="expense-analysis">{t('reports.expenseAnalysis')}</SelectItem>
+                    <SelectItem value="property-occupancy">{t('reports.propertyOccupancy')}</SelectItem>
+                    <SelectItem value="maintenance-summary">{t('reports.maintenanceSummary')}</SelectItem>
+                    <SelectItem value="tenant-analysis">{t('reports.tenantAnalysis')}</SelectItem>
+                    <SelectItem value="performance-dashboard">{t('reports.performanceDashboard')}</SelectItem>
+                    <SelectItem value="trend-analysis">{t('reports.trendAnalysis')}</SelectItem>
+                    <SelectItem value="comparative-analysis">{t('reports.comparativeAnalysis')}</SelectItem>
+                    <SelectItem value="compliance-report">{t('reports.complianceReport')}</SelectItem>
+                    <SelectItem value="audit-trail">{t('reports.auditTrail')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
