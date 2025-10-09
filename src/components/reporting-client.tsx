@@ -10,6 +10,7 @@ import type { Employee } from '@/lib/types';
 import { generateReportAction } from '@/app/dashboard/actions';
 import { Separator } from './ui/separator';
 import { hasPermission } from '@/lib/permissions';
+import { useToast } from '@/hooks/use-toast';
 
 interface ReportingClientProps {
     loggedInEmployee: Employee | null;
