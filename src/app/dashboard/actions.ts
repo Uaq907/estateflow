@@ -18,11 +18,6 @@ import {
     addLeasePayment,
     updateLeasePayment,
     deleteLeasePayment as dbDeleteLeasePayment,
-    getPurchaseRequests,
-    getPurchaseRequestById,
-    addPurchaseRequest as dbAddPurchaseRequest,
-    updatePurchaseRequest as dbUpdatePurchaseRequest,
-    deletePurchaseRequest as dbDeletePurchaseRequest,
     requestPaymentExtension as dbRequestPaymentExtension,
     reviewPaymentExtension as dbReviewPaymentExtension,
     addPaymentTransaction,
@@ -900,7 +895,7 @@ export async function handleAddExpense(expenseData: Partial<Omit<Expense, 'id' |
             performedBy: loggedInEmployee!.id,
             performedByName: loggedInEmployee!.name,
             notes: `Created expense: ${expenseData.category} - AED ${finalAmount.toLocaleString()}`,
-            previousStatus: null,
+            previousStatus: undefined,
             newStatus: 'Pending'
         });
         
@@ -986,7 +981,7 @@ export async function handleUpdateExpense(id: string, expenseData: Partial<Omit<
                 action: actionMap[dataToUpdate.status] || 'Submitted',
                 performedBy: loggedInEmployee!.id,
                 performedByName: loggedInEmployee!.name,
-                notes: dataToUpdate.managerNotes || null,
+                notes: dataToUpdate.managerNotes || undefined,
                 previousStatus: originalExpense.status,
                 newStatus: dataToUpdate.status
             });
@@ -2126,127 +2121,6 @@ export async function handleDeleteEvictionRequest(id: string) {
 }
 
 // ====== Purchase Request Actions ======
-
-export async function handleAddPurchaseRequest(requestData: Partial<PurchaseRequest>) {
-    const loggedInEmployee = await getEmployeeFromSession();
-    if (!loggedInEmployee) {
-        return { success: false, message: 'Not authenticated.' };
-    }
-
-    try {
-        const result = await dbAddPurchaseRequest({
-            ...requestData,
-            employeeId: loggedInEmployee.id,
-            status: 'Pending'
-        });
-
-        if (result.success) {
-            await logActivity(loggedInEmployee.id, loggedInEmployee.name, 'CREATE_PURCHASE_REQUEST', 'PurchaseRequest', requestData.id || '', { title: requestData.title });
-            
-            // Send notification to approvers
-            await sendSystemTelegramNotification(
-                `🛒 طلب شراء جديد\n` +
-                `الموظف: ${loggedInEmployee.name}\n` +
-                `العنوان: ${requestData.title}\n` +
-                `المبلغ المقدر: AED ${requestData.estimatedAmount?.toFixed(2)}`
-            );
-            
-            revalidatePath('/dashboard/purchase-requests');
-            return { success: true, message: 'Purchase request submitted successfully.' };
-        }
-        return result;
-    } catch (error: any) {
-        console.error('Failed to add purchase request:', error);
-        return { success: false, message: 'Failed to submit purchase request.' };
-    }
-}
-
-export async function handleApprovePurchaseRequest(id: string) {
-    const loggedInEmployee = await getEmployeeFromSession();
-    if (!hasPermission(loggedInEmployee, 'expenses:approve')) {
-        return { success: false, message: 'Permission denied.' };
-    }
-
-    try {
-        const result = await dbUpdatePurchaseRequest(id, {
-            status: 'Approved',
-            approvedBy: loggedInEmployee!.id,
-            approvedAt: new Date()
-        });
-
-        if (result.success) {
-            const purchaseRequest = await getPurchaseRequestById(id);
-            if (purchaseRequest) {
-                await sendNotification(
-                    purchaseRequest.employeeId,
-                    `✅ تمت الموافقة على طلب الشراء\n` +
-                    `العنوان: ${purchaseRequest.title}\n` +
-                    `يمكنك المتابعة بالشراء الآن`
-                );
-            }
-            
-            await logActivity(loggedInEmployee!.id, loggedInEmployee!.name, 'APPROVE_PURCHASE_REQUEST', 'PurchaseRequest', id);
-            revalidatePath('/dashboard/purchase-requests');
-            return { success: true, message: 'Purchase request approved.' };
-        }
-        return result;
-    } catch (error: any) {
-        return { success: false, message: 'Failed to approve purchase request.' };
-    }
-}
-
-export async function handleRejectPurchaseRequest(id: string, rejectionReason: string) {
-    const loggedInEmployee = await getEmployeeFromSession();
-    if (!hasPermission(loggedInEmployee, 'expenses:approve')) {
-        return { success: false, message: 'Permission denied.' };
-    }
-
-    try {
-        const result = await dbUpdatePurchaseRequest(id, {
-            status: 'Rejected',
-            rejectionReason,
-            approvedBy: loggedInEmployee!.id,
-            approvedAt: new Date()
-        });
-
-        if (result.success) {
-            const purchaseRequest = await getPurchaseRequestById(id);
-            if (purchaseRequest) {
-                await sendNotification(
-                    purchaseRequest.employeeId,
-                    `❌ تم رفض طلب الشراء\n` +
-                    `العنوان: ${purchaseRequest.title}\n` +
-                    `السبب: ${rejectionReason}`
-                );
-            }
-            
-            await logActivity(loggedInEmployee!.id, loggedInEmployee!.name, 'REJECT_PURCHASE_REQUEST', 'PurchaseRequest', id, { rejectionReason });
-            revalidatePath('/dashboard/purchase-requests');
-            return { success: true, message: 'Purchase request rejected.' };
-        }
-        return result;
-    } catch (error: any) {
-        return { success: false, message: 'Failed to reject purchase request.' };
-    }
-}
-
-export async function handleDeletePurchaseRequest(id: string) {
-    const loggedInEmployee = await getEmployeeFromSession();
-    if (!loggedInEmployee) {
-        return { success: false, message: 'Not authenticated.' };
-    }
-
-    try {
-        const result = await dbDeletePurchaseRequest(id);
-        if (result.success) {
-            await logActivity(loggedInEmployee.id, loggedInEmployee.name, 'DELETE_PURCHASE_REQUEST', 'PurchaseRequest', id);
-            revalidatePath('/dashboard/purchase-requests');
-            return { success: true, message: 'Purchase request deleted.' };
-        }
-        return result;
-    } catch (error: any) {
-        return { success: false, message: 'Failed to delete purchase request.' };
-    }
-}
+// NOTE: Purchase Request feature has been removed from the application
 
     
