@@ -28,7 +28,8 @@ import {
   Maximize2,
   FileSpreadsheet,
   ChevronDown,
-  CreditCard
+  CreditCard,
+  Percent
 } from 'lucide-react';
 import { generatePDFReport, generatePDFFromHTML, type PDFReportData } from '@/lib/pdf-generator';
 import * as XLSX from 'xlsx';
