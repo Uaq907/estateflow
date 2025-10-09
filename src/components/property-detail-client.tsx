@@ -70,6 +70,8 @@ export default function PropertyDetailClient({
   const [employeeToAssign, setEmployeeToAssign] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [isRemoveEmployeeDialogOpen, setIsRemoveEmployeeDialogOpen] = useState(false);
+  const [employeeToRemove, setEmployeeToRemove] = useState<{id: string, name: string} | null>(null);
 
 
   const { toast } = useToast();
@@ -308,14 +310,23 @@ export default function PropertyDetailClient({
     }
   };
 
-  const handleRemoveEmployee = async (employeeId: string) => {
-    const result = await handleRemoveEmployeeFromProperty(employeeId, property.id);
+  const handleRemoveEmployeeClick = (employeeId: string, employeeName: string) => {
+    setEmployeeToRemove({ id: employeeId, name: employeeName });
+    setIsRemoveEmployeeDialogOpen(true);
+  };
+
+  const confirmRemoveEmployee = async () => {
+    if (!employeeToRemove) return;
+    
+    const result = await handleRemoveEmployeeFromProperty(employeeToRemove.id, property.id);
      if (result.success) {
       toast({ title: 'Success', description: result.message });
-      setAssignedEmployees(assignedEmployees.filter(e => e.id !== employeeId));
+      setAssignedEmployees(assignedEmployees.filter(e => e.id !== employeeToRemove.id));
     } else {
       toast({ variant: 'destructive', title: 'Error', description: result.message });
     }
+    setIsRemoveEmployeeDialogOpen(false);
+    setEmployeeToRemove(null);
   };
   
   const unassignedEmployees = allEmployees.filter(emp => !assignedEmployees.some(assigned => assigned.id === emp.id));
@@ -523,7 +534,7 @@ export default function PropertyDetailClient({
                             </div>
                            </div>
                            {canAssignStaff && (
-                            <Button variant="ghost" size="icon" onClick={() => handleRemoveEmployee(employee.id)}>
+                            <Button variant="ghost" size="icon" onClick={() => handleRemoveEmployeeClick(employee.id, employee.name)}>
                                 <UserMinus className="h-4 w-4 text-destructive" />
                             </Button>
                            )}
@@ -574,6 +585,23 @@ export default function PropertyDetailClient({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteProperty} className="bg-destructive hover:bg-destructive/90">
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={isRemoveEmployeeDialogOpen} onOpenChange={setIsRemoveEmployeeDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('propertyDetail.removeEmployeeTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('propertyDetail.removeEmployeeDesc')} <span className="font-semibold">{employeeToRemove?.name}</span> {t('propertyDetail.fromProperty')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('unitList.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRemoveEmployee} className="bg-destructive hover:bg-destructive/90">
+              {t('propertyDetail.remove')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
