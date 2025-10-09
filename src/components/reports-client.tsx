@@ -107,6 +107,24 @@ const reportTypes: ReportData[] = [
     color: 'bg-orange-500',
     frequency: 'daily'
   },
+  {
+    id: 'taxable-revenue-report',
+    title: 'Taxable Revenue Report',
+    description: 'VAT report for revenue based on paid invoices within selected period',
+    category: 'financial',
+    icon: DollarSign,
+    color: 'bg-emerald-600',
+    frequency: 'quarterly'
+  },
+  {
+    id: 'taxable-expenses-report',
+    title: 'Taxable Expenses Report',
+    description: 'VAT report for expenses based on approved expenses within selected period',
+    category: 'financial',
+    icon: WalletCards,
+    color: 'bg-rose-600',
+    frequency: 'quarterly'
+  },
 
   // Operational Reports
   {
@@ -204,36 +222,6 @@ export default function ReportsClient({
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedChequeStatus, setSelectedChequeStatus] = useState<string>('all');
-  const [taxDateRange, setTaxDateRange] = useState<{ from?: Date, to?: Date }>({});
-  const [isGeneratingTaxReport, setIsGeneratingTaxReport] = useState(false);
-  
-  // Tax Report Handler
-  const handleGenerateTaxReport = async (reportType: 'revenue' | 'expenses') => {
-    if (!taxDateRange.from || !taxDateRange.to) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Please select both start and end dates for the tax period.' });
-      return;
-    }
-    
-    setIsGeneratingTaxReport(true);
-    const result = await generateTaxReportAction(reportType, taxDateRange.from, taxDateRange.to);
-    
-    if (result.success && result.file) {
-      const blob = new Blob([new Uint8Array(result.file)], { type: result.mimeType });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = result.fileName;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-      toast({ title: 'Success', description: `${reportType === 'revenue' ? 'Revenue' : 'Expenses'} tax report generated.` });
-    } else {
-      toast({ variant: 'destructive', title: 'Error', description: result.message });
-    }
-    
-    setIsGeneratingTaxReport(false);
-  };
   
   // Translation functions for categories and frequencies
   const getCategoryLabel = (category: string) => {
@@ -380,7 +368,48 @@ export default function ReportsClient({
 
   const handleGenerateReport = async (reportId: string) => {
     setIsGenerating(reportId);
-    // Simulate report generation
+    
+    // Handle tax reports specially
+    if (reportId === 'taxable-revenue-report' || reportId === 'taxable-expenses-report') {
+      if (!dateRange.from || !dateRange.to) {
+        toast({ 
+          variant: 'destructive', 
+          title: t('common.error'), 
+          description: t('reports.selectDateRangeError') 
+        });
+        setIsGenerating(null);
+        return;
+      }
+      
+      const reportType = reportId === 'taxable-revenue-report' ? 'revenue' : 'expenses';
+      const result = await generateTaxReportAction(reportType, dateRange.from, dateRange.to);
+      
+      if (result.success && result.file) {
+        const blob = new Blob([new Uint8Array(result.file)], { type: result.mimeType });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = result.fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        toast({ 
+          title: t('common.success'), 
+          description: t('reports.taxReportGenerated') 
+        });
+      } else {
+        toast({ 
+          variant: 'destructive', 
+          title: t('common.error'), 
+          description: result.message 
+        });
+      }
+      setIsGenerating(null);
+      return;
+    }
+    
+    // Simulate report generation for other reports
     await new Promise(resolve => setTimeout(resolve, 2000));
     setIsGenerating(null);
     // Here you would implement actual report generation
@@ -768,40 +797,6 @@ export default function ReportsClient({
             <CardContent>
               <div className="text-2xl font-bold">{reportStats.byCategory.analytical || 0}</div>
             </CardContent>
-          </Card>
-        </div>
-
-        {/* Tax Reports Section */}
-        <div className="space-y-6" dir={t('common.direction') || 'rtl'}>
-          <div className="space-y-2">
-            <h3 className="text-xl font-semibold">{t('reports.taxReports')}</h3>
-            <p className="text-sm text-muted-foreground">{t('reports.taxReportsDesc')}</p>
-            <Separator />
-          </div>
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('reports.selectTaxPeriod')}</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col sm:flex-row gap-4 items-end">
-              <div className="grid gap-2">
-                <Label htmlFor="tax-from">{t('reports.from')}</Label>
-                <DatePicker name="tax-from" value={taxDateRange.from} onSelect={(date) => setTaxDateRange(prev => ({...prev, from: date}))} />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="tax-to">{t('reports.to')}</Label>
-                <DatePicker name="tax-to" value={taxDateRange.to} onSelect={(date) => setTaxDateRange(prev => ({...prev, to: date}))} />
-              </div>
-            </CardContent>
-            <CardFooter className="flex flex-col sm:flex-row gap-4">
-              <Button onClick={() => handleGenerateTaxReport('revenue')} disabled={isGeneratingTaxReport} className="w-full sm:w-auto">
-                <Download className="mr-2"/>
-                {isGeneratingTaxReport ? t('reports.generating') : t('reports.taxableRevenueReport')}
-              </Button>
-              <Button onClick={() => handleGenerateTaxReport('expenses')} disabled={isGeneratingTaxReport} className="w-full sm:w-auto">
-                <Download className="mr-2"/>
-                {isGeneratingTaxReport ? t('reports.generating') : t('reports.taxableExpensesReport')}
-              </Button>
-            </CardFooter>
           </Card>
         </div>
 

@@ -601,6 +601,8 @@ const translations = {
     'reports.financialReports': 'تقارير مالية',
     'reports.operationalReports': 'تقارير تشغيلية',
     'reports.analyticalReports': 'تقارير تحليلية',
+    'reports.selectDateRangeError': 'الرجاء اختيار نطاق التاريخ (من - إلى) في الفلاتر أولاً',
+    'reports.taxReportGenerated': 'تم إنشاء التقرير الضريبي بنجاح',
     
     // Dashboard home page
     'dashboard.welcomeBack': 'مرحباً بعودتك',
@@ -2363,6 +2365,8 @@ const translations = {
     'reports.financialReports': 'Financial Reports',
     'reports.operationalReports': 'Operational Reports',
     'reports.analyticalReports': 'Analytical Reports',
+    'reports.selectDateRangeError': 'Please select date range (from - to) in filters first',
+    'reports.taxReportGenerated': 'Tax report generated successfully',
     
     // Dashboard home page
     'dashboard.welcomeBack': 'Welcome back',
