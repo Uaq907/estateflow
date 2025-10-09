@@ -257,8 +257,21 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
 
                 {isVat && (
                     <div className="space-y-2">
-                        <Label htmlFor="taxNumber">Tax Number (TRN)</Label>
-                        <Input id="taxNumber" name="taxNumber" defaultValue={expense?.taxNumber ?? ''} placeholder="Tax Registration Number" disabled={!isEditable}/>
+                        <Label htmlFor="taxNumber">{t('expenseForm.taxNumber')} <span className="text-red-500">*</span></Label>
+                        <Input 
+                            id="taxNumber" 
+                            name="taxNumber" 
+                            defaultValue={expense?.taxNumber ?? ''} 
+                            placeholder={t('expenseForm.taxNumberPlaceholder')}
+                            pattern="[0-9]*"
+                            title={t('expenseForm.taxNumberValidation')}
+                            required
+                            disabled={!isEditable}
+                            onInput={(e) => {
+                                const target = e.target as HTMLInputElement;
+                                target.value = target.value.replace(/[^0-9]/g, '');
+                            }}
+                        />
                     </div>
                 )}
                 
