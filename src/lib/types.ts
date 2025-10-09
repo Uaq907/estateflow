@@ -252,7 +252,7 @@ export const expenseSchema = z.object({
     category: z.string().min(1, "Category is required."),
     supplier: z.string().optional().nullable(),
     description: z.string().optional().nullable(),
-    status: z.enum(['Pending', 'Approved', 'Rejected', 'Needs Correction']),
+    status: z.enum(['Pending', 'Approved', 'Rejected', 'Needs Correction', 'Conditionally Approved']),
     receiptUrl: z.string().optional().nullable(),
     managerNotes: z.string().optional().nullable(),
     createdAt: z.coerce.date(),

@@ -70,6 +70,8 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
         return 'default';
       case 'Pending':
         return 'secondary';
+      case 'Conditionally Approved':
+        return 'outline';
       case 'Rejected':
       case 'Needs Correction':
         return 'destructive';
@@ -99,17 +101,17 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
 
   return (
     <>
-      <div className="rounded-md border">
+      <div className="rounded-md border" dir="rtl">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('expenses.propertyUnit')}</TableHead>
-              <TableHead>{t('expenses.submittedBy')}</TableHead>
-              <TableHead>{t('expenses.category')}</TableHead>
-              <TableHead>{t('expenses.amount')}</TableHead>
-              <TableHead>{t('expenses.status')}</TableHead>
-              <TableHead>{t('expenses.receipt')}</TableHead>
-              <TableHead>
+              <TableHead className="text-right">{t('expenses.propertyUnit')}</TableHead>
+              <TableHead className="text-right">{t('expenses.submittedBy')}</TableHead>
+              <TableHead className="text-right">{t('expenses.category')}</TableHead>
+              <TableHead className="text-right">{t('expenses.amount')}</TableHead>
+              <TableHead className="text-right">{t('expenses.status')}</TableHead>
+              <TableHead className="text-right">{t('expenses.receipt')}</TableHead>
+              <TableHead className="text-right">
                 <span className="sr-only">{t('expenses.actions')}</span>
               </TableHead>
             </TableRow>
@@ -120,7 +122,7 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
                 const actionDetails = getActionDetails(expense, t);
                 return (
                   <TableRow key={expense.id}>
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium text-right">
                       <div>{expense.propertyName}</div>
                       <div className="text-xs text-muted-foreground">ID: {expense.propertyId}</div>
                       {expense.unitNumber && (
@@ -130,14 +132,14 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
                         </div>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-right">
                       <div className="font-medium">{expense.employeeName}</div>
                       <div className="text-xs text-muted-foreground">
                         <ClientFormattedDate date={expense.createdAt} />
                       </div>
                     </TableCell>
-                    <TableCell>{expense.category}</TableCell>
-                    <TableCell>
+                    <TableCell className="text-right">{expense.category}</TableCell>
+                    <TableCell className="text-right">
                       <div className="flex flex-col">
                           <span>AED {expense.amount.toLocaleString()}</span>
                           {expense.taxNumber && 
@@ -147,13 +149,14 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
                           }
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-right">
                       <div className="flex flex-col gap-1">
                         <Badge variant={getStatusBadgeVariant(expense.status)}>
                           {expense.status === 'Pending' ? t('expenses.pending') :
                            expense.status === 'Approved' ? t('expenses.approved') :
                            expense.status === 'Rejected' ? t('expenses.rejected') :
                            expense.status === 'Needs Correction' ? t('expenses.needsCorrection') :
+                           expense.status === 'Conditionally Approved' ? t('expenses.conditionallyApproved') :
                            expense.status}
                         </Badge>
                         {expense.managerName && (
@@ -161,7 +164,7 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-right">
                         {expense.receiptUrl ? (
                             <Button asChild variant="outline" size="sm">
                                 <Link href={expense.receiptUrl} target="_blank">
@@ -172,7 +175,7 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
                            <span className="text-xs text-muted-foreground">{t('expenses.notUploaded')}</span>
                         )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-right">
                       {actionDetails.isPrimary ? (
                         <Button variant="outline" size="sm" onClick={() => onAction(expense)}>
                           {actionDetails.icon}

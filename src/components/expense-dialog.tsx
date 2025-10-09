@@ -28,7 +28,7 @@ interface ExpenseDialogProps {
 }
 
 const expenseCategories = ['Maintenance', 'Utilities', 'Marketing', 'Supplies', 'Legal', 'Other'];
-const expenseStatuses: Expense['status'][] = ['Pending', 'Approved', 'Rejected', 'Needs Correction'];
+const expenseStatuses: Expense['status'][] = ['Pending', 'Approved', 'Rejected', 'Needs Correction', 'Conditionally Approved'];
 
 export default function ExpenseDialog({ isOpen, onOpenChange, expense, properties, onSubmit, loggedInEmployee }: ExpenseDialogProps) {
   const formRef = useRef<HTMLFormElement>(null);
@@ -299,6 +299,7 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
                 <>
                 <Button type="submit" value="needs_correction" variant="secondary">{t('expenseForm.requestCorrection')}</Button>
                 <Button type="submit" value="reject" variant="destructive">{t('expenseForm.reject')}</Button>
+                <Button type="submit" value="conditional_approve" variant="outline">{t('expenses.conditionalApprove')}</Button>
                 <Button type="submit" value="approve">{t('expenseForm.approve')}</Button>
                 </>
             )}
