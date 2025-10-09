@@ -174,7 +174,7 @@ export default function LeaseDetailClient({
                         <h4 className="font-semibold text-lg flex items-center gap-2 justify-end flex-row-reverse"><Calendar /> {t('leaseDetail.leaseTerm')}</h4>
                         <p><strong>{t('leaseDetail.startDate')}:</strong> {format(new Date(lease.startDate), 'dd/MM/yyyy')}</p>
                         <p><strong>{t('leaseDetail.endDate')}:</strong> {format(new Date(lease.endDate), 'dd/MM/yyyy')}</p>
-                        <div className="flex items-center gap-2 justify-end"><Badge>{lease.status}</Badge> :<strong>{t('leaseDetail.status')}</strong></div>
+                        <p><strong>{t('leaseDetail.status')}:</strong> <Badge>{lease.status}</Badge></p>
                     </div>
 
                     <div className="space-y-2 text-right">
