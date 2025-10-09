@@ -52,8 +52,27 @@ export default function LeaseDetailClient({
   const [isLeaseDialogOpen, setIsLeaseDialogOpen] = useState(false);
   const [isEndLeaseAlertOpen, setIsEndLeaseAlertOpen] = useState(false);
   const [isRenewLeaseDialogOpen, setIsRenewLeaseDialogOpen] = useState(false);
-  const [newStartDate, setNewStartDate] = useState<Date | undefined>();
-  const [newEndDate, setNewEndDate] = useState<Date | undefined>();
+  
+  // حساب التواريخ الجديدة تلقائياً
+  const calculateNewDates = () => {
+    const oldEndDate = new Date(lease.endDate);
+    const newStart = new Date(oldEndDate);
+    newStart.setDate(newStart.getDate() + 1); // اليوم التالي
+    
+    const newEnd = new Date(newStart);
+    newEnd.setFullYear(newEnd.getFullYear() + 1); // سنة كاملة
+    newEnd.setDate(newEnd.getDate() - 1); // ناقص يوم
+    
+    return { newStart, newEnd };
+  };
+  
+  const { newStart: autoNewStartDate, newEnd: autoNewEndDate } = calculateNewDates();
+  const [newStartDate, setNewStartDate] = useState<Date | undefined>(autoNewStartDate);
+  const [newEndDate, setNewEndDate] = useState<Date | undefined>(autoNewEndDate);
+  
+  // فقط الأدمن يمكنه تعديل التواريخ
+  const isAdmin = loggedInEmployee?.email === 'uaq907@gmail.com';
+  const canEditDates = isAdmin;
   const router = useRouter();
 
   const { lease, tenant, property, unit } = leaseWithDetails;
@@ -299,11 +318,49 @@ export default function LeaseDetailClient({
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="newStartDate">{t('leaseDetail.newStartDate')}</Label>
-                  <DatePicker name="newStartDate" value={newStartDate} onSelect={setNewStartDate} required />
+                  {canEditDates ? (
+                    <DatePicker 
+                      name="newStartDate" 
+                      value={newStartDate} 
+                      onSelect={setNewStartDate} 
+                      required 
+                    />
+                  ) : (
+                    <>
+                      <Input 
+                        value={newStartDate ? format(newStartDate, 'dd/MM/yyyy') : ''} 
+                        readOnly 
+                        className="bg-muted"
+                      />
+                      <input type="hidden" name="newStartDate" value={newStartDate?.toISOString()} />
+                      <p className="text-xs text-muted-foreground">
+                        {t('leaseDetail.autoCalculated')}
+                      </p>
+                    </>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="newEndDate">{t('leaseDetail.newEndDate')}</Label>
-                  <DatePicker name="newEndDate" value={newEndDate} onSelect={setNewEndDate} required />
+                  {canEditDates ? (
+                    <DatePicker 
+                      name="newEndDate" 
+                      value={newEndDate} 
+                      onSelect={setNewEndDate} 
+                      required 
+                    />
+                  ) : (
+                    <>
+                      <Input 
+                        value={newEndDate ? format(newEndDate, 'dd/MM/yyyy') : ''} 
+                        readOnly 
+                        className="bg-muted"
+                      />
+                      <input type="hidden" name="newEndDate" value={newEndDate?.toISOString()} />
+                      <p className="text-xs text-muted-foreground">
+                        {t('leaseDetail.autoCalculated')}
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
               
