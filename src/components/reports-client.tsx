@@ -35,6 +35,10 @@ import * as XLSX from 'xlsx';
 import type { Employee, Owner, Property } from '@/lib/types';
 import { format } from 'date-fns';
 import { useLanguage } from '@/contexts/language-context';
+import { generateTaxReportAction } from '@/app/dashboard/actions';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
 
 interface ReportData {
   id: string;
@@ -197,8 +201,39 @@ export default function ReportsClient({
   properties: Property[];
 }) {
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedChequeStatus, setSelectedChequeStatus] = useState<string>('all');
+  const [taxDateRange, setTaxDateRange] = useState<{ from?: Date, to?: Date }>({});
+  const [isGeneratingTaxReport, setIsGeneratingTaxReport] = useState(false);
+  
+  // Tax Report Handler
+  const handleGenerateTaxReport = async (reportType: 'revenue' | 'expenses') => {
+    if (!taxDateRange.from || !taxDateRange.to) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Please select both start and end dates for the tax period.' });
+      return;
+    }
+    
+    setIsGeneratingTaxReport(true);
+    const result = await generateTaxReportAction(reportType, taxDateRange.from, taxDateRange.to);
+    
+    if (result.success && result.file) {
+      const blob = new Blob([new Uint8Array(result.file)], { type: result.mimeType });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = result.fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast({ title: 'Success', description: `${reportType === 'revenue' ? 'Revenue' : 'Expenses'} tax report generated.` });
+    } else {
+      toast({ variant: 'destructive', title: 'Error', description: result.message });
+    }
+    
+    setIsGeneratingTaxReport(false);
+  };
   
   // Translation functions for categories and frequencies
   const getCategoryLabel = (category: string) => {
@@ -733,6 +768,40 @@ export default function ReportsClient({
             <CardContent>
               <div className="text-2xl font-bold">{reportStats.byCategory.analytical || 0}</div>
             </CardContent>
+          </Card>
+        </div>
+
+        {/* Tax Reports Section */}
+        <div className="space-y-6" dir={t('common.direction') || 'rtl'}>
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold">{t('reports.taxReports')}</h3>
+            <p className="text-sm text-muted-foreground">{t('reports.taxReportsDesc')}</p>
+            <Separator />
+          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('reports.selectTaxPeriod')}</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col sm:flex-row gap-4 items-end">
+              <div className="grid gap-2">
+                <Label htmlFor="tax-from">{t('reports.from')}</Label>
+                <DatePicker name="tax-from" value={taxDateRange.from} onSelect={(date) => setTaxDateRange(prev => ({...prev, from: date}))} />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="tax-to">{t('reports.to')}</Label>
+                <DatePicker name="tax-to" value={taxDateRange.to} onSelect={(date) => setTaxDateRange(prev => ({...prev, to: date}))} />
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col sm:flex-row gap-4">
+              <Button onClick={() => handleGenerateTaxReport('revenue')} disabled={isGeneratingTaxReport} className="w-full sm:w-auto">
+                <Download className="mr-2"/>
+                {isGeneratingTaxReport ? t('reports.generating') : t('reports.taxableRevenueReport')}
+              </Button>
+              <Button onClick={() => handleGenerateTaxReport('expenses')} disabled={isGeneratingTaxReport} className="w-full sm:w-auto">
+                <Download className="mr-2"/>
+                {isGeneratingTaxReport ? t('reports.generating') : t('reports.taxableExpensesReport')}
+              </Button>
+            </CardFooter>
           </Card>
         </div>
 

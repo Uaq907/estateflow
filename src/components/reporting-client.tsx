@@ -5,14 +5,11 @@ import { useState } from 'react';
 import { AppHeader } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
 import { Download, Building, Users, HomeIcon, UserSquare, Receipt, WalletCards, FileSignature, Percent } from 'lucide-react';
 import type { Employee } from '@/lib/types';
-import { generateReportAction, generateTaxReportAction } from '@/app/dashboard/actions';
+import { generateReportAction } from '@/app/dashboard/actions';
 import { Separator } from './ui/separator';
 import { hasPermission } from '@/lib/permissions';
-import { DatePicker } from './date-picker';
-import { Label } from './ui/label';
 
 interface ReportingClientProps {
     loggedInEmployee: Employee | null;
@@ -72,36 +69,6 @@ function ReportButton({ type, title, description, icon }: ReportButtonProps) {
 
 export default function ReportingClient({ loggedInEmployee }: ReportingClientProps) {
     const canExecute = hasPermission(loggedInEmployee, 'reporting:execute');
-    const [taxDateRange, setTaxDateRange] = useState<{ from?: Date, to?: Date }>({});
-    const [isGeneratingTaxReport, setIsGeneratingTaxReport] = useState(false);
-    const { toast } = useToast();
-    
-    const handleGenerateTaxReport = async (reportType: 'revenue' | 'expenses') => {
-        if (!taxDateRange.from || !taxDateRange.to) {
-            toast({ variant: 'destructive', title: 'Error', description: 'Please select a valid date range.' });
-            return;
-        }
-
-        setIsGeneratingTaxReport(true);
-        const result = await generateTaxReportAction(reportType, taxDateRange.from, taxDateRange.to);
-
-        if (result.success && result.file) {
-            const blob = new Blob([new Uint8Array(result.file)], { type: result.mimeType });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = result.fileName;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
-            toast({ title: 'Success', description: `Tax report generated successfully.` });
-        } else {
-            toast({ variant: 'destructive', title: 'Error', description: result.message });
-        }
-        setIsGeneratingTaxReport(false);
-    }
-
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -117,39 +84,6 @@ export default function ReportingClient({ loggedInEmployee }: ReportingClientPro
 
                     {canExecute ? (
                         <>
-                            <div className="space-y-6">
-                                <div className="space-y-2">
-                                    <h3 className="text-xl font-semibold">Tax Reports (UAE VAT)</h3>
-                                    <p className="text-sm text-muted-foreground">Generate reports for VAT return filing based on paid invoices and approved expenses within a selected period.</p>
-                                    <Separator />
-                                </div>
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Select Tax Period</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="flex flex-col sm:flex-row gap-4 items-end">
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="tax-from">From</Label>
-                                            <DatePicker name="tax-from" value={taxDateRange.from} onSelect={(date) => setTaxDateRange(prev => ({...prev, from: date}))} />
-                                        </div>
-                                        <div className="grid gap-2">
-                                             <Label htmlFor="tax-to">To</Label>
-                                            <DatePicker name="tax-to" value={taxDateRange.to} onSelect={(date) => setTaxDateRange(prev => ({...prev, to: date}))} />
-                                        </div>
-                                    </CardContent>
-                                    <CardFooter className="gap-4">
-                                        <Button onClick={() => handleGenerateTaxReport('revenue')} disabled={isGeneratingTaxReport}>
-                                            <Download className="mr-2"/>
-                                            {isGeneratingTaxReport ? 'Generating...' : 'Taxable Revenue Report'}
-                                        </Button>
-                                         <Button onClick={() => handleGenerateTaxReport('expenses')} disabled={isGeneratingTaxReport}>
-                                            <Download className="mr-2"/>
-                                            {isGeneratingTaxReport ? 'Generating...' : 'Taxable Expenses Report'}
-                                        </Button>
-                                    </CardFooter>
-                                </Card>
-                            </div>
-
                             <div className="space-y-6">
                                 <div className="space-y-2">
                                     <h3 className="text-xl font-semibold">General Reports</h3>

@@ -584,6 +584,24 @@ const translations = {
     'propertyDocuments.delete': 'حذف',
     'propertyDocuments.unknown': 'غير معروف',
     
+    // Reports Page
+    'reports.taxReports': 'تقارير الضرائب (ضريبة القيمة المضافة الإماراتية)',
+    'reports.taxReportsDesc': 'إنشاء تقارير لتقديم إقرار ضريبة القيمة المضافة بناءً على الفواتير المدفوعة والمصروفات الموافق عليها خلال الفترة المحددة.',
+    'reports.selectTaxPeriod': 'اختر الفترة الضريبية',
+    'reports.from': 'من',
+    'reports.to': 'إلى',
+    'reports.taxableRevenueReport': 'تقرير الإيرادات الخاضعة للضريبة',
+    'reports.taxableExpensesReport': 'تقرير المصروفات الخاضعة للضريبة',
+    'reports.generating': 'جاري الإنشاء...',
+    'reports.comprehensiveReports': 'التقارير الشاملة',
+    'reports.generateAndDownload': 'إنشاء وتنزيل تقارير لمختلف جوانب عملياتك',
+    'reports.refresh': 'تحديث',
+    'reports.downloadAll': 'تنزيل الكل',
+    'reports.totalReports': 'إجمالي التقارير',
+    'reports.financialReports': 'تقارير مالية',
+    'reports.operationalReports': 'تقارير تشغيلية',
+    'reports.analyticalReports': 'تقارير تحليلية',
+    
     // Dashboard home page
     'dashboard.welcomeBack': 'مرحباً بعودتك',
     'dashboard.propertiesDescription': 'هنا العقارات التي تديرها. اختر واحد لعرض تفاصيله',
@@ -2327,6 +2345,24 @@ const translations = {
     'propertyDocuments.cancel': 'Cancel',
     'propertyDocuments.delete': 'Delete',
     'propertyDocuments.unknown': 'Unknown',
+    
+    // Reports Page
+    'reports.taxReports': 'Tax Reports (UAE VAT)',
+    'reports.taxReportsDesc': 'Generate reports for VAT return filing based on paid invoices and approved expenses within a selected period.',
+    'reports.selectTaxPeriod': 'Select Tax Period',
+    'reports.from': 'From',
+    'reports.to': 'To',
+    'reports.taxableRevenueReport': 'Taxable Revenue Report',
+    'reports.taxableExpensesReport': 'Taxable Expenses Report',
+    'reports.generating': 'Generating...',
+    'reports.comprehensiveReports': 'Comprehensive Reports',
+    'reports.generateAndDownload': 'Generate and download reports for various aspects of your operations',
+    'reports.refresh': 'Refresh',
+    'reports.downloadAll': 'Download All',
+    'reports.totalReports': 'Total Reports',
+    'reports.financialReports': 'Financial Reports',
+    'reports.operationalReports': 'Operational Reports',
+    'reports.analyticalReports': 'Analytical Reports',
     
     // Dashboard home page
     'dashboard.welcomeBack': 'Welcome back',
