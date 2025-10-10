@@ -2940,3 +2940,22 @@ export async function getCompletedLeasesHistory(): Promise<LeaseHistoryItem[]> {
         }
     }
 }
+
+// --- Email Settings Functions ---
+
+export async function getEmailSettings(): Promise<any | null> {
+  let connection: mysql.Connection | null = null;
+  try {
+    connection = await getConnection();
+    const [rows] = await connection.query('SELECT * FROM email_settings LIMIT 1');
+    const data = rows as any[];
+    return data.length > 0 ? data[0] : null;
+  } catch (e) {
+    console.error("Error fetching email settings", e);
+    return null;
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+}
