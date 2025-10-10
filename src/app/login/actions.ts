@@ -81,7 +81,7 @@ export async function authenticate(
                 const ip = forwarded ? forwarded.split(',')[0] : headersList.get('x-real-ip') || 'Unknown';
                 
                 // تسجيل نجاح تسجيل الدخول فقط
-                await logActivity(employee.id, employee.name, 'LOGIN_SUCCESS', ip, employee.id, { email });
+                await logActivity(employee.id, employee.name, 'LOGIN_SUCCESS', 'System', employee.id, { email, ip });
             } catch (logError) {
                 console.error('Error logging activity:', logError);
             }
@@ -117,7 +117,7 @@ export async function authenticate(
                 const ip = forwarded ? forwarded.split(',')[0] : headersList.get('x-real-ip') || 'Unknown';
                 
                 // تسجيل نجاح تسجيل الدخول فقط
-                await logActivity(tenant.id, tenant.name, 'LOGIN_SUCCESS', ip, tenant.id, { email });
+                await logActivity(tenant.id, tenant.name, 'LOGIN_SUCCESS', 'System', tenant.id, { email, ip });
             } catch (logError) {
                 console.error('Error logging activity:', logError);
             }
