@@ -47,10 +47,10 @@ export default function LeaseHistoryClient({
     return leaseHistory.filter(item => {
       const searchLower = searchTerm.toLowerCase();
       return (
-        item.property.name.toLowerCase().includes(searchLower) ||
-        item.unit.unitNumber.toLowerCase().includes(searchLower) ||
-        item.tenant.name.toLowerCase().includes(searchLower) ||
-        item.lease.businessName?.toLowerCase().includes(searchLower)
+        item.property?.name?.toLowerCase().includes(searchLower) ||
+        item.unit?.unitNumber?.toLowerCase().includes(searchLower) ||
+        item.tenant?.name?.toLowerCase().includes(searchLower) ||
+        item.lease?.businessName?.toLowerCase().includes(searchLower)
       );
     });
   }, [leaseHistory, searchTerm]);
