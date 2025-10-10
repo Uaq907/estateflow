@@ -632,7 +632,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
   // التحرير المباشر
   const handleStartInlineEdit = (template: any) => {
     setSelectedTemplate(template);
-    setPreviewEditingContent(template.content);
+    setPreviewEditingContent(''); // بدء بنموذج فارغ
     setIsPreviewEditing(true);
     setShowPreviewDialog(true);
     setFormattingOptions({
