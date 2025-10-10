@@ -8,7 +8,9 @@ export default async function PetitionTemplatesPage() {
   return (
     <div className="min-h-screen bg-background">
       <AppHeader loggedInEmployee={loggedInEmployee} />
-      <PetitionTemplatesClient loggedInEmployee={loggedInEmployee} />
+      <main className="p-6">
+        <PetitionTemplatesClient loggedInEmployee={loggedInEmployee} />
+      </main>
     </div>
   );
 }

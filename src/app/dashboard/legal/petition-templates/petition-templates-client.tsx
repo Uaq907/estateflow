@@ -364,11 +364,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
   const [showNewRequestDialog, setShowNewRequestDialog] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [requests, setRequests] = useState(petitionRequests);
-  const [isEditingEnabled, setIsEditingEnabled] = useState(() => {
-    // تحميل حالة التعديل من localStorage
-    const saved = localStorage.getItem('templatesEditingEnabled');
-    return saved ? JSON.parse(saved) : true; // افتراضياً مفعل
-  });
+  const [isEditingEnabled, setIsEditingEnabled] = useState(true);
   const [isCustomTitle, setIsCustomTitle] = useState(false);
   const [customTitle, setCustomTitle] = useState('');
   const [formattingOptions, setFormattingOptions] = useState({
@@ -424,27 +420,39 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
 
   // تحميل النماذج من localStorage مع دمج النماذج الجديدة
   useEffect(() => {
-    const savedTemplates = localStorage.getItem('petitionTemplates');
-    if (savedTemplates) {
-      const parsed = JSON.parse(savedTemplates);
-      // دمج النماذج الافتراضية مع المحفوظة (إضافة النماذج الجديدة)
-      const defaultIds = petitionTemplates.map(t => t.id);
-      const savedIds = parsed.map((t: any) => t.id);
-      
-      // إضافة النماذج الافتراضية الجديدة التي لا توجد في المحفوظة
-      const newTemplates = petitionTemplates.filter(t => !savedIds.includes(t.id));
-      
-      if (newTemplates.length > 0) {
-        const merged = [...parsed, ...newTemplates];
-        setTemplates(merged);
-        localStorage.setItem('petitionTemplates', JSON.stringify(merged));
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const savedTemplates = localStorage.getItem('petitionTemplates');
+      if (savedTemplates) {
+        const parsed = JSON.parse(savedTemplates);
+        // دمج النماذج الافتراضية مع المحفوظة (إضافة النماذج الجديدة)
+        const defaultIds = petitionTemplates.map(t => t.id);
+        const savedIds = parsed.map((t: any) => t.id);
+        
+        // إضافة النماذج الافتراضية الجديدة التي لا توجد في المحفوظة
+        const newTemplates = petitionTemplates.filter(t => !savedIds.includes(t.id));
+        
+        if (newTemplates.length > 0) {
+          const merged = [...parsed, ...newTemplates];
+          setTemplates(merged);
+          localStorage.setItem('petitionTemplates', JSON.stringify(merged));
+        } else {
+          setTemplates(parsed);
+        }
       } else {
-        setTemplates(parsed);
+        // أول مرة: حفظ النماذج الافتراضية
+        setTemplates(petitionTemplates);
+        localStorage.setItem('petitionTemplates', JSON.stringify(petitionTemplates));
       }
-    } else {
-      // أول مرة: حفظ النماذج الافتراضية
-      setTemplates(petitionTemplates);
-      localStorage.setItem('petitionTemplates', JSON.stringify(petitionTemplates));
+      
+      // تحميل حالة التعديل
+      const savedEditingState = localStorage.getItem('templatesEditingEnabled');
+      if (savedEditingState) {
+        setIsEditingEnabled(JSON.parse(savedEditingState));
+      }
+    } catch (error) {
+      console.error('Error loading templates from localStorage:', error);
     }
   }, []);
 
