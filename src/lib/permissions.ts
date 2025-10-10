@@ -19,8 +19,10 @@ export const ALL_PERMISSIONS = [
   // Property Management
   'properties:read',
   'properties:read-all', // General Manager: Can view all properties
+  'properties:read-assigned', // Property Manager: Can view only assigned properties
   'properties:create',
   'properties:update',
+  'properties:update-assigned', // Property Manager: Can update only assigned properties
   'properties:delete',
   'properties:documents:update',
   'properties:documents:delete',
@@ -132,8 +134,10 @@ export const PERMISSION_GROUPS = {
     "Property Management": [
         'properties:read',
         'properties:read-all',
+        'properties:read-assigned',
         'properties:create',
         'properties:update',
+        'properties:update-assigned',
         'properties:delete',
         'properties:documents:update',
         'properties:documents:delete',
