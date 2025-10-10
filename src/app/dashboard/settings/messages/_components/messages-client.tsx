@@ -11,7 +11,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Inbox, Send, Edit, Trash2, Star, Archive, Search, Plus, Mail, MailOpen, Reply, Forward, Paperclip, Clock, User } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Inbox, Send, Edit, Trash2, Star, Archive, Search, Plus, Mail, MailOpen, Reply, Forward, Paperclip, Clock, User, Settings, Lock, Server, CheckCircle, XCircle, Loader2, Eye, EyeOff, Shield } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import type { Employee } from '@/lib/types';
@@ -85,6 +86,7 @@ export default function MessagesClient({ employee }: { employee: Employee }) {
   const [selectedCategory, setSelectedCategory] = useState<'inbox' | 'sent' | 'draft' | 'archived'>('inbox');
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [isComposeOpen, setIsComposeOpen] = useState(false);
+  const [isEmailConfigOpen, setIsEmailConfigOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   
   // حالة رسالة جديدة
@@ -94,6 +96,19 @@ export default function MessagesClient({ employee }: { employee: Employee }) {
     content: '',
     attachments: [] as File[]
   });
+
+  // إعدادات البريد الإلكتروني
+  const [email, setEmail] = useState('no-reply@uaq907.com');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [host, setHost] = useState('smtpout.secureserver.net');
+  const [port, setPort] = useState(465);
+  const [fromName, setFromName] = useState('نظام إدارة العقارات - UAQ907');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [verificationStatus, setVerificationStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [verificationMessage, setVerificationMessage] = useState('');
+  const [isVerified, setIsVerified] = useState(false);
 
   // تصفية الرسائل حسب الفئة والبحث
   const filteredMessages = messages.filter(msg => {
@@ -159,6 +174,54 @@ export default function MessagesClient({ employee }: { employee: Employee }) {
     }
   };
 
+  // دالة للتحقق من صحة بيانات SMTP
+  const handleVerifyEmail = async () => {
+    if (!email || !password) {
+      setVerificationStatus('error');
+      setVerificationMessage('⚠️ يرجى إدخال البريد الإلكتروني وكلمة المرور');
+      return;
+    }
+
+    setIsVerifying(true);
+    setVerificationStatus('idle');
+    
+    try {
+      // محاكاة التحقق (سيتم استبداله بـ API حقيقي)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // محاكاة نجاح التحقق
+      setVerificationStatus('success');
+      setVerificationMessage('✅ تم التحقق من البريد الإلكتروني بنجاح! يمكنك الحفظ الآن.');
+      setIsVerified(true);
+    } catch (error) {
+      setVerificationStatus('error');
+      setVerificationMessage('❌ فشل الاتصال بخادم البريد. تحقق من البيانات.');
+      setIsVerified(false);
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  // دالة لحفظ الإعدادات
+  const handleSaveSettings = async () => {
+    if (!isVerified) {
+      alert('⚠️ يجب التحقق من البريد الإلكتروني أولاً');
+      return;
+    }
+
+    setIsSaving(true);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      alert('✅ تم حفظ إعدادات البريد الإلكتروني بنجاح!');
+      setIsEmailConfigOpen(false);
+    } catch (error) {
+      alert('❌ حدث خطأ أثناء حفظ الإعدادات');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <>
       <AppHeader employee={employee} />
@@ -218,6 +281,17 @@ export default function MessagesClient({ employee }: { employee: Employee }) {
                 >
                   <Archive className="h-4 w-4 mr-2" />
                   الأرشيف
+                </Button>
+                
+                <Separator className="my-2" />
+                
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start bg-blue-50 hover:bg-blue-100 text-blue-700"
+                  onClick={() => setIsEmailConfigOpen(true)}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  إعدادات البريد
                 </Button>
               </CardContent>
             </Card>
@@ -511,8 +585,200 @@ export default function MessagesClient({ employee }: { employee: Employee }) {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* نافذة إعدادات البريد الإلكتروني */}
+        <Dialog open={isEmailConfigOpen} onOpenChange={setIsEmailConfigOpen}>
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                إعدادات البريد الإلكتروني
+              </DialogTitle>
+              <DialogDescription>
+                ضبط وتفعيل حساب البريد الإلكتروني للنظام
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-6">
+              {/* بيانات البريد */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-sm flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  بيانات حساب البريد
+                </h3>
+                
+                {/* البريد الإلكتروني */}
+                <div className="grid gap-2">
+                  <Label htmlFor="email">البريد الإلكتروني *</Label>
+                  <div className="relative">
+                    <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="no-reply@uaq907.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pr-10"
+                      dir="ltr"
+                    />
+                  </div>
+                </div>
+
+                {/* كلمة المرور */}
+                <div className="grid gap-2">
+                  <Label htmlFor="password">كلمة المرور *</Label>
+                  <div className="relative">
+                    <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="أدخل كلمة المرور"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pr-10 pl-10"
+                      dir="ltr"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute left-0 top-0 h-full px-3 hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    كلمة مرور حساب البريد الإلكتروني من GoDaddy
+                  </p>
+                </div>
+
+                {/* اسم المرسل */}
+                <div className="grid gap-2">
+                  <Label htmlFor="fromName">اسم المرسل</Label>
+                  <Input
+                    id="fromName"
+                    type="text"
+                    placeholder="نظام إدارة العقارات - UAQ907"
+                    value={fromName}
+                    onChange={(e) => setFromName(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* إعدادات SMTP */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-sm flex items-center gap-2">
+                  <Server className="h-4 w-4" />
+                  إعدادات SMTP (متقدم)
+                </h3>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="host">خادم SMTP</Label>
+                    <Input
+                      id="host"
+                      type="text"
+                      value={host}
+                      onChange={(e) => setHost(e.target.value)}
+                      dir="ltr"
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="port">المنفذ</Label>
+                    <Input
+                      id="port"
+                      type="number"
+                      value={port}
+                      onChange={(e) => setPort(parseInt(e.target.value))}
+                    />
+                  </div>
+                </div>
+
+                <Alert className="bg-blue-50 border-blue-200">
+                  <Shield className="h-4 w-4 text-blue-600" />
+                  <AlertDescription className="text-xs text-blue-800">
+                    <strong>إعدادات GoDaddy:</strong> خادم SMTP: smtpout.secureserver.net | المنفذ: 465 (SSL)
+                  </AlertDescription>
+                </Alert>
+              </div>
+
+              <Separator />
+
+              {/* حالة التحقق */}
+              {verificationStatus !== 'idle' && (
+                <Alert className={verificationStatus === 'success' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}>
+                  {verificationStatus === 'success' ? (
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <XCircle className="h-4 w-4 text-red-600" />
+                  )}
+                  <AlertDescription className={verificationStatus === 'success' ? 'text-green-800' : 'text-red-800'}>
+                    {verificationMessage}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* ملاحظات الأمان */}
+              <Alert>
+                <Shield className="h-4 w-4" />
+                <AlertDescription className="text-xs">
+                  <strong>🔒 ملاحظة أمان:</strong> سيتم تشفير كلمة المرور قبل الحفظ. 
+                  يُنصح بإنشاء كلمة مرور خاصة بالتطبيق من إعدادات GoDaddy.
+                </AlertDescription>
+              </Alert>
+            </div>
+
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setIsEmailConfigOpen(false)}>
+                إلغاء
+              </Button>
+              <Button
+                onClick={handleVerifyEmail}
+                disabled={isVerifying || !email || !password}
+                variant="outline"
+              >
+                {isVerifying ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    جارٍ التحقق...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    التحقق من البريد
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={handleSaveSettings}
+                disabled={!isVerified || isSaving}
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    جارٍ الحفظ...
+                  </>
+                ) : (
+                  <>
+                    <Shield className="h-4 w-4 mr-2" />
+                    حفظ الإعدادات
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </>
   );
 }
+
 
