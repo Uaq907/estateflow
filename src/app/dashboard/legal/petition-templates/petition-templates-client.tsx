@@ -631,8 +631,10 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
 
   // التحرير المباشر
   const handleStartInlineEdit = (template: any) => {
-    setEditingTemplateId(template.id);
-    setEditingContent(template.content);
+    setSelectedTemplate(template);
+    setPreviewEditingContent(template.content);
+    setIsPreviewEditing(true);
+    setShowPreviewDialog(true);
     setFormattingOptions({
       bold: false,
       italic: false,
