@@ -47,6 +47,9 @@ export default function EvictionPageClient({
   const [showTenantSearch, setShowTenantSearch] = useState<boolean>(false);
   const [showCompanyDetails, setShowCompanyDetails] = useState<boolean>(false);
   const [selectedBusinessName, setSelectedBusinessName] = useState<string>('');
+  const [showTemplateDialog, setShowTemplateDialog] = useState<boolean>(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [filledTemplateContent, setFilledTemplateContent] = useState<string>('');
   
   const [newEviction, setNewEviction] = useState({
     tenantName: '',
@@ -58,10 +61,121 @@ export default function EvictionPageClient({
     description: ''
   });
   
-  // Template selection states
-  const [showTemplateDialog, setShowTemplateDialog] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
-  const [filledTemplateContent, setFilledTemplateContent] = useState('');
+  // تحميل النماذج من localStorage
+  const [availableTemplates, setAvailableTemplates] = useState<any[]>([]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedTemplates = localStorage.getItem('petitionTemplates');
+        if (savedTemplates) {
+          const templates = JSON.parse(savedTemplates);
+          // فلترة النماذج للإخلاء فقط
+          setAvailableTemplates(templates.filter((t: any) => t.category === 'إخلاء'));
+        }
+      } catch (error) {
+        console.error('Error loading templates:', error);
+      }
+    }
+  }, []);
+  
+  // ملء النموذج بالبيانات
+  const fillTemplateWithData = (templateContent: string) => {
+    const selectedTenant = tenants.find(t => t.id === selectedTenantId) || mockTenants.find(t => t.id === selectedTenantId);
+    const commercialCompany = mockCommercialCompanies.find(c => c.id === selectedTenantId);
+    
+    const dataMap: Record<string, string> = {
+      'اسم_المدعي': 'عبدالله محمد بن عمير ال علي',
+      'هوية_المدعي': '784-1945-4384241-1',
+      'عنوان_المدعي': 'أم القيوين – الظهر',
+      'هاتف_المدعي': '0522020200',
+      'ايميل_المدعي': 'uaq907@gmail.com',
+      'اسم_المدعى_عليه': newEviction.tenantName || selectedTenant?.name || commercialCompany?.name || '',
+      'هوية_المدعى_عليه': (selectedTenant as any)?.emiratesId || (commercialCompany as any)?.tradeLicense || '',
+      'عنوان_المدعى_عليه': newEviction.propertyName || '',
+      'هاتف_المدعى_عليه': selectedTenant?.phone || commercialCompany?.phone || '',
+      'ايميل_المدعى_عليه': selectedTenant?.email || commercialCompany?.email || '',
+      'اسم_العقار': newEviction.propertyName || '',
+      'رقم_العقد': 'TC-' + Date.now().toString().slice(-6),
+      'تاريخ_العقد': newEviction.submittedDate || '',
+      'قيمة_الايجار': newEviction.dueAmount || '0',
+      'تاريخ_البداية': newEviction.submittedDate || '',
+      'تاريخ_النهاية': new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toLocaleDateString('ar-SA'),
+      'المبلغ_المتأخر': newEviction.dueAmount || '0',
+      'تاريخ_اليوم': new Date().toLocaleDateString('ar-SA')
+    };
+    
+    let filled = templateContent;
+    Object.entries(dataMap).forEach(([key, value]) => {
+      const regex = new RegExp(`\\[${key}\\]`, 'g');
+      filled = filled.replace(regex, value);
+    });
+    
+    return filled;
+  };
+  
+  // اختيار نموذج
+  const handleSelectTemplate = (template: any) => {
+    const filled = fillTemplateWithData(template.content);
+    setSelectedTemplate(template);
+    setFilledTemplateContent(filled);
+    setShowTemplateDialog(false);
+    
+    // فتح النموذج في نافذة جديدة
+    const printWindow = window.open('', '_blank', 'width=900,height=700');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html dir="rtl" lang="ar">
+          <head>
+            <meta charset="UTF-8">
+            <title>${template.title}</title>
+            <style>
+              body { 
+                font-family: 'Arial', sans-serif; 
+                direction: rtl; 
+                text-align: right; 
+                margin: 40px; 
+                line-height: 1.8; 
+                background: white;
+              }
+              .header { 
+                text-align: center; 
+                margin-bottom: 30px; 
+                border-bottom: 2px solid #333; 
+                padding-bottom: 20px; 
+              }
+              .content { 
+                white-space: pre-line; 
+                font-size: 14px; 
+              }
+              .footer { 
+                margin-top: 40px; 
+                text-align: center;
+                padding-top: 20px;
+                border-top: 1px solid #ccc;
+              }
+              @media print {
+                body { margin: 20px; }
+                .no-print { display: none; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>${template.title}</h1>
+              <p>الفئة: ${template.category} | الإمارة: ${template.emirate}</p>
+            </div>
+            <div class="content">${filled}</div>
+            <div class="footer no-print">
+              <button onclick="window.print()" style="padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">🖨️ طباعة</button>
+              <button onclick="window.close()" style="padding: 10px 20px; margin: 10px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">✖️ إغلاق</button>
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+  };
 
   const handlePayeeTypeChange = (value: string) => {
     setPayeeType(value as 'tenant' | 'manual');
@@ -1028,18 +1142,17 @@ export default function EvictionPageClient({
           </div>
           
           <DialogFooter className="flex-row-reverse gap-2">
-                {selectedTenantId && (
-                  <Button 
-                    type="button"
-                    variant="secondary" 
-                    onClick={() => setShowTemplateDialog(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <FileText className="h-4 w-4" />
-                    اختيار نموذج دعوى
-                  </Button>
-                )}
-                <Button onClick={handleAddEviction} disabled={isSubmitting}>
+            {selectedTenantId && (
+              <Button 
+                onClick={() => setShowTemplateDialog(true)} 
+                variant="secondary"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <FileText className="ml-2 h-4 w-4" />
+                اختيار نموذج دعوى
+              </Button>
+            )}
+                <Button onClick={handleAddEviction} disabled={isSubmitting || !selectedTenantId}>
                   {isSubmitting ? 'جاري الإضافة...' : t('eviction.addRequest')}
             </Button>
             <Button variant="outline" onClick={handleCloseDialog}>
@@ -1051,173 +1164,62 @@ export default function EvictionPageClient({
       
       {/* Template Selection Dialog */}
       <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-right">اختيار نموذج دعوى</DialogTitle>
+            <DialogTitle className="text-right flex items-center gap-2 justify-start flex-row-reverse">
+              اختر نموذج الدعوى
+              <FileText className="h-5 w-5" />
+            </DialogTitle>
             <DialogDescription className="text-right">
-              اختر نموذجاً لملئه بالبيانات المدخلة
+              اختر نموذج دعوى مناسب لحالة الإخلاء. سيتم ملء النموذج تلقائياً بالبيانات المختارة.
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">
-            {/* عرض النماذج المتاحة - يتم جلبها من localStorage */}
-            {(() => {
-              if (typeof window === 'undefined') return null;
-              
-              try {
-                const savedTemplates = localStorage.getItem('petitionTemplates');
-                const templates = savedTemplates ? JSON.parse(savedTemplates) : [];
-                const evictionTemplates = templates.filter((t: any) => 
-                  t.category === 'إخلاء' || t.title.includes('إخلاء')
-                );
-                
-                if (evictionTemplates.length === 0) {
-                  return (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>لا توجد نماذج إخلاء متاحة</p>
-                      <Button variant="link" asChild className="mt-2">
-                        <Link href="/dashboard/legal/petition-templates">
-                          انتقل لصفحة النماذج
-                        </Link>
-                      </Button>
-                    </div>
-                  );
-                }
-                
-                return (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {evictionTemplates.map((template: any) => (
-                      <Card 
-                        key={template.id} 
-                        className="cursor-pointer hover:shadow-lg transition-shadow"
-                        onClick={() => {
-                          // ملء النموذج بالبيانات
-                          const tenant = tenants.find(t => t.id === selectedTenantId);
-                          const filledData = {
-                            'اسم_المدعى_عليه': tenant?.name || newEviction.tenantName,
-                            'هوية_المدعى_عليه': tenant?.idNumber || 'N/A',
-                            'عنوان_المدعى_عليه': newEviction.propertyName,
-                            'هاتف_المدعى_عليه': tenant?.phone || 'N/A',
-                            'ايميل_المدعى_عليه': tenant?.email || 'N/A',
-                            'اسم_العقار': newEviction.propertyName,
-                            'المبلغ_المتأخر': newEviction.dueAmount,
-                            'تاريخ_اليوم': new Date().toLocaleDateString('ar-SA')
-                          };
-                          
-                          let content = template.content;
-                          Object.entries(filledData).forEach(([key, value]) => {
-                            content = content.replace(new RegExp(`\\[${key}\\]`, 'g'), value);
-                          });
-                          
-                          setSelectedTemplate(template);
-                          setFilledTemplateContent(content);
-                          setShowTemplateDialog(false);
-                          
-                          // فتح صفحة النموذج في تاب جديد
-                          const printWindow = window.open('', '_blank');
-                          if (printWindow) {
-                            printWindow.document.write(`
-                              <!DOCTYPE html>
-                              <html dir="rtl" lang="ar">
-                              <head>
-                                <meta charset="UTF-8">
-                                <title>${template.title}</title>
-                                <style>
-                                  body {
-                                    font-family: 'Arial', sans-serif;
-                                    direction: rtl;
-                                    text-align: right;
-                                    line-height: 1.8;
-                                    margin: 40px;
-                                    background: white;
-                                  }
-                                  .header {
-                                    text-align: center;
-                                    margin-bottom: 30px;
-                                    border-bottom: 2px solid #333;
-                                    padding-bottom: 20px;
-                                  }
-                                  .content {
-                                    white-space: pre-line;
-                                    font-size: 14px;
-                                  }
-                                  .actions {
-                                    margin-top: 40px;
-                                    text-align: center;
-                                    padding: 20px;
-                                    background: #f5f5f5;
-                                    border-radius: 8px;
-                                  }
-                                  button {
-                                    padding: 10px 20px;
-                                    margin: 5px;
-                                    border: none;
-                                    border-radius: 5px;
-                                    cursor: pointer;
-                                    font-size: 14px;
-                                  }
-                                  .print-btn {
-                                    background: #007bff;
-                                    color: white;
-                                  }
-                                  .edit-btn {
-                                    background: #28a745;
-                                    color: white;
-                                  }
-                                  @media print {
-                                    .actions { display: none; }
-                                  }
-                                </style>
-                              </head>
-                              <body>
-                                <div class="header">
-                                  <h1>${template.title}</h1>
-                                  <p>الفئة: ${template.category} | الإمارة: ${template.emirate}</p>
-                                </div>
-                                <div class="content">${content}</div>
-                                <div class="actions">
-                                  <button class="print-btn" onclick="window.print()">🖨️ طباعة</button>
-                                  <button class="edit-btn" onclick="document.querySelector('.content').contentEditable = true; this.style.display = 'none'; document.querySelector('.save-btn').style.display = 'inline-block';">✏️ تعديل</button>
-                                  <button class="save-btn edit-btn" style="display: none;" onclick="document.querySelector('.content').contentEditable = false; this.style.display = 'none'; document.querySelector('.edit-btn').style.display = 'inline-block'; alert('تم حفظ التعديلات في هذه الصفحة فقط');">💾 حفظ</button>
-                                </div>
-                              </body>
-                              </html>
-                            `);
-                            printWindow.document.close();
-                          }
-                        }}
-                      >
-                        <CardHeader>
-                          <CardTitle className="text-base">{template.title}</CardTitle>
-                          <CardDescription>
-                            <Badge variant="outline">{template.category}</Badge>
-                            {' '}
-                            <Badge variant="secondary">{template.emirate}</Badge>
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground line-clamp-3">
-                            {template.content.substring(0, 150)}...
-                          </p>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                );
-              } catch (error) {
-                return (
-                  <div className="text-center py-8 text-red-600">
-                    <p>خطأ في تحميل النماذج</p>
-                  </div>
-                );
-              }
-            })()}
+            {availableTemplates.length === 0 ? (
+              <div className="text-center py-8">
+                <FileText className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+                <p className="text-gray-500 mb-4">لا توجد نماذج إخلاء متاحة</p>
+                <Button variant="outline" asChild>
+                  <Link href="/dashboard/legal/petition-templates">
+                    إضافة نماذج من صفحة النماذج
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="grid gap-3">
+                {availableTemplates.map((template) => (
+                  <Card 
+                    key={template.id} 
+                    className="cursor-pointer hover:shadow-lg transition-shadow border-2 hover:border-blue-500"
+                    onClick={() => handleSelectTemplate(template)}
+                  >
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg flex items-center justify-between">
+                        <span>{template.title}</span>
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">
+                          {template.emirate}
+                        </Badge>
+                      </CardTitle>
+                      <CardDescription className="text-sm text-gray-600">
+                        {template.content.substring(0, 150)}...
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span>📅 {template.createdAt}</span>
+                        <span>👥 استخدام: {template.usageCount || 0}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
           
-          <DialogFooter>
+          <DialogFooter className="flex-row-reverse">
             <Button variant="outline" onClick={() => setShowTemplateDialog(false)}>
-              إغلاق
+              إلغاء
             </Button>
           </DialogFooter>
         </DialogContent>
