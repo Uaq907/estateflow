@@ -356,28 +356,67 @@ export function CasesPageClient() {
     if (newCase.priority && newCase.priority.trim()) {
       let clearedTemplate = newCase.priority;
       
-      // إزالة البيانات المعبأة وإعادة placeholders الأصلية
-      // بيانات المدعي
-      clearedTemplate = clearedTemplate.replace(/🔴عبدالله محمد بن عمير ال علي🔴/g, '[اسم_المدعي]');
-      clearedTemplate = clearedTemplate.replace(/🔴784-1945-4384241-1🔴/g, '[هوية_المدعي]');
-      clearedTemplate = clearedTemplate.replace(/🔴أم القيوين – الظهر🔴/g, '[عنوان_المدعي]');
-      clearedTemplate = clearedTemplate.replace(/🔴0522020200🔴/g, '[هاتف_المدعي]');
-      clearedTemplate = clearedTemplate.replace(/🔴uaq907@gmail\.com🔴/g, '[ايميل_المدعي]');
+      // إعادة البيانات المعبأة إلى placeholders
+      // بيانات المدعي (المالك)
+      clearedTemplate = clearedTemplate.replace(/عبدالله محمد بن عمير ال علي/g, '[اسم_المدعي]');
+      clearedTemplate = clearedTemplate.replace(/إماراتي/g, '[جنسية_المدعي]');
+      clearedTemplate = clearedTemplate.replace(/784-1945-4384241-1/g, '[هوية_المدعي]');
+      clearedTemplate = clearedTemplate.replace(/أم القيوين – الظهر/g, '[عنوان_المدعي]');
+      clearedTemplate = clearedTemplate.replace(/0522020200/g, '[هاتف_المدعي]');
+      clearedTemplate = clearedTemplate.replace(/uaq907@gmail\.com/g, '[ايميل_المدعي]');
       
-      // إزالة جميع البيانات المعبأة الأخرى (بين 🔴...🔴)
-      clearedTemplate = clearedTemplate.replace(/🔴(.*?)🔴/g, (match, content) => {
-        // إذا كان المحتوى يحتوي على بيانات معبأة، نعيد placeholder مناسب
-        if (content.includes('@')) return '[ايميل_المدعى_عليه]';
-        if (content.includes('+971') || content.startsWith('05')) return '[هاتف_المدعى_عليه]';
-        if (content.includes('784-')) return '[هوية_المدعى_عليه]';
-        if (content.includes('/')) return '[تاريخ_اليوم]';
-        if (content.match(/^\d+$/)) return '[المبلغ_المتأخر]';
-        if (content.includes('TC-')) return '[رقم_العقد]';
-        if (content.includes('برج') || content.includes('فيلا') || content.includes('مجمع')) return '[اسم_العقار]';
-        if (content.match(/^[A-Z]-\d+$/) || content.match(/^[VTR]-\d+$/)) return '[رقم_الوحدة]';
-        // اسماء الأشخاص والشركات
-        return '[اسم_المدعى_عليه]';
-      });
+      // بيانات المدعى عليه (أمثلة من البيانات الوهمية)
+      clearedTemplate = clearedTemplate.replace(/فاطمة السالم/g, '[اسم_المدعى_عليه]');
+      clearedTemplate = clearedTemplate.replace(/أحمد محمد علي/g, '[اسم_المدعى_عليه]');
+      clearedTemplate = clearedTemplate.replace(/محمد حسن النور/g, '[اسم_المدعى_عليه]');
+      clearedTemplate = clearedTemplate.replace(/عائشة أحمد الزهراني/g, '[اسم_المدعى_عليه]');
+      clearedTemplate = clearedTemplate.replace(/خالد عبدالله المطيري/g, '[اسم_المدعى_عليه]');
+      
+      // الجنسيات
+      clearedTemplate = clearedTemplate.replace(/الإمارات/g, '[جنسية_المدعى_عليه]');
+      clearedTemplate = clearedTemplate.replace(/السودان/g, '[جنسية_المدعى_عليه]');
+      clearedTemplate = clearedTemplate.replace(/السعودية/g, '[جنسية_المدعى_عليه]');
+      clearedTemplate = clearedTemplate.replace(/الكويت/g, '[جنسية_المدعى_عليه]');
+      
+      // أرقام الهوية
+      clearedTemplate = clearedTemplate.replace(/784-\d{4}-\d{7}-\d/g, '[هوية_المدعى_عليه]');
+      
+      // أرقام الهاتف
+      clearedTemplate = clearedTemplate.replace(/\+971\d{9}/g, '[هاتف_المدعى_عليه]');
+      
+      // البريد الإلكتروني
+      clearedTemplate = clearedTemplate.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[ايميل_المدعى_عليه]');
+      
+      // العناوين
+      clearedTemplate = clearedTemplate.replace(/فيلا الشاطئ - وحدة V-\d+/g, '[عنوان_المدعى_عليه]');
+      clearedTemplate = clearedTemplate.replace(/برج النخيل السكني - وحدة [A-Z]-\d+/g, '[عنوان_المدعى_عليه]');
+      
+      // العقارات
+      clearedTemplate = clearedTemplate.replace(/فيلا الشاطئ/g, '[اسم_العقار]');
+      clearedTemplate = clearedTemplate.replace(/برج النخيل السكني/g, '[اسم_العقار]');
+      clearedTemplate = clearedTemplate.replace(/مجمع المستقبل/g, '[اسم_العقار]');
+      
+      // أرقام الوحدات
+      clearedTemplate = clearedTemplate.replace(/V-\d+/g, '[رقم_الوحدة]');
+      clearedTemplate = clearedTemplate.replace(/[A-Z]-\d+/g, '[رقم_الوحدة]');
+      
+      // المبالغ المالية
+      clearedTemplate = clearedTemplate.replace(/\d{5,}/g, '[المبلغ_المتأخر]');
+      clearedTemplate = clearedTemplate.replace(/\d+\.\d{2}/g, '[قيمة_الضريبة]');
+      
+      // التواريخ
+      clearedTemplate = clearedTemplate.replace(/\d{2}\/\d{2}\/\d{4}/g, '[تاريخ_اليوم]');
+      clearedTemplate = clearedTemplate.replace(/TC-\d{4}-\d+/g, '[رقم_العقد]');
+      
+      // السنة الميلادية
+      clearedTemplate = clearedTemplate.replace(/202\d/g, '[سنة_ميلادية]');
+      
+      // عدد الدفعات والأشهر
+      clearedTemplate = clearedTemplate.replace(/\d+ شهر/g, '[عدد_الاشهر_المتأخرة] شهر');
+      clearedTemplate = clearedTemplate.replace(/\d+ دفعات/g, '[عدد_الدفعات] دفعات');
+      
+      // وسائل الإنذار
+      clearedTemplate = clearedTemplate.replace(/رسالة نصية ورسالة بريد إلكتروني/g, '[وسيلة_الانذار]');
       
       setNewCase(prev => ({
         ...prev,
