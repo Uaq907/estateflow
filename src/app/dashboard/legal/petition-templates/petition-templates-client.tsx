@@ -172,7 +172,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
     fontSize: '14px',
     fontFamily: 'Arial',
     textAlign: 'right',
-    textColor: '#dc2626'
+    textColor: '#000000'
   });
 
   const [newTemplate, setNewTemplate] = useState({
@@ -644,7 +644,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
       fontSize: '14px',
       fontFamily: 'Arial',
       textAlign: 'right',
-      textColor: '#dc2626'
+      textColor: '#000000'
     });
   };
 
@@ -706,11 +706,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
         return (
           <span 
             key={index} 
-            className={`px-1 py-0.5 rounded text-xs font-mono border ${
-              showRealData 
-                ? 'bg-green-100 text-green-800 border-green-300' 
-                : 'bg-red-50 text-red-600 border-red-300 font-semibold'
-            }`}
+            className="px-1 py-0.5 rounded text-xs font-mono border bg-red-50 text-red-600 border-red-300 font-semibold"
             title={showRealData ? `البيانات الفعلية: ${realData || 'غير متوفر'}` : `حقل بيانات: ${part}`}
           >
             {showRealData && realData ? realData : `[${part}]`}
@@ -1034,7 +1030,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                         value={newTemplate.content}
                         onChange={(e) => setNewTemplate(prev => ({ ...prev, content: e.target.value }))}
                         placeholder="اكتب محتوى النموذج هنا..."
-                        className="min-h-[400px] resize-y border-0 bg-transparent text-red-600 font-medium"
+                        className="min-h-[400px] resize-y border-0 bg-transparent text-black font-medium"
                         rows={20}
                         style={{
                           lineHeight: '1.8',
@@ -1249,7 +1245,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                           <Textarea
                             value={editingContent}
                             onChange={(e) => setEditingContent(e.target.value)}
-                            className="min-h-[200px] resize-y border-0 bg-transparent text-red-600 font-medium"
+                            className="min-h-[200px] resize-y border-0 bg-transparent text-black font-medium"
                             rows={8}
                             style={{
                               lineHeight: '1.8',
@@ -1342,11 +1338,11 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              {isPreviewEditing ? <Edit className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              {isPreviewEditing ? 'تعديل النموذج' : 'معاينة النموذج'}
+              <Edit className="h-5 w-5" />
+              تعديل النموذج
             </DialogTitle>
             <DialogDescription>
-              {isPreviewEditing ? 'قم بتعديل النموذج وحفظ التغييرات' : 'معاينة وتصدير نموذج الدعوى'}
+              قم بتعديل النموذج وحفظ التغييرات أو تصديره
             </DialogDescription>
           </DialogHeader>
 
@@ -1402,7 +1398,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                           onClick={() => setShowRealData(!showRealData)}
                           className="h-8 px-3 text-xs"
                         >
-                          {showRealData ? "🔵 عرض العلامات" : "🟢 عرض البيانات"}
+                          {showRealData ? "🔴 عرض العلامات" : "🔴 عرض البيانات"}
                         </Button>
                         <Button
                           variant="outline"
@@ -1463,7 +1459,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                           value={previewEditingContent}
                           onChange={(e) => setPreviewEditingContent(e.target.value)}
                           placeholder="اكتب محتوى النموذج هنا..."
-                          className="min-h-[400px] resize-y border-0 bg-transparent text-red-600 font-medium"
+                          className="min-h-[400px] resize-y border-0 bg-transparent text-black font-medium"
                           rows={20}
                           style={{
                             lineHeight: '1.8',
@@ -1480,13 +1476,13 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                 ) : (
                   <>
                     <div className="bg-gray-50 p-4 rounded border">
-                      <div className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
+                      <div className="whitespace-pre-wrap text-sm leading-relaxed text-black">
                         {selectedTemplate.content ? renderContentWithTags(selectedTemplate.content, showRealData) : 'لا يوجد محتوى متاح لهذا النموذج.'}
                       </div>
                     </div>
                     {showRealData && (
-                      <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded text-xs text-green-700">
-                        💡 <strong>وضع عرض البيانات:</strong> العلامات الخضراء تظهر البيانات الفعلية من النظام
+                      <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded text-xs text-red-700">
+                        💡 <strong>وضع عرض البيانات:</strong> العلامات الحمراء تظهر البيانات الفعلية من النظام
                       </div>
                     )}
                   </>
