@@ -71,12 +71,24 @@ const petitionTemplates = [
   }
 ];
 
+// نموذج المسودة الجديدة
+const defaultNewTemplate = {
+  id: Date.now(),
+  title: '',
+  category: 'إخلاء',
+  emirate: 'أم القيوين',
+  content: '',
+  createdAt: new Date().toISOString().split('T')[0],
+  lastModified: new Date().toISOString().split('T')[0],
+  usageCount: 0
+};
+
 // قوالب عناوين النماذج
 const templateTitles = [
   'نموذج دعوى - منازعات إيجارية'
 ];
 
-const categories = ['إخلاء'];
+const categories = ['إخلاء', 'منازعات إيجارية'];
 const emirates = ['أم القيوين'];
 
 // بيانات وهمية للطلبات
