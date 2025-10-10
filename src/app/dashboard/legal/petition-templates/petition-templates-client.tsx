@@ -1477,7 +1477,12 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                   <>
                     <div className="bg-gray-50 p-4 rounded border">
                       <div className="whitespace-pre-wrap text-sm leading-relaxed text-black">
-                        {selectedTemplate.content ? renderContentWithTags(selectedTemplate.content, showRealData) : 'لا يوجد محتوى متاح لهذا النموذج.'}
+                        {/* استخدام النموذج الأصلي من templates (بدون بيانات معبأة) */}
+                        {(() => {
+                          const originalTemplate = templates.find(t => t.id === selectedTemplate.id);
+                          const contentToShow = originalTemplate?.content || selectedTemplate.content;
+                          return contentToShow ? renderContentWithTags(contentToShow, showRealData) : 'لا يوجد محتوى متاح لهذا النموذج.';
+                        })()}
                       </div>
                     </div>
                     {showRealData && (
