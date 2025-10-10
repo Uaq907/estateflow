@@ -365,6 +365,46 @@ export function CasesPageClient() {
         console.log('Found tenant:', tenant.name);
         setSelectedTenantId(tenantId);
         
+        // نموذج الدعوى السكني
+        const residentialTemplate = `لجنة فض المنازعات الإيجارية بإمارة أم القيوين
+لائحة الدعوى رقم          لسنة / 2025 منازعات إيجارية أم القيوين
+المحدد لها جلسة بتاريخ      /       / 2025م
+
+صحيفة الدعوى
+
+مقدمة من المالك: [اسم_المدعي] - إماراتية الجنسية- حمل بطاقة هوية رقم ([هوية_المدعي])
+العنوان : [عنوان_المدعي]
+رقم الهاتف : [هاتف_المدعي]
+الايميل : [ايميل_المدعي]
+
+ضـــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــد
+
+المستأجر: [اسم_المدعى_عليه] – سير لانكا الجنسية- يحمل بطاقة هوية رقم ([هوية_المدعى_عليه])
+العنوان: [عنوان_المدعى_عليه] – رقم الهاتف: [هاتف_المدعى_عليه]
+الايميل : [ايميل_المدعى_عليه]
+
+الوقائع والأسانيد :
+
+أولاً : الوقـــائع
+
+1/ بموجب عقد إيجار موثق بالرقم ([رقم_العقد]) الصادر بتاريخ ([تاريخ_العقد]) من دائرة بلدية أم القيوين، استأجر المستأجر من المالك عقار عبارة عن ([اسم_العقار]) في منطقة الظهر – أم القيوين لمدة عام ، في الفترة من [تاريخ_البداية] حتى تاريخ [تاريخ_النهاية] بقيمة إيجارية سنوية وتقدر بمبلغ وقدره [قيمة_الايجار] درهم، وبعد انتهاء عقد الإيجار.
+
+يلتمس المالك من عدلكم الموقر القضاء لها بالاتي:
+
+أولاً من الناحية الشكليه :
+1/ قبول لائحة الدعوى شكلاً والتصريح بقيدها بأقرب وقت ممكن .
+
+ثانيا : من الناحية الموضوعية :
+1/ الزام المستأجر بأن يؤدي للمالك جميع المبالع المتاخرة والجديده
+2/ الزام المستأجر بأن يسلم للمالك براءة ذمة من هيئة الكهرباء والمياه
+3/ واخلاء العين المؤجرة وتسليمها خاليها من الشواغل
+4/ الزام المستأجر بالرسوم والمصاريف القضائية
+
+وتفضلوا بقبول فائق الاحترام والتقدير ....
+
+مقدم الطلب
+التوقيع :`;
+        
         // جلب بيانات العقار والوحدة تلقائياً
         const propertyData = tenantPropertyData[tenantId];
         if (propertyData) {
@@ -375,10 +415,17 @@ export function CasesPageClient() {
             contactEmail: tenant.email,
             propertyName: propertyData.propertyName,
             unitNumber: propertyData.unitNumber,
-            dueAmount: propertyData.dueAmount.toString()
+            dueAmount: propertyData.dueAmount.toString(),
+            priority: residentialTemplate
           }));
         } else {
-          setNewCase(prev => ({...prev, client: tenant.name, contactPhone: tenant.phone, contactEmail: tenant.email}));
+          setNewCase(prev => ({
+            ...prev, 
+            client: tenant.name, 
+            contactPhone: tenant.phone, 
+            contactEmail: tenant.email,
+            priority: residentialTemplate
+          }));
         }
         
         setTenantSearchTerm(''); // إزالة النص من خانة البحث
@@ -390,6 +437,31 @@ export function CasesPageClient() {
         console.log('Found company:', company.name);
         setSelectedTenantId(tenantId);
         
+        // نموذج الدعوى التجاري
+        const commercialTemplate = `لجنة فض المنازعات الإيجارية بإمارة دبي
+دعوى مطالبة مالية - تأخير إيجار تجاري
+
+المدعي: [اسم_المدعي]
+الهوية: [هوية_المدعي]
+العنوان: [عنوان_المدعي]
+
+المدعى عليه (الشركة): [اسم_المدعى_عليه]
+رقم السجل التجاري: [هوية_المدعى_عليه]
+العنوان: [عنوان_المدعى_عليه]
+
+الوقائع:
+1. تم إبرام عقد إيجار تجاري برقم [رقم_العقد] بتاريخ [تاريخ_العقد]
+2. العقار التجاري: [اسم_العقار]
+3. رقم الوحدة: [رقم_الوحدة]
+4. المبلغ المتأخر: [المبلغ_المتأخر] درهم
+5. فترة التأخير: من [تاريخ_البداية] إلى [تاريخ_النهاية]
+
+الطلب:
+يلتمس المدعي إلزام الشركة المدعى عليها بدفع المبلغ المتأخر والفوائد القانونية وإخلاء المحل التجاري.
+
+مقدم الطلب
+التوقيع :`;
+        
         // جلب بيانات العقار والوحدة تلقائياً
         const propertyData = tenantPropertyData[tenantId];
         if (propertyData) {
@@ -400,10 +472,17 @@ export function CasesPageClient() {
             contactEmail: company.email,
             propertyName: propertyData.propertyName,
             unitNumber: propertyData.unitNumber,
-            dueAmount: propertyData.dueAmount.toString()
+            dueAmount: propertyData.dueAmount.toString(),
+            priority: commercialTemplate
           }));
         } else {
-          setNewCase(prev => ({...prev, client: company.name, contactPhone: company.phone, contactEmail: company.email}));
+          setNewCase(prev => ({
+            ...prev, 
+            client: company.name, 
+            contactPhone: company.phone, 
+            contactEmail: company.email,
+            priority: commercialTemplate
+          }));
         }
         
         setTenantSearchTerm(''); // إزالة النص من خانة البحث
