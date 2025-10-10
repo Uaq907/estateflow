@@ -233,7 +233,7 @@ export default function MessagesClient({
 
   return (
     <>
-      <AppHeader employee={employee} />
+      <AppHeader loggedInEmployee={employee} />
       <main className="p-6 max-w-7xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">📬 البريد الداخلي</h1>

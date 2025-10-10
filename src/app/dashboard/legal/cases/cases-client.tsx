@@ -108,8 +108,6 @@ export function CasesPageClient() {
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
   const [showTemplateSelectionDialog, setShowTemplateSelectionDialog] = useState(false);
   const [isSaveTemplateDialogOpen, setIsSaveTemplateDialogOpen] = useState(false);
-  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
-  const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [selectedCaseId, setSelectedCaseId] = useState<number | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [payeeType, setPayeeType] = useState<'tenant' | 'manual'>('tenant');
@@ -849,37 +847,6 @@ export function CasesPageClient() {
     handleResetCaseData();
     
     alert('تم إضافة القضية بنجاح!');
-  };
-
-  const handleSendPetitionEmail = async () => {
-    if (!newCase.contactEmail || !newCase.priority) {
-      alert('⚠️ يرجى ملء البريد الإلكتروني ونموذج الدعوى أولاً');
-      return;
-    }
-
-    setIsSendingEmail(true);
-    
-    try {
-      const { sendPetitionEmailAction } = await import('@/app/dashboard/actions');
-      const result = await sendPetitionEmailAction({
-        to: newCase.contactEmail,
-        clientName: newCase.client,
-        caseNumber: `CASE-2025-${Date.now().toString().slice(-3)}`,
-        petitionContent: newCase.priority,
-      });
-
-      if (result.success) {
-        alert('✅ ' + result.message);
-        setIsEmailDialogOpen(false);
-      } else {
-        alert('❌ ' + result.message);
-      }
-    } catch (error) {
-      console.error('Error sending email:', error);
-      alert('❌ حدث خطأ أثناء إرسال البريد الإلكتروني');
-    } finally {
-      setIsSendingEmail(false);
-    }
   };
 
   const handleResetCaseData = () => {
@@ -1721,17 +1688,9 @@ export function CasesPageClient() {
                   </div>
                 </div>
                 
-                <DialogFooter className="gap-2">
+                <DialogFooter>
                   <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                     إلغاء
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={() => setIsEmailDialogOpen(true)}
-                    disabled={!newCase.contactEmail || !newCase.priority}
-                    className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300"
-                  >
-                    📧 إرسال عبر البريد
                   </Button>
                   <Button onClick={handleAddCase}>
                     إضافة القضية
@@ -1740,56 +1699,6 @@ export function CasesPageClient() {
               </DialogContent>
             </Dialog>
 
-            {/* نافذة تأكيد إرسال البريد الإلكتروني */}
-            <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
-              <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    📧 إرسال نموذج الدعوى عبر البريد
-                  </DialogTitle>
-                  <DialogDescription>
-                    سيتم إرسال نموذج الدعوى إلى البريد الإلكتروني التالي
-                  </DialogDescription>
-                </DialogHeader>
-                
-                <div className="space-y-4">
-                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                    <p className="text-sm text-gray-700">
-                      <strong>المرسل:</strong> نظام إدارة العقارات - UAQ907
-                    </p>
-                    <p className="text-sm text-gray-700 mt-2">
-                      <strong>المرسل من:</strong> no-reply@uaq907.com
-                    </p>
-                    <p className="text-sm text-gray-700 mt-2">
-                      <strong>المرسل إلى:</strong> {newCase.contactEmail}
-                    </p>
-                    <p className="text-sm text-gray-700 mt-2">
-                      <strong>العميل:</strong> {newCase.client}
-                    </p>
-                  </div>
-                  
-                  <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-                    <p className="text-xs text-yellow-800">
-                      ⚠️ تأكد من صحة البريد الإلكتروني قبل الإرسال
-                    </p>
-                  </div>
-                </div>
-                
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsEmailDialogOpen(false)}>
-                    إلغاء
-                  </Button>
-                  <Button 
-                    onClick={handleSendPetitionEmail}
-                    disabled={isSendingEmail}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    {isSendingEmail ? '📤 جارٍ الإرسال...' : '📧 إرسال الآن'}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-            
             <Button 
               variant="outline"
               onClick={() => {

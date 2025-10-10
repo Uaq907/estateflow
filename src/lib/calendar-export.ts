@@ -1,18 +1,12 @@
 import { createEvents, EventAttributes } from 'ics';
-
-interface CalendarEvent {
-  id: string;
-  title: string;
-  date: string;
-  type: string;
-  details?: string;
-}
+import type { CalendarEvent } from './types';
 
 // دالة لتحويل أحداث التقويم إلى صيغة .ics
 export function exportCalendarToICS(events: CalendarEvent[]): string | null {
   try {
     const icsEvents: EventAttributes[] = events.map((event) => {
-      const eventDate = new Date(event.date);
+      // التعامل مع Date أو string
+      const eventDate = event.date instanceof Date ? event.date : new Date(event.date);
       
       return {
         start: [
@@ -51,4 +45,5 @@ export function exportCalendarToICS(events: CalendarEvent[]): string | null {
 export function exportSingleEventToICS(event: CalendarEvent): string | null {
   return exportCalendarToICS([event]);
 }
+
 
