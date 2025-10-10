@@ -107,6 +107,7 @@ export function CasesPageClient() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
   const [showTemplateSelectionDialog, setShowTemplateSelectionDialog] = useState(false);
+  const [isSaveTemplateDialogOpen, setIsSaveTemplateDialogOpen] = useState(false);
   const [selectedCaseId, setSelectedCaseId] = useState<number | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [payeeType, setPayeeType] = useState<'tenant' | 'manual'>('tenant');
@@ -115,6 +116,7 @@ export function CasesPageClient() {
   const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null);
   const [selectedBusinessName, setSelectedBusinessName] = useState<string>('');
   const [showCompanyDetails, setShowCompanyDetails] = useState(false);
+  const [templateName, setTemplateName] = useState('');
   
   const [newCase, setNewCase] = useState({
     client: '',
@@ -295,6 +297,50 @@ export function CasesPageClient() {
       contactPhone: '',
       contactEmail: ''
     });
+  };
+
+  // دالة لحفظ النموذج المعدل
+  const handleSaveTemplate = () => {
+    if (!newCase.priority.trim()) {
+      alert('⚠️ النموذج فارغ! يرجى إضافة محتوى أولاً');
+      return;
+    }
+    
+    if (!templateName.trim()) {
+      alert('⚠️ يرجى إدخال اسم للنموذج');
+      return;
+    }
+    
+    try {
+      // إزالة العلامات الحمراء قبل الحفظ
+      const cleanedTemplate = newCase.priority.replace(/🔴/g, '');
+      
+      // جلب النماذج الموجودة
+      const existingTemplates = JSON.parse(localStorage.getItem('customPetitionTemplates') || '[]');
+      
+      // إضافة النموذج الجديد
+      const newTemplate = {
+        id: Date.now(),
+        title: templateName,
+        category: payeeType === 'tenant' ? 'سكنية' : 'تجارية',
+        emirate: 'أم القيوين',
+        content: cleanedTemplate,
+        createdAt: new Date().toISOString().split('T')[0],
+        lastModified: new Date().toISOString().split('T')[0],
+        usageCount: 0,
+        isCustom: true
+      };
+      
+      existingTemplates.push(newTemplate);
+      localStorage.setItem('customPetitionTemplates', JSON.stringify(existingTemplates));
+      
+      setIsSaveTemplateDialogOpen(false);
+      setTemplateName('');
+      alert('✅ تم حفظ النموذج بنجاح! يمكنك الوصول إليه من صفحة النماذج');
+    } catch (error) {
+      console.error('Error saving template:', error);
+      alert('❌ حدث خطأ أثناء حفظ النموذج');
+    }
   };
 
   // دالة لتفريغ البيانات وإعادة placeholders الأصلية
@@ -1326,6 +1372,17 @@ export function CasesPageClient() {
                           <FileText className="h-3 w-3 mr-1" />
                           اختيار نموذج
                         </Button>
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setIsSaveTemplateDialogOpen(true);
+                          }}
+                          className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300"
+                        >
+                          💾 حفظ النموذج
+                        </Button>
                       </div>
                     </div>
 
@@ -1825,6 +1882,64 @@ export function CasesPageClient() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+      {/* حوار حفظ النموذج */}
+      <Dialog open={isSaveTemplateDialogOpen} onOpenChange={setIsSaveTemplateDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              💾 حفظ النموذج المعدل
+            </DialogTitle>
+            <DialogDescription>
+              احفظ النموذج المعدل كنموذج جديد يمكنك استخدامه في المستقبل
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="templateName">اسم النموذج</Label>
+              <Input
+                id="templateName"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                placeholder="مثال: نموذج إخلاء مخصص 2025"
+                className="mt-2"
+              />
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <FileText className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold text-blue-900 mb-1">معلومات النموذج</h4>
+                  <ul className="text-xs text-blue-700 space-y-1">
+                    <li>• النوع: {payeeType === 'tenant' ? 'نموذج سكني' : 'نموذج تجاري'}</li>
+                    <li>• سيتم إزالة العلامات الحمراء تلقائياً</li>
+                    <li>• يمكنك الوصول إليه من صفحة نماذج الدعاوى</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsSaveTemplateDialogOpen(false);
+                setTemplateName('');
+              }}
+            >
+              إلغاء
+            </Button>
+            <Button onClick={handleSaveTemplate} className="bg-blue-600 hover:bg-blue-700">
+              💾 حفظ النموذج
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );
