@@ -391,6 +391,7 @@ export function CasesPageClient() {
       
       // تعبئة بيانات المدعي (المالك) - بيانات افتراضية
       updatedTemplate = updatedTemplate.replace(/\[اسم_المدعي\]/g, markData('عبدالله محمد بن عمير ال علي'));
+      updatedTemplate = updatedTemplate.replace(/\[جنسية_المدعي\]/g, markData('إماراتي'));
       updatedTemplate = updatedTemplate.replace(/\[هوية_المدعي\]/g, markData('784-1945-4384241-1'));
       updatedTemplate = updatedTemplate.replace(/\[عنوان_المدعي\]/g, markData('أم القيوين – الظهر'));
       updatedTemplate = updatedTemplate.replace(/\[هاتف_المدعي\]/g, markData('0522020200'));
@@ -399,14 +400,16 @@ export function CasesPageClient() {
       // تعبئة بيانات المدعى عليه (المستأجر)
       if (tenant) {
         updatedTemplate = updatedTemplate.replace(/\[اسم_المدعى_عليه\]/g, markData(tenant.name));
+        updatedTemplate = updatedTemplate.replace(/\[جنسية_المدعى_عليه\]/g, markData(tenant.nationality || 'غير محدد'));
         updatedTemplate = updatedTemplate.replace(/\[هوية_المدعى_عليه\]/g, markData(tenant.idNumber || 'غير محدد'));
-        updatedTemplate = updatedTemplate.replace(/\[عنوان_المدعى_عليه\]/g, markData(propertyName || 'غير محدد'));
+        updatedTemplate = updatedTemplate.replace(/\[عنوان_المدعى_عليه\]/g, markData(propertyName && unitNumber ? `${propertyName} - وحدة ${unitNumber}` : 'غير محدد'));
         updatedTemplate = updatedTemplate.replace(/\[هاتف_المدعى_عليه\]/g, markData(tenant.phone || 'غير محدد'));
         updatedTemplate = updatedTemplate.replace(/\[ايميل_المدعى_عليه\]/g, markData(tenant.email || 'غير محدد'));
       } else if (company) {
         updatedTemplate = updatedTemplate.replace(/\[اسم_المدعى_عليه\]/g, markData(company.name));
+        updatedTemplate = updatedTemplate.replace(/\[جنسية_المدعى_عليه\]/g, markData('إماراتي'));
         updatedTemplate = updatedTemplate.replace(/\[هوية_المدعى_عليه\]/g, markData(company.idNumber || 'غير محدد'));
-        updatedTemplate = updatedTemplate.replace(/\[عنوان_المدعى_عليه\]/g, markData(propertyName || 'غير محدد'));
+        updatedTemplate = updatedTemplate.replace(/\[عنوان_المدعى_عليه\]/g, markData(propertyName && unitNumber ? `${propertyName} - وحدة ${unitNumber}` : 'غير محدد'));
         updatedTemplate = updatedTemplate.replace(/\[هاتف_المدعى_عليه\]/g, markData(company.phone || 'غير محدد'));
         updatedTemplate = updatedTemplate.replace(/\[ايميل_المدعى_عليه\]/g, markData(company.email || 'غير محدد'));
       }
@@ -420,18 +423,46 @@ export function CasesPageClient() {
         updatedTemplate = updatedTemplate.replace(/\[رقم_الوحدة\]/g, markData(unitNumber));
       }
       
+      // تعبئة البيانات المالية
       if (dueAmount) {
+        const dueAmountNum = parseFloat(dueAmount);
+        const taxAmount = (dueAmountNum * 0.05).toFixed(2); // ضريبة 5%
+        const totalAmount = (dueAmountNum + parseFloat(taxAmount)).toFixed(2);
+        
         updatedTemplate = updatedTemplate.replace(/\[المبلغ_المتأخر\]/g, markData(dueAmount));
         updatedTemplate = updatedTemplate.replace(/\[قيمة_الايجار\]/g, markData(dueAmount));
+        updatedTemplate = updatedTemplate.replace(/\[قيمة_الضريبة\]/g, markData(taxAmount));
+        updatedTemplate = updatedTemplate.replace(/\[اجمالي_المطالبة\]/g, markData(totalAmount));
+        
+        // حساب عدد الدفعات وقيمة كل دفعة (افتراضياً 4 دفعات)
+        const numberOfPayments = 4;
+        const paymentAmount = (dueAmountNum / numberOfPayments).toFixed(2);
+        updatedTemplate = updatedTemplate.replace(/\[عدد_الدفعات\]/g, markData(numberOfPayments.toString()));
+        updatedTemplate = updatedTemplate.replace(/\[قيمة_الدفعة\]/g, markData(paymentAmount));
       }
       
       // تعبئة التواريخ
       const today = new Date();
+      const startDate = new Date(today.getFullYear(), 0, 1); // 1 يناير من السنة الحالية
+      const endDate = new Date(today.getFullYear(), 11, 31); // 31 ديسمبر من السنة الحالية
+      const delayStartDate = new Date(today.getFullYear(), today.getMonth() - 3, 1); // قبل 3 أشهر
+      
       updatedTemplate = updatedTemplate.replace(/\[تاريخ_اليوم\]/g, markData(today.toLocaleDateString('ar-SA')));
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_العقد\]/g, markData('01/01/2024'));
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_البداية\]/g, markData('01/01/2024'));
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_النهاية\]/g, markData('31/12/2024'));
-      updatedTemplate = updatedTemplate.replace(/\[رقم_العقد\]/g, markData('TC-2024-001'));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_العقد\]/g, markData(startDate.toLocaleDateString('ar-SA')));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_البداية\]/g, markData(startDate.toLocaleDateString('ar-SA')));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_النهاية\]/g, markData(endDate.toLocaleDateString('ar-SA')));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_بداية_التأخير\]/g, markData(delayStartDate.toLocaleDateString('ar-SA')));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_نهاية_التأخير\]/g, markData(today.toLocaleDateString('ar-SA')));
+      updatedTemplate = updatedTemplate.replace(/\[رقم_العقد\]/g, markData('TC-2025-001'));
+      
+      // حساب عدد الأشهر المتأخرة
+      const monthsDiff = Math.floor((today.getTime() - delayStartDate.getTime()) / (1000 * 60 * 60 * 24 * 30));
+      updatedTemplate = updatedTemplate.replace(/\[عدد_الاشهر_المتأخرة\]/g, markData(monthsDiff.toString()));
+      
+      // تعبئة بيانات الإنذار
+      const warningDate = new Date(today.getFullYear(), today.getMonth() - 1, 15); // قبل شهر تقريباً
+      updatedTemplate = updatedTemplate.replace(/\[وسيلة_الانذار\]/g, markData('رسالة نصية ورسالة بريد إلكتروني'));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_الانذار\]/g, markData(warningDate.toLocaleDateString('ar-SA')));
       
       setNewCase(prev => ({
         ...prev,
@@ -449,52 +480,90 @@ export function CasesPageClient() {
         console.log('Found tenant:', tenant.name);
         setSelectedTenantId(tenantId);
         
-        // نموذج الدعوى السكني - النص الكامل من صفحة النماذج
+        // نموذج دعوى مطالبة مالية - تأخير إيجار
         const residentialTemplate = `لجنة فض المنازعات الإيجارية بإمارة أم القيوين
-لائحة الدعوى رقم          لسنة / 2025 منازعات إيجارية أم القيوين
+لائحة الدعوى رقم          لسنة / 2025 - مطالبة مالية (تأخير إيجار)
 المحدد لها جلسة بتاريخ      /       / 2025م
 
-صحيفة الدعوى
+صحيفة دعوى مطالبة مالية
 
-مقدمة من المالك: [اسم_المدعي] - إماراتية الجنسية- حمل بطاقة هوية رقم ([هوية_المدعي])
-العنوان : [عنوان_المدعي]
-رقم الهاتف : [هاتف_المدعي]
-الايميل : [ايميل_المدعي]
+مقدمة من المالك: [اسم_المدعي] - [جنسية_المدعي] الجنسية
+بطاقة هوية رقم: [هوية_المدعي]
+العنوان: [عنوان_المدعي]
+رقم الهاتف: [هاتف_المدعي]
+البريد الإلكتروني: [ايميل_المدعي]
 
 ضـــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــــد
 
-المستأجر: [اسم_المدعى_عليه] – سير لانكا الجنسية- يحمل بطاقة هوية رقم ([هوية_المدعى_عليه])
-العنوان: [عنوان_المدعى_عليه] – رقم الهاتف: [هاتف_المدعى_عليه]
-الايميل : [ايميل_المدعى_عليه]
+المدعى عليه (المستأجر): [اسم_المدعى_عليه]
+الجنسية: [جنسية_المدعى_عليه]
+بطاقة هوية رقم: [هوية_المدعى_عليه]
+العنوان: [عنوان_المدعى_عليه]
+رقم الهاتف: [هاتف_المدعى_عليه]
+البريد الإلكتروني: [ايميل_المدعى_عليه]
 
-الوقائع والأسانيد :
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-أولاً : الوقـــائع
+الموضوع: المطالبة بالقيمة الإيجارية المتأخرة
 
-1/ بموجب عقد إيجار موثق بالرقم ([رقم_العقد]) الصادر بتاريخ ([تاريخ_العقد]) من دائرة بلدية أم القيوين، استأجر المستأجر من المالك عقار عبارة عن ([اسم_العقار]) في منطقة الظهر – أم القيوين لمدة عام ، في الفترة من [تاريخ_البداية] حتى تاريخ [تاريخ_النهاية] بقيمة إيجارية سنوية وتقدر بمبلغ وقدره [قيمة_الايجار] درهم، وبعد انتهاء عقد الإيجار.
+الوقائع:
 
-(مستند رقم (1) عبارة عن عقد الايجار الأول رقم .... TC-222.......)
+أولاً: بموجب عقد إيجار موثق برقم [رقم_العقد] الصادر بتاريخ [تاريخ_العقد] من بلدية أم القيوين، استأجر المدعى عليه من المدعي العقار الكائن في: [اسم_العقار] - رقم الوحدة: [رقم_الوحدة].
 
-2/ إلا أن المستأجر لم يلتزم بسداد القيمة الايجارية عن العقد رقم ([رقم_العقد]) المحرر بتاريخ من [تاريخ_البداية] حتى [تاريخ_النهاية] مع العلم ان المتبقي للسداد من العقد مبلغ وقدره [المبلغ_المتأخر] درهم المبلغ المتبقي كما انه لم يتم تجدد عقد الايجار ، مما دفع المالك لإقامة هذه الدعوى لإلزام المستأجر بسداد القيمة الايجارية من تاريخ [تاريخ_اليوم] حتى [تاريخ_النهاية] وهذه هي المده الافتراضية التي كان يجب فيها تجديد عقد الايجار والتي تقدر بمبلغ وقدره [قيمة_الايجار] درهم من زيادة نسبة 10% قيمة الايجار لسنه الميلادية بالاضافة الى مبلغ ( 300) ( 5% ) للهيئة الاتحادية لضرائب الى تاريخ الاخلاء الفعلي .
+ثانياً: مدة الإيجار من تاريخ [تاريخ_البداية] وحتى [تاريخ_النهاية]، بقيمة إيجارية سنوية قدرها [قيمة_الايجار] درهم إماراتي.
 
-يلتمس المالك من عدلكم الموقر القضاء لها بالاتي:
+ثالثاً: التزم المستأجر بموجب العقد بدفع القيمة الإيجارية على [عدد_الدفعات] دفعات، كل دفعة بقيمة [قيمة_الدفعة] درهم.
 
-أولاً من الناحية الشكليه :
-1/ قبول لائحة الدعوى شكلاً والتصريح بقيدها بأقرب وقت ممكن .
+رابعاً: لم يلتزم المدعى عليه بسداد المبالغ المستحقة في مواعيدها المحددة، حيث تراكمت عليه المبالغ المتأخرة التالية:
 
-ثانيا : من الناحية الموضوعية :
-1/ الزام المستأجر بأن يؤدي للمالك جميع المبالع المتاخرة والجديده مع إلزام المستأجر بمبلغ الضريبة ( 5 % ) درهم تشمل القيمة الايجارية المتأخرة عن الفترة من من 01/02/2022 حتى 31/01/2023, وما يستجد من مستحقات ايجارية حتي تمام السداد وحتى تاريخ الاخلاء الفعلي .
+   • المبلغ الأساسي المتأخر: [المبلغ_المتأخر] درهم
+   • الفترة: من [تاريخ_بداية_التأخير] حتى [تاريخ_نهاية_التأخير]
+   • عدد الأشهر المتأخرة: [عدد_الاشهر_المتأخرة] شهر
+   
+خامساً: تم إنذار المدعى عليه بضرورة السداد عبر [وسيلة_الانذار] بتاريخ [تاريخ_الانذار]، إلا أنه لم يستجب ولم يقم بالسداد.
 
-2/ الزام المستأجر بأن يسلم للمالك براءة ذمة من هيئة الكهرباء والمياه والغاز للفواتير المستحقة على المأجور طوال مدة الايجار و حتى تاريخه.
+سادساً: المبلغ الإجمالي المطالب به:
+   • القيمة الإيجارية المتأخرة: [المبلغ_المتأخر] درهم
+   • ضريبة القيمة المضافة (5%): [قيمة_الضريبة] درهم
+   • الإجمالي: [اجمالي_المطالبة] درهم
 
-3/ واخلاء العين المؤجرة وتسليمها خاليها من الشواغل.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-4/ الزام المستأجر بالرسوم والمصاريف القضائية .
+الأسانيد القانونية:
 
-وتفضلوا بقبول فائق الاحترام والتقدير ....
+- القانون الاتحادي رقم (26) لسنة 2007 بشأن تنظيم العلاقة بين المؤجر والمستأجر في إمارة أم القيوين
+- المادة (25) من قانون المعاملات المدنية الاتحادي
+- أحكام عقد الإيجار المبرم بين الطرفين
 
-مقدم الطلب
-التوقيع :`;
+المستندات المرفقة:
+
+1. صورة من عقد الإيجار الموثق رقم [رقم_العقد]
+2. صورة من إشعار الدفع وكشف حساب المستأجر
+3. صورة من الإنذار الموجه للمستأجر
+4. أي مستندات أخرى تدعم الدعوى
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+بناءً عليه،
+
+يلتمس المدعي من عدالة اللجنة الموقرة الحكم بالآتي:
+
+أولاً - من الناحية الشكلية:
+   1. قبول الدعوى شكلاً لتقديمها وفق الأوضاع القانونية المقررة.
+
+ثانياً - من الناحية الموضوعية:
+   1. إلزام المدعى عليه بأن يؤدي للمدعي مبلغاً وقدره [اجمالي_المطالبة] درهم (القيمة الإيجارية المتأخرة + ضريبة القيمة المضافة).
+   
+   2. إلزام المدعى عليه بسداد ما يستجد من مبالغ إيجارية حتى تاريخ السداد الفعلي أو الإخلاء.
+   
+   3. إلزام المدعى عليه بالرسوم والمصاريف القضائية وأتعاب المحاماة.
+
+وتفضلوا بقبول فائق الاحترام والتقدير
+
+مقدم الطلب / المدعي
+الاسم: [اسم_المدعي]
+التوقيع: _______________
+التاريخ: [تاريخ_اليوم]`;
         
         // جلب بيانات العقار والوحدة تلقائياً
         const propertyData = tenantPropertyData[tenantId];
