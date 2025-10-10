@@ -1342,11 +1342,11 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Eye className="h-5 w-5" />
-              معاينة النموذج
+              {isPreviewEditing ? <Edit className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              {isPreviewEditing ? 'تعديل النموذج' : 'معاينة النموذج'}
             </DialogTitle>
             <DialogDescription>
-              معاينة وتصدير نموذج الدعوى
+              {isPreviewEditing ? 'قم بتعديل النموذج وحفظ التغييرات' : 'معاينة وتصدير نموذج الدعوى'}
             </DialogDescription>
           </DialogHeader>
 
