@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -80,7 +82,13 @@ const mockMessages: Message[] = [
   }
 ];
 
-export default function MessagesClient({ employee }: { employee: Employee }) {
+export default function MessagesClient({ 
+  employee, 
+  allEmployees 
+}: { 
+  employee: Employee;
+  allEmployees: Employee[];
+}) {
   const { t, language } = useLanguage();
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [selectedCategory, setSelectedCategory] = useState<'inbox' | 'sent' | 'draft' | 'archived'>('inbox');
@@ -88,6 +96,7 @@ export default function MessagesClient({ employee }: { employee: Employee }) {
   const [isComposeOpen, setIsComposeOpen] = useState(false);
   const [isEmailConfigOpen, setIsEmailConfigOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [recipientType, setRecipientType] = useState<'employee' | 'custom'>('employee');
   
   // حالة رسالة جديدة
   const [newMessage, setNewMessage] = useState({
@@ -523,14 +532,59 @@ export default function MessagesClient({ employee }: { employee: Employee }) {
 
             <div className="space-y-4">
               <div>
-                <Label htmlFor="to">إلى (البريد الإلكتروني) *</Label>
-                <Input
-                  id="to"
-                  type="email"
-                  placeholder="admin@estateflow.com"
-                  value={newMessage.to}
-                  onChange={(e) => setNewMessage({ ...newMessage, to: e.target.value })}
-                />
+                <Label>إلى (المرسل إليه) *</Label>
+                <RadioGroup 
+                  value={recipientType} 
+                  onValueChange={(value: 'employee' | 'custom') => {
+                    setRecipientType(value);
+                    setNewMessage({ ...newMessage, to: '' });
+                  }}
+                  className="flex gap-4 mb-2"
+                >
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <RadioGroupItem value="employee" id="employee" />
+                    <Label htmlFor="employee" className="font-normal cursor-pointer">
+                      اختيار موظف
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <RadioGroupItem value="custom" id="custom" />
+                    <Label htmlFor="custom" className="font-normal cursor-pointer">
+                      بريد مخصص
+                    </Label>
+                  </div>
+                </RadioGroup>
+
+                {recipientType === 'employee' ? (
+                  <Select 
+                    value={newMessage.to} 
+                    onValueChange={(value) => setNewMessage({ ...newMessage, to: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="اختر موظف..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allEmployees.filter(emp => emp.id !== employee.id).map((emp) => (
+                        <SelectItem key={emp.id} value={emp.email}>
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4" />
+                            <span>{emp.name}</span>
+                            <span className="text-xs text-gray-500">({emp.email})</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    id="to"
+                    type="email"
+                    placeholder="أدخل البريد الإلكتروني..."
+                    value={newMessage.to}
+                    onChange={(e) => setNewMessage({ ...newMessage, to: e.target.value })}
+                    dir="ltr"
+                  />
+                )}
               </div>
 
               <div>
