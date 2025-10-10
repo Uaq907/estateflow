@@ -352,8 +352,10 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
 
   // بدء التعديل في المعاينة
   const handleStartPreviewEdit = () => {
+    // استخدام النموذج الأصلي من قاعدة البيانات (بدون بيانات معبأة)
+    const originalTemplate = templates.find(t => t.id === selectedTemplate?.id);
+    setPreviewEditingContent(originalTemplate?.content || selectedTemplate?.content || '');
     setIsPreviewEditing(true);
-    setPreviewEditingContent(selectedTemplate?.content || '');
   };
 
   // حفظ التعديل في المعاينة
