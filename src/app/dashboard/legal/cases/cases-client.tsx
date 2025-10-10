@@ -208,6 +208,18 @@ export function CasesPageClient() {
     'mock-5': ['شركة الأمان للاستثمار', 'مؤسسة القحطاني التجارية']
   };
 
+  // ربط بيانات العقار والوحدة بالمستأجرين
+  const tenantPropertyData: Record<string, { propertyName: string; unitNumber: string; dueAmount: number }> = {
+    'mock-1': { propertyName: 'برج النخيل السكني', unitNumber: 'A-201', dueAmount: 45000 },
+    'mock-2': { propertyName: 'فيلا الشاطئ', unitNumber: 'V-105', dueAmount: 60000 },
+    'mock-3': { propertyName: 'مجمع المستقبل', unitNumber: 'B-304', dueAmount: 38000 },
+    'mock-4': { propertyName: 'برج الزهراء', unitNumber: 'C-102', dueAmount: 42000 },
+    'mock-5': { propertyName: 'مجمع الأمان التجاري', unitNumber: 'T-501', dueAmount: 75000 },
+    'commercial-1': { propertyName: 'مجمع النخيل التجاري', unitNumber: 'T-101', dueAmount: 80000 },
+    'commercial-2': { propertyName: 'برج المستقبل', unitNumber: 'R-205', dueAmount: 95000 },
+    'commercial-3': { propertyName: 'مركز الأمان للأعمال', unitNumber: 'T-301', dueAmount: 120000 }
+  };
+
   // إغلاق قائمة البحث عند النقر خارجها
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -352,12 +364,22 @@ export function CasesPageClient() {
       if (tenant) {
         console.log('Found tenant:', tenant.name);
         setSelectedTenantId(tenantId);
-        setNewCase(prev => ({...prev, client: tenant.name, contactPhone: tenant.phone, contactEmail: tenant.email}));
         
-        // تعبئة البيانات في النموذج تلقائياً
-        setTimeout(() => {
-          fillTemplateData(tenant.name, tenantId, newCase.propertyName, newCase.unitNumber, newCase.dueAmount);
-        }, 100);
+        // جلب بيانات العقار والوحدة تلقائياً
+        const propertyData = tenantPropertyData[tenantId];
+        if (propertyData) {
+          setNewCase(prev => ({
+            ...prev, 
+            client: tenant.name, 
+            contactPhone: tenant.phone, 
+            contactEmail: tenant.email,
+            propertyName: propertyData.propertyName,
+            unitNumber: propertyData.unitNumber,
+            dueAmount: propertyData.dueAmount.toString()
+          }));
+        } else {
+          setNewCase(prev => ({...prev, client: tenant.name, contactPhone: tenant.phone, contactEmail: tenant.email}));
+        }
         
         setTenantSearchTerm(''); // إزالة النص من خانة البحث
         setShowTenantSearch(false); // إغلاق قائمة البحث
@@ -367,12 +389,22 @@ export function CasesPageClient() {
       if (company) {
         console.log('Found company:', company.name);
         setSelectedTenantId(tenantId);
-        setNewCase(prev => ({...prev, client: company.name, contactPhone: company.phone, contactEmail: company.email}));
         
-        // تعبئة البيانات في النموذج تلقائياً
-        setTimeout(() => {
-          fillTemplateData(company.name, tenantId, newCase.propertyName, newCase.unitNumber, newCase.dueAmount);
-        }, 100);
+        // جلب بيانات العقار والوحدة تلقائياً
+        const propertyData = tenantPropertyData[tenantId];
+        if (propertyData) {
+          setNewCase(prev => ({
+            ...prev, 
+            client: company.name, 
+            contactPhone: company.phone, 
+            contactEmail: company.email,
+            propertyName: propertyData.propertyName,
+            unitNumber: propertyData.unitNumber,
+            dueAmount: propertyData.dueAmount.toString()
+          }));
+        } else {
+          setNewCase(prev => ({...prev, client: company.name, contactPhone: company.phone, contactEmail: company.email}));
+        }
         
         setTenantSearchTerm(''); // إزالة النص من خانة البحث
         setShowTenantSearch(false); // إغلاق قائمة البحث
