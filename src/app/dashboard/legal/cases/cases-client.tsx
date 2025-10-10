@@ -689,7 +689,7 @@ export function CasesPageClient() {
         {/* أزرار الإجراءات */}
         {canCreateCases && (
           <div className="mb-6 flex gap-4">
-            <Button onClick={() => setShowTemplateSelectionDialog(true)}>
+            <Button onClick={() => setIsAddDialogOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   إضافة قضية جديدة
                 </Button>
@@ -1145,13 +1145,12 @@ export function CasesPageClient() {
                           variant="outline" 
                           size="sm"
                           onClick={() => {
-                            window.open('/dashboard/legal/petition-templates', '_blank');
-                            alert('تم فتح صفحة نماذج الدعاوى. يمكنك نسخ النموذج المناسب ولصقه هنا.');
+                            setShowTemplateSelectionDialog(true);
                           }}
                           className="text-xs"
                         >
                           <FileText className="h-3 w-3 mr-1" />
-                          نماذج جاهزة
+                          اختيار نموذج
                         </Button>
                       </div>
                     </div>
@@ -1441,7 +1440,6 @@ export function CasesPageClient() {
 التوقيع :`
                   }));
                   setShowTemplateSelectionDialog(false);
-                  setIsAddDialogOpen(true);
                 }}
               >
                 <div className="flex items-start gap-4 mb-3">
@@ -1494,7 +1492,6 @@ export function CasesPageClient() {
 يلتمس المدعي إلزام المدعى عليه بدفع المبلغ المتأخر والفوائد القانونية.`
                   }));
                   setShowTemplateSelectionDialog(false);
-                  setIsAddDialogOpen(true);
                 }}
               >
                 <div className="flex items-start gap-4 mb-3">
@@ -1543,7 +1540,6 @@ export function CasesPageClient() {
 إخلاء العقار وتسليمه للمدعي مع دفع المبالغ المستحقة.`
                   }));
                   setShowTemplateSelectionDialog(false);
-                  setIsAddDialogOpen(true);
                 }}
               >
                 <div className="flex items-start gap-4 mb-3">
@@ -1579,7 +1575,6 @@ export function CasesPageClient() {
                     priority: ''
                   }));
                   setShowTemplateSelectionDialog(false);
-                  setIsAddDialogOpen(true);
                 }}
               >
                 <div className="flex items-start gap-4 mb-3">
