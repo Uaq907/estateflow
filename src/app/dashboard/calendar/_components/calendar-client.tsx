@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import type { CalendarEvent, Employee } from '@/lib/types';
 import { format, isToday } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
-import { FileSignature, Banknote, Wrench, WalletCards, ChevronLeft, ChevronRight, Receipt, Calendar, CalendarDays } from 'lucide-react';
+import { FileSignature, Banknote, Wrench, WalletCards, ChevronLeft, ChevronRight, Receipt, Calendar, CalendarDays, Download } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useMemo, useEffect } from 'react';
 import { CustomCalendar } from './custom-calendar';
@@ -68,6 +68,38 @@ export default function CalendarClient({
     });
     const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
     const [hasSelectedDate, setHasSelectedDate] = useState(false); // تتبع إذا تم اختيار تاريخ
+    const [isExporting, setIsExporting] = useState(false);
+    
+    // دالة لتصدير التقويم
+    const handleExportCalendar = async () => {
+        setIsExporting(true);
+        try {
+            const { exportCalendarToICS } = await import('@/app/dashboard/actions');
+            const result = await exportCalendarToICS();
+            
+            if (result.success && result.data) {
+                // إنشاء ملف للتنزيل
+                const blob = new Blob([result.data], { type: 'text/calendar;charset=utf-8' });
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `uaq907-calendar-${new Date().toISOString().split('T')[0]}.ics`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+                
+                alert('✅ تم تصدير التقويم بنجاح! افتح الملف على هاتفك لاستيراده في Google Calendar');
+            } else {
+                alert('❌ ' + (result.message || 'فشل تصدير التقويم'));
+            }
+        } catch (error) {
+            console.error('Error exporting calendar:', error);
+            alert('❌ حدث خطأ أثناء تصدير التقويم');
+        } finally {
+            setIsExporting(false);
+        }
+    };
     
     // حفظ viewMode في localStorage عند تغييره
     useEffect(() => {
@@ -157,6 +189,16 @@ export default function CalendarClient({
                                 >
                                     <Calendar className="h-4 w-4 mr-2" />
                                     {t('calendar.yearly')}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleExportCalendar}
+                                    disabled={isExporting}
+                                    className="bg-green-50 hover:bg-green-100 text-green-700 border-green-300"
+                                >
+                                    <Download className="h-4 w-4 mr-2" />
+                                    {isExporting ? 'جارٍ التصدير...' : 'تصدير للهاتف'}
                                 </Button>
                             </div>
                         </div>

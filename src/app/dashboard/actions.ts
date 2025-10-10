@@ -2120,6 +2120,40 @@ export async function handleDeleteEvictionRequest(id: string) {
     }
 }
 
+// ====== Calendar Export Actions ======
+
+export async function exportCalendarToICS() {
+  const loggedInEmployee = await getEmployeeFromSession();
+  if (!loggedInEmployee) {
+    return { success: false, message: 'Not authenticated.' };
+  }
+
+  try {
+    const { getCalendarEvents } = await import('@/lib/db');
+    const { exportCalendarToICS } = await import('@/lib/calendar-export');
+    
+    const events = await getCalendarEvents();
+    const icsContent = exportCalendarToICS(events);
+
+    if (icsContent) {
+      await logActivity(
+        loggedInEmployee.id,
+        loggedInEmployee.name,
+        'EXPORT_CALENDAR',
+        'Calendar',
+        undefined,
+        { eventCount: events.length }
+      );
+      return { success: true, data: icsContent };
+    } else {
+      return { success: false, message: 'فشل إنشاء ملف التقويم' };
+    }
+  } catch (error: any) {
+    console.error('Failed to export calendar:', error);
+    return { success: false, message: error.message || 'حدث خطأ أثناء التصدير' };
+  }
+}
+
 // ====== Purchase Request Actions ======
 // NOTE: Purchase Request feature has been removed from the application
 
