@@ -352,9 +352,9 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
 
   // بدء التعديل في المعاينة
   const handleStartPreviewEdit = () => {
-    // استخدام النموذج الأصلي من قاعدة البيانات (بدون بيانات معبأة)
-    const originalTemplate = templates.find(t => t.id === selectedTemplate?.id);
-    setPreviewEditingContent(originalTemplate?.content || selectedTemplate?.content || '');
+    // استخدام النموذج الافتراضي الثابت (بدون بيانات معبأة)
+    const defaultTemplate = petitionTemplates.find(t => t.id === selectedTemplate?.id);
+    setPreviewEditingContent(defaultTemplate?.content || selectedTemplate?.content || '');
     setIsPreviewEditing(true);
   };
 
@@ -1477,10 +1477,11 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                   <>
                     <div className="bg-gray-50 p-4 rounded border">
                       <div className="whitespace-pre-wrap text-sm leading-relaxed text-black">
-                        {/* استخدام النموذج الأصلي من templates (بدون بيانات معبأة) */}
+                        {/* استخدام النموذج الافتراضي الثابت (بدون بيانات معبأة) */}
                         {(() => {
-                          const originalTemplate = templates.find(t => t.id === selectedTemplate.id);
-                          const contentToShow = originalTemplate?.content || selectedTemplate.content;
+                          // إذا كان النموذج هو الافتراضي (id: 1)، نستخدم النموذج الثابت
+                          const defaultTemplate = petitionTemplates.find(t => t.id === selectedTemplate.id);
+                          const contentToShow = defaultTemplate?.content || selectedTemplate.content;
                           return contentToShow ? renderContentWithTags(contentToShow, showRealData) : 'لا يوجد محتوى متاح لهذا النموذج.';
                         })()}
                       </div>
