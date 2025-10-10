@@ -297,6 +297,17 @@ export function CasesPageClient() {
     });
   };
 
+  // دالة لتفريغ البيانات (إزالة العلامات الحمراء)
+  const clearFilledData = () => {
+    if (newCase.priority && newCase.priority.trim()) {
+      const clearedTemplate = newCase.priority.replace(/🔴/g, '');
+      setNewCase(prev => ({
+        ...prev,
+        priority: clearedTemplate
+      }));
+    }
+  };
+
   // دالة لتعبئة البيانات في نموذج الدعوى مع علامات للون الأحمر
   const fillTemplateData = (client: string, tenantId: string, propertyName?: string, unitNumber?: string, dueAmount?: string) => {
     const tenant = allTenants.find(t => t.id === tenantId);
@@ -1266,6 +1277,18 @@ export function CasesPageClient() {
                           className="text-xs bg-green-50 hover:bg-green-100 text-green-700 border-green-300"
                         >
                           🔄 تعبئة البيانات
+                        </Button>
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            clearFilledData();
+                            alert('✓ تم تفريغ البيانات المعبأة!');
+                          }}
+                          className="text-xs bg-red-50 hover:bg-red-100 text-red-700 border-red-300"
+                        >
+                          🗑️ تفريغ البيانات
                         </Button>
                         <Button 
                           type="button" 
