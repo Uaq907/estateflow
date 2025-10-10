@@ -6,7 +6,7 @@ import { ar } from 'date-fns/locale';
 import { Employee } from '@/lib/types';
 import { LeaseHistoryItem } from '@/lib/db';
 import { useLanguage } from '@/contexts/language-context';
-import AppHeader from './layout/header';
+import { AppHeader } from './layout/header';
 import { 
   Table, 
   TableBody, 

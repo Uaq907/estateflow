@@ -101,18 +101,6 @@ function LoginForm() {
           {isLoading ? 'Logging in...' : 'Login'}
         </Button>
         
-        {/* Demo Credentials Info */}
-        <Alert className="w-full bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-          <LogIn className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          <AlertTitle className="text-blue-800 dark:text-blue-200">بيانات الدخول التجريبية</AlertTitle>
-          <AlertDescription className="text-blue-700 dark:text-blue-300">
-            <div className="space-y-1 mt-2">
-              <div><strong>البريد:</strong> uaq907@gmail.com</div>
-              <div><strong>كلمة السر:</strong> demo123</div>
-            </div>
-          </AlertDescription>
-        </Alert>
-        
         {errorMessage && (
           <Alert variant="destructive" className="w-full">
             <ServerCrash className="h-4 w-4" />

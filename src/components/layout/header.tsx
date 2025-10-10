@@ -123,7 +123,6 @@ export function AppHeader({ loggedInEmployee }: { loggedInEmployee: Employee | n
                        <DropdownMenuSeparator className="xl:hidden"/>
                        {canReadLeases && <DropdownMenuItem asChild><Link href="/dashboard/financials/overview"><BarChart3 className="mr-2" />{t('nav.financialsDashboard')}</Link></DropdownMenuItem>}
                        {canReadLeases && <DropdownMenuItem asChild><Link href="/dashboard/financials"><FileSignature className="mr-2" />{t('nav.leasesPayments')}</Link></DropdownMenuItem>}
-                       {canReadLeases && <DropdownMenuItem asChild><Link href="/dashboard/leases/history"><Archive className="mr-2" />{t('nav.leaseHistory')}</Link></DropdownMenuItem>}
                        {canReadExpenses && <DropdownMenuItem asChild><Link href="/dashboard/expenses"><Receipt className="mr-2" />{t('nav.expenses')}</Link></DropdownMenuItem>}
                        {canReadCheques && <DropdownMenuItem asChild><Link href="/dashboard/cheques"><WalletCards className="mr-2"/>{t('nav.cheques')}</Link></DropdownMenuItem>}
                     </DropdownMenuContent>
@@ -207,6 +206,7 @@ export function AppHeader({ loggedInEmployee }: { loggedInEmployee: Employee | n
                         <DropdownMenuSeparator className="xl:hidden"/>
                         {canManageSettings && <DropdownMenuItem asChild><Link href="/dashboard/settings/unit-configurations"><Settings className="mr-2" />{t('settings.unitConfigurations')}</Link></DropdownMenuItem>}
                         {canViewLogs && <DropdownMenuItem asChild><Link href="/dashboard/settings/log-analyzer"><ListOrdered className="mr-2" />{t('settings.logAnalyzer')}</Link></DropdownMenuItem>}
+                        {canReadLeases && <DropdownMenuItem asChild><Link href="/dashboard/leases/history"><Archive className="mr-2" />{t('nav.leaseHistory')}</Link></DropdownMenuItem>}
                         {canManageSettings && <DropdownMenuItem asChild><Link href="/dashboard/settings/reports"><BarChart3 className="mr-2" />{t('settings.reports')}</Link></DropdownMenuItem>}
                       </DropdownMenuContent>
                     </DropdownMenu>
