@@ -297,10 +297,34 @@ export function CasesPageClient() {
     });
   };
 
-  // دالة لتفريغ البيانات (إزالة العلامات الحمراء)
+  // دالة لتفريغ البيانات وإعادة placeholders الأصلية
   const clearFilledData = () => {
     if (newCase.priority && newCase.priority.trim()) {
-      const clearedTemplate = newCase.priority.replace(/🔴/g, '');
+      let clearedTemplate = newCase.priority;
+      
+      // إزالة البيانات المعبأة وإعادة placeholders الأصلية
+      // بيانات المدعي
+      clearedTemplate = clearedTemplate.replace(/🔴عبدالله محمد بن عمير ال علي🔴/g, '[اسم_المدعي]');
+      clearedTemplate = clearedTemplate.replace(/🔴784-1945-4384241-1🔴/g, '[هوية_المدعي]');
+      clearedTemplate = clearedTemplate.replace(/🔴أم القيوين – الظهر🔴/g, '[عنوان_المدعي]');
+      clearedTemplate = clearedTemplate.replace(/🔴0522020200🔴/g, '[هاتف_المدعي]');
+      clearedTemplate = clearedTemplate.replace(/🔴uaq907@gmail\.com🔴/g, '[ايميل_المدعي]');
+      
+      // إزالة جميع البيانات المعبأة الأخرى (بين 🔴...🔴)
+      clearedTemplate = clearedTemplate.replace(/🔴(.*?)🔴/g, (match, content) => {
+        // إذا كان المحتوى يحتوي على بيانات معبأة، نعيد placeholder مناسب
+        if (content.includes('@')) return '[ايميل_المدعى_عليه]';
+        if (content.includes('+971') || content.startsWith('05')) return '[هاتف_المدعى_عليه]';
+        if (content.includes('784-')) return '[هوية_المدعى_عليه]';
+        if (content.includes('/')) return '[تاريخ_اليوم]';
+        if (content.match(/^\d+$/)) return '[المبلغ_المتأخر]';
+        if (content.includes('TC-')) return '[رقم_العقد]';
+        if (content.includes('برج') || content.includes('فيلا') || content.includes('مجمع')) return '[اسم_العقار]';
+        if (content.match(/^[A-Z]-\d+$/) || content.match(/^[VTR]-\d+$/)) return '[رقم_الوحدة]';
+        // اسماء الأشخاص والشركات
+        return '[اسم_المدعى_عليه]';
+      });
+      
       setNewCase(prev => ({
         ...prev,
         priority: clearedTemplate
