@@ -85,7 +85,9 @@ const defaultNewTemplate = {
 
 // قوالب عناوين النماذج
 const templateTitles = [
-  'نموذج دعوى - منازعات إيجارية'
+  'نموذج دعوى - منازعات إيجارية',
+  'نموذج إخلاء - عدم دفع الإيجار',
+  'نموذج زيادة سنوية - قانون 33'
 ];
 
 const categories = ['زيادة سنوية', 'إخلاء', 'منازعات إيجارية'];
@@ -284,14 +286,16 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
 
   // إنشاء نموذج جديد
   const handleCreateTemplate = () => {
-    if (!newTemplate.title || !newTemplate.category || !newTemplate.emirate || !newTemplate.content) {
-      alert('يرجى ملء جميع الحقول المطلوبة');
+    if (!newTemplate.title || !newTemplate.content) {
+      alert('يرجى ملء عنوان النموذج والمحتوى');
       return;
     }
 
     const template = {
       id: Date.now(),
       ...newTemplate,
+      category: 'منازعات إيجارية', // تعيين تلقائي
+      emirate: 'أم القيوين', // تعيين تلقائي
       createdAt: new Date().toISOString().split('T')[0],
       lastModified: new Date().toISOString().split('T')[0],
       usageCount: 0
@@ -311,7 +315,13 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
   const handleUpdateTemplate = () => {
     const updatedTemplates = templates.map(template => 
       template.id === selectedTemplate?.id 
-        ? { ...template, ...newTemplate, lastModified: new Date().toISOString().split('T')[0] }
+        ? { 
+            ...template, 
+            ...newTemplate, 
+            category: 'منازعات إيجارية', // تعيين تلقائي
+            emirate: 'أم القيوين', // تعيين تلقائي
+            lastModified: new Date().toISOString().split('T')[0] 
+          }
         : template
     );
     
@@ -965,9 +975,9 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
               </DialogHeader>
 
               <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="title">عنوان النموذج *</Label>
+                <div className="grid gap-4">
+                  <div className="grid gap-3">
+                    <Label htmlFor="title" className="text-base font-semibold">عنوان النموذج *</Label>
                     <Select 
                       value={isCustomTitle ? 'مخصص' : newTemplate.title} 
                       onValueChange={(value) => {
@@ -1005,37 +1015,6 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                     )}
                   </div>
 
-                  <div className="grid gap-2">
-                    <Label htmlFor="category">الفئة *</Label>
-                    <Select value={newTemplate.category} onValueChange={(value) => setNewTemplate(prev => ({ ...prev, category: value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر الفئة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="emirate">الإمارة *</Label>
-                  <Select value={newTemplate.emirate} onValueChange={(value) => setNewTemplate(prev => ({ ...prev, emirate: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر الإمارة" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {emirates.map((emirate) => (
-                        <SelectItem key={emirate} value={emirate}>
-                          {emirate}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
                 </div>
 
                 <div className="grid gap-2">
@@ -1647,39 +1626,6 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                     />
                   )}
                 </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="edit-category">الفئة *</Label>
-                  <Select value={newTemplate.category} onValueChange={(value) => setNewTemplate(prev => ({ ...prev, category: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر الفئة" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="edit-emirate">الإمارة *</Label>
-                <Select value={newTemplate.emirate} onValueChange={(value) => setNewTemplate(prev => ({ ...prev, emirate: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="اختر الإمارة" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {emirates.map((emirate) => (
-                      <SelectItem key={emirate} value={emirate}>
-                        {emirate}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
 
               <div className="grid gap-2">
                 <div className="flex items-center gap-2">
