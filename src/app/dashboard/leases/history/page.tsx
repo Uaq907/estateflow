@@ -9,7 +9,7 @@ export default async function LeaseHistoryPage() {
     redirect('/login');
   }
 
-  let leaseHistory = [];
+  let leaseHistory: Awaited<ReturnType<typeof getCompletedLeasesHistory>> = [];
   try {
     leaseHistory = await getCompletedLeasesHistory();
   } catch (error) {
