@@ -705,7 +705,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
             className={`px-1 py-0.5 rounded text-xs font-mono border ${
               showRealData 
                 ? 'bg-green-100 text-green-800 border-green-300' 
-                : 'bg-blue-100 text-blue-800 border-blue-300'
+                : 'bg-red-50 text-red-600 border-red-300 font-semibold'
             }`}
             title={showRealData ? `البيانات الفعلية: ${realData || 'غير متوفر'}` : `حقل بيانات: ${part}`}
           >
@@ -713,7 +713,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
           </span>
         );
       }
-      return part;
+      return <span key={index} className="text-black">{part}</span>;
     });
   };
 
@@ -1587,45 +1587,43 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="edit-title">عنوان النموذج *</Label>
-                  <Select 
-                    value={isCustomTitle ? 'مخصص' : newTemplate.title} 
-                    onValueChange={(value) => {
-                      if (value === 'مخصص') {
-                        setIsCustomTitle(true);
-                        setNewTemplate(prev => ({ ...prev, title: customTitle }));
-                      } else {
-                        setIsCustomTitle(false);
-                        setNewTemplate(prev => ({ ...prev, title: value }));
-                      }
+              <div className="grid gap-3">
+                <Label htmlFor="edit-title" className="text-base font-semibold">عنوان النموذج *</Label>
+                <Select 
+                  value={isCustomTitle ? 'مخصص' : newTemplate.title} 
+                  onValueChange={(value) => {
+                    if (value === 'مخصص') {
+                      setIsCustomTitle(true);
+                      setNewTemplate(prev => ({ ...prev, title: customTitle }));
+                    } else {
+                      setIsCustomTitle(false);
+                      setNewTemplate(prev => ({ ...prev, title: value }));
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر عنوان النموذج" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {templateTitles.map((title) => (
+                      <SelectItem key={title} value={title}>
+                        {title}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="مخصص">✏️ عنوان مخصص</SelectItem>
+                  </SelectContent>
+                </Select>
+                {isCustomTitle && (
+                  <Input
+                    value={customTitle}
+                    onChange={(e) => {
+                      setCustomTitle(e.target.value);
+                      setNewTemplate(prev => ({ ...prev, title: e.target.value }));
                     }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر عنوان النموذج" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {templateTitles.map((title) => (
-                        <SelectItem key={title} value={title}>
-                          {title}
-                        </SelectItem>
-                      ))}
-                      <SelectItem value="مخصص">✏️ عنوان مخصص</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {isCustomTitle && (
-                    <Input
-                      value={customTitle}
-                      onChange={(e) => {
-                        setCustomTitle(e.target.value);
-                        setNewTemplate(prev => ({ ...prev, title: e.target.value }));
-                      }}
-                      placeholder="أدخل عنوان مخصص"
-                      className="mt-2"
-                    />
-                  )}
-                </div>
+                    placeholder="أدخل عنوان مخصص"
+                    className="mt-2"
+                  />
+                )}
               </div>
 
               <div className="grid gap-2">
