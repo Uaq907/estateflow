@@ -2120,6 +2120,52 @@ export async function handleDeleteEvictionRequest(id: string) {
     }
 }
 
+// ====== Email Actions ======
+
+export async function sendPetitionEmailAction({
+  to,
+  clientName,
+  caseNumber,
+  petitionContent,
+}: {
+  to: string;
+  clientName: string;
+  caseNumber: string;
+  petitionContent: string;
+}) {
+  const loggedInEmployee = await getEmployeeFromSession();
+  if (!loggedInEmployee) {
+    return { success: false, message: 'Not authenticated.' };
+  }
+
+  try {
+    const { sendPetitionEmail } = await import('@/lib/email');
+    const result = await sendPetitionEmail({
+      to,
+      clientName,
+      caseNumber,
+      petitionContent,
+    });
+
+    if (result.success) {
+      await logActivity(
+        loggedInEmployee.id,
+        loggedInEmployee.name,
+        'SEND_EMAIL',
+        'Case',
+        caseNumber,
+        { to, type: 'petition', clientName }
+      );
+      return { success: true, message: 'تم إرسال نموذج الدعوى عبر البريد الإلكتروني بنجاح!' };
+    } else {
+      return { success: false, message: 'فشل إرسال البريد الإلكتروني' };
+    }
+  } catch (error: any) {
+    console.error('Failed to send petition email:', error);
+    return { success: false, message: error.message || 'حدث خطأ أثناء الإرسال' };
+  }
+}
+
 // ====== Purchase Request Actions ======
 // NOTE: Purchase Request feature has been removed from the application
 
