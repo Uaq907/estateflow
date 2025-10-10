@@ -496,16 +496,24 @@ export function CasesPageClient() {
       const endDate = new Date(today.getFullYear(), 11, 31); // 31 ديسمبر من السنة الحالية
       const delayStartDate = new Date(today.getFullYear(), today.getMonth() - 3, 1); // قبل 3 أشهر
       
+      // دالة لتنسيق التاريخ بالميلادي (DD/MM/YYYY)
+      const formatGregorianDate = (date: Date): string => {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      };
+      
       // حساب السنة الميلادية
       const gregorianYear = today.getFullYear().toString();
       
       updatedTemplate = updatedTemplate.replace(/\[سنة_ميلادية\]/g, gregorianYear);
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_اليوم\]/g, today.toLocaleDateString('ar-SA'));
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_العقد\]/g, startDate.toLocaleDateString('ar-SA'));
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_البداية\]/g, startDate.toLocaleDateString('ar-SA'));
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_النهاية\]/g, endDate.toLocaleDateString('ar-SA'));
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_بداية_التأخير\]/g, delayStartDate.toLocaleDateString('ar-SA'));
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_نهاية_التأخير\]/g, today.toLocaleDateString('ar-SA'));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_اليوم\]/g, formatGregorianDate(today));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_العقد\]/g, formatGregorianDate(startDate));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_البداية\]/g, formatGregorianDate(startDate));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_النهاية\]/g, formatGregorianDate(endDate));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_بداية_التأخير\]/g, formatGregorianDate(delayStartDate));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_نهاية_التأخير\]/g, formatGregorianDate(today));
       updatedTemplate = updatedTemplate.replace(/\[رقم_العقد\]/g, 'TC-2025-001');
       
       // حساب عدد الأشهر المتأخرة
@@ -515,7 +523,7 @@ export function CasesPageClient() {
       // تعبئة بيانات الإنذار
       const warningDate = new Date(today.getFullYear(), today.getMonth() - 1, 15); // قبل شهر تقريباً
       updatedTemplate = updatedTemplate.replace(/\[وسيلة_الانذار\]/g, 'رسالة نصية ورسالة بريد إلكتروني');
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_الانذار\]/g, warningDate.toLocaleDateString('ar-SA'));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_الانذار\]/g, formatGregorianDate(warningDate));
       
       console.log('✨ Data filling completed!');
       
@@ -861,7 +869,7 @@ export function CasesPageClient() {
       <body>
         <div class="header">
           <h1>لائحة الدعوى</h1>
-          <p>تاريخ: ${new Date().toLocaleDateString('ar-SA')}</p>
+          <p>تاريخ: ${new Date().toLocaleDateString('en-GB')}</p>
         </div>
         <div class="content">${formattedContent}</div>
         <div class="footer no-print">
