@@ -566,10 +566,17 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
 
   // إعادة تعيين النماذج
   const handleResetTemplates = () => {
-    if (confirm('هل أنت متأكد من إعادة تعيين جميع النماذج؟ سيتم حذف جميع التعديلات.')) {
+    if (confirm('هل أنت متأكد من إعادة تعيين جميع النماذج؟ سيتم حذف جميع النماذج القديمة والاحتفاظ بنموذج واحد فقط.')) {
+      // مسح localStorage تماماً
+      localStorage.removeItem('petitionTemplates');
+      localStorage.removeItem('customPetitionTemplates');
+      
+      // تحميل النموذج الافتراضي الوحيد
       setTemplates(petitionTemplates);
       localStorage.setItem('petitionTemplates', JSON.stringify(petitionTemplates));
-      alert('تم إعادة تعيين النماذج بنجاح! ✓');
+      
+      // إعادة تحميل الصفحة للتأكد من التطبيق
+      window.location.reload();
     }
   };
   
