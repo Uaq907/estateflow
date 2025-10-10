@@ -1365,12 +1365,17 @@ export function CasesPageClient() {
                           variant="outline" 
                           size="sm"
                           onClick={() => {
-                            setShowTemplateSelectionDialog(true);
+                            // حفظ النموذج الحالي في localStorage للتمييز
+                            if (newCase.priority && newCase.priority.trim()) {
+                              localStorage.setItem('currentActiveTemplate', newCase.priority.replace(/🔴/g, ''));
+                            }
+                            // فتح صفحة النماذج في نافذة جديدة
+                            window.open('/dashboard/legal/petition-templates', '_blank');
                           }}
                           className="text-xs"
                         >
                           <FileText className="h-3 w-3 mr-1" />
-                          اختيار نموذج
+                          اختيار/تعديل نموذج
                         </Button>
                         <Button 
                           type="button" 

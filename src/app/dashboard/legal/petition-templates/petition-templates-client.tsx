@@ -367,6 +367,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
   const [isEditingEnabled, setIsEditingEnabled] = useState(true);
   const [isCustomTitle, setIsCustomTitle] = useState(false);
   const [customTitle, setCustomTitle] = useState('');
+  const [currentActiveTemplate, setCurrentActiveTemplate] = useState<string>('');
   const [formattingOptions, setFormattingOptions] = useState({
     bold: false,
     italic: false,
@@ -453,6 +454,20 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
       }
     } catch (error) {
       console.error('Error loading templates from localStorage:', error);
+    }
+  }, []);
+
+  // قراءة النموذج النشط من localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const activeTemplate = localStorage.getItem('currentActiveTemplate');
+      if (activeTemplate) {
+        setCurrentActiveTemplate(activeTemplate);
+      }
+    } catch (error) {
+      console.error('Error loading active template:', error);
     }
   }, []);
 
@@ -1356,12 +1371,32 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
 
       {/* Templates Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredTemplates.map((template) => (
-          <Card key={template.id} className="hover:shadow-lg transition-shadow">
+        {filteredTemplates.map((template) => {
+          // تحقق من تطابق النموذج مع النموذج النشط
+          const isActiveTemplate = currentActiveTemplate && template.content === currentActiveTemplate;
+          
+          return (
+          <Card 
+            key={template.id} 
+            className={`hover:shadow-lg transition-all ${
+              isActiveTemplate 
+                ? 'border-4 border-red-500 bg-red-50 shadow-2xl ring-4 ring-red-200' 
+                : 'hover:shadow-lg'
+            }`}
+          >
             <CardHeader className="pb-3">
+              {isActiveTemplate && (
+                <div className="mb-2 bg-red-600 text-white px-3 py-1 rounded-lg text-center font-bold text-sm flex items-center justify-center gap-2">
+                  <span className="animate-pulse">🔴</span>
+                  <span>النموذج النشط الحالي</span>
+                  <span className="animate-pulse">🔴</span>
+                </div>
+              )}
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <CardTitle className="text-lg leading-tight">{template.title}</CardTitle>
+                  <CardTitle className={`text-lg leading-tight ${isActiveTemplate ? 'text-red-700 font-bold' : ''}`}>
+                    {template.title}
+                  </CardTitle>
                   <CardDescription className="mt-2 flex items-center gap-4">
                     <Badge className={getCategoryColor(template.category)}>
                       {template.category}
@@ -1513,7 +1548,8 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
               </div>
             </CardContent>
           </Card>
-        ))}
+          );
+        })}
       </div>
 
       {/* Preview Dialog */}
