@@ -366,13 +366,19 @@ export function CasesPageClient() {
       clearedTemplate = clearedTemplate.replace(/uaq907@gmail\.com/g, '[ايميل_المدعي]');
       
       // بيانات المدعى عليه (أمثلة من البيانات الوهمية)
+      // أسماء المستأجرين
       clearedTemplate = clearedTemplate.replace(/فاطمة السالم/g, '[اسم_المدعى_عليه]');
       clearedTemplate = clearedTemplate.replace(/أحمد محمد علي/g, '[اسم_المدعى_عليه]');
       clearedTemplate = clearedTemplate.replace(/محمد حسن النور/g, '[اسم_المدعى_عليه]');
       clearedTemplate = clearedTemplate.replace(/عائشة أحمد الزهراني/g, '[اسم_المدعى_عليه]');
       clearedTemplate = clearedTemplate.replace(/خالد عبدالله المطيري/g, '[اسم_المدعى_عليه]');
+      // أسماء الشركات التجارية
+      clearedTemplate = clearedTemplate.replace(/شركة النخيل التجارية/g, '[اسم_المدعى_عليه]');
+      clearedTemplate = clearedTemplate.replace(/مؤسسة المستقبل للخدمات/g, '[اسم_المدعى_عليه]');
+      clearedTemplate = clearedTemplate.replace(/شركة الأمان للاستثمار/g, '[اسم_المدعى_عليه]');
       
-      // الجنسيات
+      // الجنسيات والأسماء التجارية
+      clearedTemplate = clearedTemplate.replace(/الاسم التجاري: [^،\n]+/g, '[جنسية_المدعى_عليه]');
       clearedTemplate = clearedTemplate.replace(/الإمارات/g, '[جنسية_المدعى_عليه]');
       clearedTemplate = clearedTemplate.replace(/السودان/g, '[جنسية_المدعى_عليه]');
       clearedTemplate = clearedTemplate.replace(/السعودية/g, '[جنسية_المدعى_عليه]');
@@ -455,8 +461,8 @@ export function CasesPageClient() {
         updatedTemplate = updatedTemplate.replace(/\[هاتف_المدعى_عليه\]/g, tenant.phone || 'غير محدد');
         updatedTemplate = updatedTemplate.replace(/\[ايميل_المدعى_عليه\]/g, tenant.email || 'غير محدد');
       } else if (company) {
-        updatedTemplate = updatedTemplate.replace(/\[اسم_المدعى_عليه\]/g, company.name);
-        updatedTemplate = updatedTemplate.replace(/\[جنسية_المدعى_عليه\]/g, company.nationality || 'غير محدد');
+        updatedTemplate = updatedTemplate.replace(/\[اسم_المدعى_عليه\]/g, company.licenseOwner || company.name);
+        updatedTemplate = updatedTemplate.replace(/\[جنسية_المدعى_عليه\]/g, `الاسم التجاري: ${company.name}`);
         updatedTemplate = updatedTemplate.replace(/\[هوية_المدعى_عليه\]/g, company.idNumber || 'غير محدد');
         updatedTemplate = updatedTemplate.replace(/\[عنوان_المدعى_عليه\]/g, propertyName && unitNumber ? `${propertyName} - وحدة ${unitNumber}` : 'غير محدد');
         updatedTemplate = updatedTemplate.replace(/\[هاتف_المدعى_عليه\]/g, company.phone || 'غير محدد');
