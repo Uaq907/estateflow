@@ -246,7 +246,7 @@ export default function UserPreferencesClient({ loggedInEmployee }: { loggedInEm
                                         ? '✨ التغييرات تُطبق فوراً على التقويم بدون الحاجة للحفظ' 
                                         : '✨ Changes apply immediately to the calendar without needing to save'}
                                 </p>
-                            </div>
+                                            </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {[
                                     { 
@@ -294,14 +294,14 @@ export default function UserPreferencesClient({ loggedInEmployee }: { loggedInEm
                                                     isVisible ? 'bg-gradient-to-br from-gray-50 to-gray-100' : 'bg-gray-200'
                                                 }`}>
                                                     <Icon className={`h-6 w-6 ${eventType.color} ${!isVisible && 'opacity-50'}`} />
-                                                </div>
+                                        </div>
                                                 <div className="flex-1">
                                                     <Label 
                                                         htmlFor={`visibility-${eventType.key}`} 
                                                         className="font-bold text-base cursor-pointer block mb-1"
                                                     >
                                                         {eventType.label}
-                                                    </Label>
+                                    </Label>
                                                     <p className="text-sm text-muted-foreground">{eventType.description}</p>
                                                     {isVisible && (
                                                         <div className="mt-2 flex items-center gap-1.5 text-xs text-green-600 font-medium">
@@ -315,7 +315,7 @@ export default function UserPreferencesClient({ loggedInEmployee }: { loggedInEm
                                                             {language === 'ar' ? 'مخفي من التقويم' : 'Hidden from calendar'}
                                                         </div>
                                                     )}
-                                                </div>
+                                </div>
                                             </div>
                                             <Switch
                                                 id={`visibility-${eventType.key}`}
@@ -326,7 +326,7 @@ export default function UserPreferencesClient({ loggedInEmployee }: { loggedInEm
                                         </div>
                                     );
                                 })}
-                            </div>
+                                </div>
                         </CardContent>
                     </Card>
 
@@ -402,9 +402,9 @@ export default function UserPreferencesClient({ loggedInEmployee }: { loggedInEm
                                         <div className="p-2 bg-white rounded-lg shadow-sm">
                                             <Bot className="h-6 w-6 text-cyan-600" />
                                         </div>
-                                        <div className="space-y-1">
+                                <div className="space-y-1">
                                             <h4 className="font-bold text-base">{t('settings.telegramNotifications')}</h4>
-                                            <p className="text-sm text-muted-foreground">{t('settings.receiveAlerts')}</p>
+                                    <p className="text-sm text-muted-foreground">{t('settings.receiveAlerts')}</p>
                                             {!telegramConfigured && (
                                                 <div className="bg-amber-50 border border-amber-300 rounded-lg px-3 py-1.5 mt-2">
                                                     <p className="text-xs text-amber-700 font-medium flex items-center gap-1.5">
@@ -526,9 +526,9 @@ export default function UserPreferencesClient({ loggedInEmployee }: { loggedInEm
                             {selectedLanguage !== savedLanguageRef.current && (
                                 <div className="bg-amber-50 border-2 border-amber-300 rounded-lg p-3">
                                     <p className="text-sm text-amber-800 font-medium flex items-center gap-2">
-                                        <span>⚠️</span>
-                                        <span>{t('userPreferences.languageNotSaved')}</span>
-                                    </p>
+                                    <span>⚠️</span>
+                                    <span>{t('userPreferences.languageNotSaved')}</span>
+                                </p>
                                 </div>
                             )}
                         </CardFooter>
