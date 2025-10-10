@@ -139,6 +139,7 @@ export function CasesPageClient() {
       email: 'ahmed@example.com',
       phone: '+971501234567',
       idNumber: '784-1985-1234567-1',
+      nationality: 'الإمارات',
       hasCommercialLicense: true
     },
     {
@@ -156,6 +157,7 @@ export function CasesPageClient() {
       email: 'mohammed@example.com',
       phone: '+971507654321',
       idNumber: '784-1988-7654321-3',
+      nationality: 'السودان',
       hasCommercialLicense: true
     },
     {
@@ -164,6 +166,7 @@ export function CasesPageClient() {
       email: 'aisha@example.com',
       phone: '+971501111111',
       idNumber: '784-1992-1111111-4',
+      nationality: 'السعودية',
       hasCommercialLicense: false
     },
     {
@@ -172,6 +175,7 @@ export function CasesPageClient() {
       email: 'khalid@example.com',
       phone: '+971502222222',
       idNumber: '784-1987-2222222-5',
+      nationality: 'الكويت',
       hasCommercialLicense: true
     }
   ];
@@ -184,7 +188,8 @@ export function CasesPageClient() {
       licenseOwner: 'أحمد محمد علي',
       phone: '+971501234567',
       email: 'info@nakhil.com',
-      idNumber: '1234567890'
+      idNumber: '1234567890',
+      nationality: 'الإمارات'
     },
     {
       id: 'commercial-2',
@@ -192,7 +197,8 @@ export function CasesPageClient() {
       licenseOwner: 'محمد حسن النور',
       phone: '+971507654321',
       email: 'info@mustaqbal.com',
-      idNumber: '0987654321'
+      idNumber: '0987654321',
+      nationality: 'السودان'
     },
     {
       id: 'commercial-3',
@@ -200,7 +206,8 @@ export function CasesPageClient() {
       licenseOwner: 'خالد عبدالله المطيري',
       phone: '+971502222222',
       email: 'info@aman.com',
-      idNumber: '1122334455'
+      idNumber: '1122334455',
+      nationality: 'الكويت'
     }
   ];
 
@@ -410,7 +417,7 @@ export function CasesPageClient() {
         updatedTemplate = updatedTemplate.replace(/\[ايميل_المدعى_عليه\]/g, tenant.email || 'غير محدد');
       } else if (company) {
         updatedTemplate = updatedTemplate.replace(/\[اسم_المدعى_عليه\]/g, company.name);
-        updatedTemplate = updatedTemplate.replace(/\[جنسية_المدعى_عليه\]/g, 'إماراتي');
+        updatedTemplate = updatedTemplate.replace(/\[جنسية_المدعى_عليه\]/g, company.nationality || 'غير محدد');
         updatedTemplate = updatedTemplate.replace(/\[هوية_المدعى_عليه\]/g, company.idNumber || 'غير محدد');
         updatedTemplate = updatedTemplate.replace(/\[عنوان_المدعى_عليه\]/g, propertyName && unitNumber ? `${propertyName} - وحدة ${unitNumber}` : 'غير محدد');
         updatedTemplate = updatedTemplate.replace(/\[هاتف_المدعى_عليه\]/g, company.phone || 'غير محدد');
