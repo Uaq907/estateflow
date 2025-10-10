@@ -918,7 +918,7 @@ export function CasesPageClient() {
                 </Button>
             
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+              <DialogContent className="sm:max-w-[1000px] max-h-[95vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">
                     <Plus className="h-5 w-5" />
@@ -1456,8 +1456,8 @@ export function CasesPageClient() {
                           value={newCase.priority}
                           onChange={(e) => handleInputChange('priority', e.target.value)}
                           placeholder="اكتب تفاصيل الدعوى هنا أو انسخ نموذجاً جاهزاً من صفحة النماذج..."
-                          className="min-h-[300px] resize-y border-0 bg-transparent text-sm leading-relaxed"
-                          rows={15}
+                          className="min-h-[600px] resize-y border-0 bg-transparent text-sm leading-relaxed"
+                          rows={30}
                           style={{
                             fontFamily: 'Arial, sans-serif',
                             lineHeight: '1.8',
