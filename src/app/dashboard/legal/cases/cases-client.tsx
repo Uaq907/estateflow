@@ -386,14 +386,6 @@ export function CasesPageClient() {
     }
   };
 
-  // دالة لتحويل التاريخ الميلادي إلى هجري
-  const getHijriYear = (gregorianDate: Date): string => {
-    // حساب تقريبي للسنة الهجرية
-    const gregorianYear = gregorianDate.getFullYear();
-    const hijriYear = Math.floor((gregorianYear - 622) * 1.030684);
-    return hijriYear.toString();
-  };
-
   // دالة لتعبئة البيانات في نموذج الدعوى مع علامات للون الأحمر
   const fillTemplateData = (client: string, tenantId: string, propertyName?: string, unitNumber?: string, dueAmount?: string) => {
     console.log('🔍 fillTemplateData called:', { client, tenantId, propertyName, unitNumber, dueAmount });
@@ -465,10 +457,10 @@ export function CasesPageClient() {
       const endDate = new Date(today.getFullYear(), 11, 31); // 31 ديسمبر من السنة الحالية
       const delayStartDate = new Date(today.getFullYear(), today.getMonth() - 3, 1); // قبل 3 أشهر
       
-      // حساب السنة الهجرية
-      const hijriYear = getHijriYear(today);
+      // حساب السنة الميلادية
+      const gregorianYear = today.getFullYear().toString();
       
-      updatedTemplate = updatedTemplate.replace(/\[سنة_هجرية\]/g, hijriYear);
+      updatedTemplate = updatedTemplate.replace(/\[سنة_ميلادية\]/g, gregorianYear);
       updatedTemplate = updatedTemplate.replace(/\[تاريخ_اليوم\]/g, today.toLocaleDateString('ar-SA'));
       updatedTemplate = updatedTemplate.replace(/\[تاريخ_العقد\]/g, startDate.toLocaleDateString('ar-SA'));
       updatedTemplate = updatedTemplate.replace(/\[تاريخ_البداية\]/g, startDate.toLocaleDateString('ar-SA'));
@@ -508,8 +500,8 @@ export function CasesPageClient() {
         
         // نموذج دعوى مطالبة مالية - تأخير إيجار
         const residentialTemplate = `لجنة فض المنازعات الإيجارية بإمارة أم القيوين
-لائحة الدعوى رقم          لسنة / [سنة_هجرية]هـ - مطالبة مالية (تأخير إيجار)
-المحدد لها جلسة بتاريخ      /       / [سنة_هجرية]هـ
+لائحة الدعوى رقم          لسنة / [سنة_ميلادية]م - مطالبة مالية (تأخير إيجار)
+المحدد لها جلسة بتاريخ      /       / [سنة_ميلادية]م
 
 صحيفة دعوى مطالبة مالية
 
