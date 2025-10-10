@@ -17,8 +17,8 @@ import { hasPermission } from '@/lib/permissions';
 const petitionTemplates = [
   {
     id: 1,
-    title: 'نموذج دعوى إخلاء - منازعات إيجارية',
-    category: 'إخلاء',
+    title: 'نموذج دعوى سكني - منازعات إيجارية',
+    category: 'سكنية',
     emirate: 'أم القيوين',
     content: `لجنة فض المنازعات الإيجارية بإمارة أم القيوين
 لائحة الدعوى رقم          لسنة / 2025 منازعات إيجارية أم القيوين
