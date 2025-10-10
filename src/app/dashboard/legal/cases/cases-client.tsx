@@ -147,6 +147,7 @@ export function CasesPageClient() {
       email: 'fatima@example.com',
       phone: '+971509876543',
       idNumber: '784-1990-9876543-2',
+      nationality: 'الإمارات',
       hasCommercialLicense: false
     },
     {
@@ -380,11 +381,16 @@ export function CasesPageClient() {
 
   // دالة لتعبئة البيانات في نموذج الدعوى مع علامات للون الأحمر
   const fillTemplateData = (client: string, tenantId: string, propertyName?: string, unitNumber?: string, dueAmount?: string) => {
+    console.log('🔍 fillTemplateData called:', { client, tenantId, propertyName, unitNumber, dueAmount });
     const tenant = allTenants.find(t => t.id === tenantId);
     const company = allCommercialCompanies.find(c => c.id === tenantId);
     
+    console.log('📋 Found tenant/company:', tenant || company);
+    console.log('📝 Current newCase.priority length:', newCase.priority?.length);
+    
     if (newCase.priority && newCase.priority.trim()) {
       let updatedTemplate = newCase.priority;
+      console.log('✅ Template loaded, starting data filling...');
       
       // دالة مساعدة لتمييز البيانات المعبأة
       const markData = (data: string) => `🔴${data}🔴`;
@@ -464,10 +470,16 @@ export function CasesPageClient() {
       updatedTemplate = updatedTemplate.replace(/\[وسيلة_الانذار\]/g, markData('رسالة نصية ورسالة بريد إلكتروني'));
       updatedTemplate = updatedTemplate.replace(/\[تاريخ_الانذار\]/g, markData(warningDate.toLocaleDateString('ar-SA')));
       
+      console.log('✨ Data filling completed!');
+      console.log('🔴 Updated template contains red markers:', updatedTemplate.includes('🔴'));
+      console.log('📊 Red markers count:', (updatedTemplate.match(/🔴/g) || []).length);
+      
       setNewCase(prev => ({
         ...prev,
         priority: updatedTemplate
       }));
+    } else {
+      console.log('⚠️ newCase.priority is empty or not loaded yet!');
     }
   };
 
