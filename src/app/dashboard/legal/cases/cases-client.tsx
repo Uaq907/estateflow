@@ -392,41 +392,38 @@ export function CasesPageClient() {
       let updatedTemplate = newCase.priority;
       console.log('✅ Template loaded, starting data filling...');
       
-      // دالة مساعدة لتمييز البيانات المعبأة
-      const markData = (data: string) => `🔴${data}🔴`;
-      
       // تعبئة بيانات المدعي (المالك) - بيانات افتراضية
-      updatedTemplate = updatedTemplate.replace(/\[اسم_المدعي\]/g, markData('عبدالله محمد بن عمير ال علي'));
-      updatedTemplate = updatedTemplate.replace(/\[جنسية_المدعي\]/g, markData('إماراتي'));
-      updatedTemplate = updatedTemplate.replace(/\[هوية_المدعي\]/g, markData('784-1945-4384241-1'));
-      updatedTemplate = updatedTemplate.replace(/\[عنوان_المدعي\]/g, markData('أم القيوين – الظهر'));
-      updatedTemplate = updatedTemplate.replace(/\[هاتف_المدعي\]/g, markData('0522020200'));
-      updatedTemplate = updatedTemplate.replace(/\[ايميل_المدعي\]/g, markData('uaq907@gmail.com'));
+      updatedTemplate = updatedTemplate.replace(/\[اسم_المدعي\]/g, 'عبدالله محمد بن عمير ال علي');
+      updatedTemplate = updatedTemplate.replace(/\[جنسية_المدعي\]/g, 'إماراتي');
+      updatedTemplate = updatedTemplate.replace(/\[هوية_المدعي\]/g, '784-1945-4384241-1');
+      updatedTemplate = updatedTemplate.replace(/\[عنوان_المدعي\]/g, 'أم القيوين – الظهر');
+      updatedTemplate = updatedTemplate.replace(/\[هاتف_المدعي\]/g, '0522020200');
+      updatedTemplate = updatedTemplate.replace(/\[ايميل_المدعي\]/g, 'uaq907@gmail.com');
       
       // تعبئة بيانات المدعى عليه (المستأجر)
       if (tenant) {
-        updatedTemplate = updatedTemplate.replace(/\[اسم_المدعى_عليه\]/g, markData(tenant.name));
-        updatedTemplate = updatedTemplate.replace(/\[جنسية_المدعى_عليه\]/g, markData(tenant.nationality || 'غير محدد'));
-        updatedTemplate = updatedTemplate.replace(/\[هوية_المدعى_عليه\]/g, markData(tenant.idNumber || 'غير محدد'));
-        updatedTemplate = updatedTemplate.replace(/\[عنوان_المدعى_عليه\]/g, markData(propertyName && unitNumber ? `${propertyName} - وحدة ${unitNumber}` : 'غير محدد'));
-        updatedTemplate = updatedTemplate.replace(/\[هاتف_المدعى_عليه\]/g, markData(tenant.phone || 'غير محدد'));
-        updatedTemplate = updatedTemplate.replace(/\[ايميل_المدعى_عليه\]/g, markData(tenant.email || 'غير محدد'));
+        updatedTemplate = updatedTemplate.replace(/\[اسم_المدعى_عليه\]/g, tenant.name);
+        updatedTemplate = updatedTemplate.replace(/\[جنسية_المدعى_عليه\]/g, tenant.nationality || 'غير محدد');
+        updatedTemplate = updatedTemplate.replace(/\[هوية_المدعى_عليه\]/g, tenant.idNumber || 'غير محدد');
+        updatedTemplate = updatedTemplate.replace(/\[عنوان_المدعى_عليه\]/g, propertyName && unitNumber ? `${propertyName} - وحدة ${unitNumber}` : 'غير محدد');
+        updatedTemplate = updatedTemplate.replace(/\[هاتف_المدعى_عليه\]/g, tenant.phone || 'غير محدد');
+        updatedTemplate = updatedTemplate.replace(/\[ايميل_المدعى_عليه\]/g, tenant.email || 'غير محدد');
       } else if (company) {
-        updatedTemplate = updatedTemplate.replace(/\[اسم_المدعى_عليه\]/g, markData(company.name));
-        updatedTemplate = updatedTemplate.replace(/\[جنسية_المدعى_عليه\]/g, markData('إماراتي'));
-        updatedTemplate = updatedTemplate.replace(/\[هوية_المدعى_عليه\]/g, markData(company.idNumber || 'غير محدد'));
-        updatedTemplate = updatedTemplate.replace(/\[عنوان_المدعى_عليه\]/g, markData(propertyName && unitNumber ? `${propertyName} - وحدة ${unitNumber}` : 'غير محدد'));
-        updatedTemplate = updatedTemplate.replace(/\[هاتف_المدعى_عليه\]/g, markData(company.phone || 'غير محدد'));
-        updatedTemplate = updatedTemplate.replace(/\[ايميل_المدعى_عليه\]/g, markData(company.email || 'غير محدد'));
+        updatedTemplate = updatedTemplate.replace(/\[اسم_المدعى_عليه\]/g, company.name);
+        updatedTemplate = updatedTemplate.replace(/\[جنسية_المدعى_عليه\]/g, 'إماراتي');
+        updatedTemplate = updatedTemplate.replace(/\[هوية_المدعى_عليه\]/g, company.idNumber || 'غير محدد');
+        updatedTemplate = updatedTemplate.replace(/\[عنوان_المدعى_عليه\]/g, propertyName && unitNumber ? `${propertyName} - وحدة ${unitNumber}` : 'غير محدد');
+        updatedTemplate = updatedTemplate.replace(/\[هاتف_المدعى_عليه\]/g, company.phone || 'غير محدد');
+        updatedTemplate = updatedTemplate.replace(/\[ايميل_المدعى_عليه\]/g, company.email || 'غير محدد');
       }
       
       // تعبئة بيانات العقار
       if (propertyName) {
-        updatedTemplate = updatedTemplate.replace(/\[اسم_العقار\]/g, markData(propertyName));
+        updatedTemplate = updatedTemplate.replace(/\[اسم_العقار\]/g, propertyName);
       }
       
       if (unitNumber) {
-        updatedTemplate = updatedTemplate.replace(/\[رقم_الوحدة\]/g, markData(unitNumber));
+        updatedTemplate = updatedTemplate.replace(/\[رقم_الوحدة\]/g, unitNumber);
       }
       
       // تعبئة البيانات المالية
@@ -435,16 +432,16 @@ export function CasesPageClient() {
         const taxAmount = (dueAmountNum * 0.05).toFixed(2); // ضريبة 5%
         const totalAmount = (dueAmountNum + parseFloat(taxAmount)).toFixed(2);
         
-        updatedTemplate = updatedTemplate.replace(/\[المبلغ_المتأخر\]/g, markData(dueAmount));
-        updatedTemplate = updatedTemplate.replace(/\[قيمة_الايجار\]/g, markData(dueAmount));
-        updatedTemplate = updatedTemplate.replace(/\[قيمة_الضريبة\]/g, markData(taxAmount));
-        updatedTemplate = updatedTemplate.replace(/\[اجمالي_المطالبة\]/g, markData(totalAmount));
+        updatedTemplate = updatedTemplate.replace(/\[المبلغ_المتأخر\]/g, dueAmount);
+        updatedTemplate = updatedTemplate.replace(/\[قيمة_الايجار\]/g, dueAmount);
+        updatedTemplate = updatedTemplate.replace(/\[قيمة_الضريبة\]/g, taxAmount);
+        updatedTemplate = updatedTemplate.replace(/\[اجمالي_المطالبة\]/g, totalAmount);
         
         // حساب عدد الدفعات وقيمة كل دفعة (افتراضياً 4 دفعات)
         const numberOfPayments = 4;
         const paymentAmount = (dueAmountNum / numberOfPayments).toFixed(2);
-        updatedTemplate = updatedTemplate.replace(/\[عدد_الدفعات\]/g, markData(numberOfPayments.toString()));
-        updatedTemplate = updatedTemplate.replace(/\[قيمة_الدفعة\]/g, markData(paymentAmount));
+        updatedTemplate = updatedTemplate.replace(/\[عدد_الدفعات\]/g, numberOfPayments.toString());
+        updatedTemplate = updatedTemplate.replace(/\[قيمة_الدفعة\]/g, paymentAmount);
       }
       
       // تعبئة التواريخ
@@ -453,26 +450,24 @@ export function CasesPageClient() {
       const endDate = new Date(today.getFullYear(), 11, 31); // 31 ديسمبر من السنة الحالية
       const delayStartDate = new Date(today.getFullYear(), today.getMonth() - 3, 1); // قبل 3 أشهر
       
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_اليوم\]/g, markData(today.toLocaleDateString('ar-SA')));
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_العقد\]/g, markData(startDate.toLocaleDateString('ar-SA')));
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_البداية\]/g, markData(startDate.toLocaleDateString('ar-SA')));
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_النهاية\]/g, markData(endDate.toLocaleDateString('ar-SA')));
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_بداية_التأخير\]/g, markData(delayStartDate.toLocaleDateString('ar-SA')));
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_نهاية_التأخير\]/g, markData(today.toLocaleDateString('ar-SA')));
-      updatedTemplate = updatedTemplate.replace(/\[رقم_العقد\]/g, markData('TC-2025-001'));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_اليوم\]/g, today.toLocaleDateString('ar-SA'));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_العقد\]/g, startDate.toLocaleDateString('ar-SA'));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_البداية\]/g, startDate.toLocaleDateString('ar-SA'));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_النهاية\]/g, endDate.toLocaleDateString('ar-SA'));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_بداية_التأخير\]/g, delayStartDate.toLocaleDateString('ar-SA'));
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_نهاية_التأخير\]/g, today.toLocaleDateString('ar-SA'));
+      updatedTemplate = updatedTemplate.replace(/\[رقم_العقد\]/g, 'TC-2025-001');
       
       // حساب عدد الأشهر المتأخرة
       const monthsDiff = Math.floor((today.getTime() - delayStartDate.getTime()) / (1000 * 60 * 60 * 24 * 30));
-      updatedTemplate = updatedTemplate.replace(/\[عدد_الاشهر_المتأخرة\]/g, markData(monthsDiff.toString()));
+      updatedTemplate = updatedTemplate.replace(/\[عدد_الاشهر_المتأخرة\]/g, monthsDiff.toString());
       
       // تعبئة بيانات الإنذار
       const warningDate = new Date(today.getFullYear(), today.getMonth() - 1, 15); // قبل شهر تقريباً
-      updatedTemplate = updatedTemplate.replace(/\[وسيلة_الانذار\]/g, markData('رسالة نصية ورسالة بريد إلكتروني'));
-      updatedTemplate = updatedTemplate.replace(/\[تاريخ_الانذار\]/g, markData(warningDate.toLocaleDateString('ar-SA')));
+      updatedTemplate = updatedTemplate.replace(/\[وسيلة_الانذار\]/g, 'رسالة نصية ورسالة بريد إلكتروني');
+      updatedTemplate = updatedTemplate.replace(/\[تاريخ_الانذار\]/g, warningDate.toLocaleDateString('ar-SA'));
       
       console.log('✨ Data filling completed!');
-      console.log('🔴 Updated template contains red markers:', updatedTemplate.includes('🔴'));
-      console.log('📊 Red markers count:', (updatedTemplate.match(/🔴/g) || []).length);
       
       setNewCase(prev => ({
         ...prev,
