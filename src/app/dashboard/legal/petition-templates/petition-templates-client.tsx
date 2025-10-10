@@ -1626,6 +1626,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                     />
                   )}
                 </div>
+              </div>
 
               <div className="grid gap-2">
                 <div className="flex items-center gap-2">
