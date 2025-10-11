@@ -125,8 +125,6 @@ export function AppHeader({ loggedInEmployee }: { loggedInEmployee: Employee | n
                        {canReadLeases && <DropdownMenuItem asChild><Link href="/dashboard/financials"><FileSignature className="mr-2" />{t('nav.leasesPayments')}</Link></DropdownMenuItem>}
                        {canReadExpenses && <DropdownMenuItem asChild><Link href="/dashboard/expenses"><Receipt className="mr-2" />{t('nav.expenses')}</Link></DropdownMenuItem>}
                        {canReadCheques && <DropdownMenuItem asChild><Link href="/dashboard/cheques"><WalletCards className="mr-2"/>{t('nav.cheques')}</Link></DropdownMenuItem>}
-                       <DropdownMenuSeparator />
-                       <DropdownMenuItem asChild><Link href="/dashboard/tax-receipts"><Receipt className="mr-2" />إيصالات الضريبة</Link></DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 )}
