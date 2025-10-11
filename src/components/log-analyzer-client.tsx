@@ -19,6 +19,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { handleDeleteActivityLog, handleDeleteAllActivityLogs, getSystemDataReport, handleDeleteAllSystemData } from '@/app/dashboard/actions';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/language-context';
+import { useToast } from '@/hooks/use-toast';
 
 function formatLogDetails(details: string | null | undefined, showAllVariables: boolean = false, t?: (key: string) => string, entityType?: string | null) {
     if (!details || details === 'null' || details === 'undefined') {
@@ -450,6 +451,7 @@ export default function LogAnalyzerClient({ initialLogs, loggedInEmployee }: { i
     const [showDataReport, setShowDataReport] = useState(false);
     const logsPerPage = 50;
     const router = useRouter();
+    const { toast } = useToast();
 
     const uniqueActions = useMemo(() => {
         const actions = new Set(logs.map(log => log.action));
@@ -519,23 +521,66 @@ export default function LogAnalyzerClient({ initialLogs, loggedInEmployee }: { i
     };
 
     const handleLoadDataReport = async () => {
-        const result = await getSystemDataReport();
-        if (result.success && result.data) {
-            setDataReport(result.data);
-            setShowDataReport(true);
-        } else {
-            alert(result.message || 'فشل تحميل التقرير');
+        try {
+            console.log('[handleLoadDataReport] Starting...');
+            const result = await getSystemDataReport();
+            console.log('[handleLoadDataReport] Result:', result);
+            
+            if (result.success && result.data) {
+                setDataReport(result.data);
+                setShowDataReport(true);
+                console.log('[handleLoadDataReport] Data report loaded successfully');
+            } else {
+                console.error('[handleLoadDataReport] Failed:', result.message);
+                toast({
+                    variant: 'destructive',
+                    title: 'خطأ',
+                    description: result.message || 'فشل تحميل التقرير'
+                });
+            }
+        } catch (error: any) {
+            console.error('[handleLoadDataReport] Exception:', error);
+            toast({
+                variant: 'destructive',
+                title: 'خطأ',
+                description: error.message || 'حدث خطأ غير متوقع'
+            });
         }
     };
 
     const handleDeleteAllData = async () => {
-        const result = await handleDeleteAllSystemData();
-        if (result.success) {
-            setShowDataReport(false);
-            alert(result.message);
-            router.refresh();
-        } else {
-            alert(result.message);
+        try {
+            console.log('[handleDeleteAllData] Starting deletion...');
+            const result = await handleDeleteAllSystemData();
+            console.log('[handleDeleteAllData] Result:', result);
+            
+            if (result.success) {
+                setShowDataReport(false);
+                toast({
+                    title: 'نجح',
+                    description: result.message || 'تم حذف البيانات بنجاح'
+                });
+                
+                // انتظر قليلاً ثم أعد تحميل الصفحة
+                setTimeout(() => {
+                    router.refresh();
+                    window.location.reload();
+                }, 1500);
+            } else {
+                console.error('[handleDeleteAllData] Failed:', result.message);
+                toast({
+                    variant: 'destructive',
+                    title: 'فشل الحذف',
+                    description: result.message
+                });
+            }
+        } catch (error: any) {
+            console.error('[handleDeleteAllData] Exception:', error);
+            toast({
+                variant: 'destructive',
+                title: 'خطأ',
+                description: error.message || 'حدث خطأ غير متوقع أثناء الحذف'
+            });
         }
     };
 

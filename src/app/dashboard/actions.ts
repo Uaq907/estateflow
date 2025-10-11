@@ -1509,12 +1509,17 @@ export async function handleDeleteAllActivityLogs() {
 
 export async function getSystemDataReport() {
     const loggedInEmployee = await getEmployeeFromSession();
+    console.log('[getSystemDataReport] Employee:', loggedInEmployee?.name);
+    
     if (!hasPermission(loggedInEmployee, 'settings:manage')) {
-        return { success: false, message: 'ليس لديك صلاحية.', data: null };
+        console.warn('[getSystemDataReport] Permission denied for:', loggedInEmployee?.name);
+        return { success: false, message: 'ليس لديك صلاحية عرض التقرير.', data: null };
     }
     
     try {
+        console.log('[getSystemDataReport] Getting connection...');
         const connection = await getConnection();
+        console.log('[getSystemDataReport] Connection obtained');
         
         const report: any = {
             properties: 0,
@@ -1552,15 +1557,18 @@ export async function getSystemDataReport() {
             try {
                 const [rows] = await connection.query(`SELECT COUNT(*) as count FROM ${table}`);
                 report[key] = (rows as any)[0].count;
-            } catch (e) {
+                console.log(`[getSystemDataReport] ${table}: ${report[key]}`);
+            } catch (e: any) {
+                console.error(`[getSystemDataReport] Error counting ${table}:`, e.message);
                 report[key] = 0;
             }
         }
         
+        console.log('[getSystemDataReport] Report generated successfully:', report);
         return { success: true, data: report };
     } catch (error: any) {
-        console.error('Failed to get system data report:', error);
-        return { success: false, message: error.message, data: null };
+        console.error('[getSystemDataReport] Failed:', error);
+        return { success: false, message: `خطأ: ${error.message}`, data: null };
     }
 }
 
