@@ -179,12 +179,7 @@ export async function handleUpdateEmployee(id: string, employee: Partial<Omit<Em
 export async function handleDeleteEmployee(id: string) {
     const loggedInEmployee = await getEmployeeFromSession();
     if (!hasPermission(loggedInEmployee, 'employees:delete')) {
-        return { success: false, message: 'ليس لديك صلاحية لحذف الموظفين.' };
-    }
-    
-    // Prevent self-deletion
-    if (loggedInEmployee?.id === id) {
-        return { success: false, message: 'لا يمكنك حذف حسابك الخاص.' };
+        return { success: false, message: 'ليس لديك صلاحية حذف الموظفين.' };
     }
     
     try {
@@ -195,7 +190,19 @@ export async function handleDeleteEmployee(id: string) {
         return { success: true, message: 'تم حذف الموظف بنجاح.' };
     } catch (error: any) {
         console.error('Failed to delete employee:', error);
-        return { success: false, message: error.message || 'فشل حذف الموظف.' };
+        
+        // رسائل خطأ واضحة بالعربية
+        if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+            return { 
+                success: false, 
+                message: 'لا يمكن حذف الموظف لأنه مرتبط ببيانات أخرى (عقود، مصروفات، إلخ). يرجى حذف البيانات المرتبطة أولاً.' 
+            };
+        }
+        
+        return { 
+            success: false, 
+            message: `فشل حذف الموظف: ${error.message || 'خطأ غير معروف'}` 
+        };
     }
 }
 

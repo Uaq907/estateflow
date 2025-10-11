@@ -88,21 +88,43 @@ export default function EmployeeManagementClient({ initialEmployees, loggedInEmp
 
   const handleDelete = async (employeeId: string) => {
     if (!canDelete) {
-        toast({ variant: 'destructive', title: 'Error', description: 'You do not have permission to delete employees.'});
+        toast({ 
+          variant: 'destructive', 
+          title: 'خطأ في الصلاحيات', 
+          description: 'ليس لديك صلاحية حذف الموظفين.'
+        });
         return;
     }
-    const result = await handleDeleteEmployee(employeeId);
-    if (result.success) {
-      setEmployees(employees.filter((e) => e.id !== employeeId));
-      toast({
-        title: 'Success',
-        description: result.message,
-      });
-    } else {
+    
+    try {
+      const result = await handleDeleteEmployee(employeeId);
+      if (result.success) {
+        // تحديث القائمة فوراً
+        setEmployees(employees.filter((e) => e.id !== employeeId));
+        
+        // إعادة جلب البيانات للتأكد
+        setTimeout(async () => {
+          const updated = await getEmployees();
+          setEmployees(updated);
+        }, 500);
+        
+        toast({
+          title: 'نجح',
+          description: result.message,
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'فشل الحذف',
+          description: result.message,
+        });
+      }
+    } catch (error: any) {
+      console.error('Error deleting employee:', error);
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: result.message,
+        title: 'خطأ',
+        description: error.message || 'حدث خطأ غير متوقع أثناء الحذف',
       });
     }
   };

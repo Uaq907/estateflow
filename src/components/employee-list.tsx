@@ -65,9 +65,9 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
           <TableHeader>
             <TableRow>
               <TableHead className="text-right">الاسم</TableHead>
-              <TableHead className="hidden lg:table-cell text-right">المعرف</TableHead>
+              <TableHead className="hidden lg:table-cell text-right">البريد الإلكتروني</TableHead>
               <TableHead className="hidden md:table-cell text-right">المنصب</TableHead>
-              <TableHead className="hidden lg:table-cell text-right">القسم</TableHead>
+              <TableHead className="hidden lg:table-cell text-right">أنشئ بواسطة</TableHead>
               <TableHead className="hidden sm:table-cell text-right">تاريخ البدء</TableHead>
               {(onEdit || onDelete) && (
                 <TableHead className="text-right">
@@ -91,15 +91,16 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
                       <div className="text-right">
                         <div className="font-medium">{employee.name}</div>
                         <div className="text-sm text-muted-foreground md:hidden">{employee.position}</div>
-                        <div className="text-sm text-muted-foreground">{employee.email}</div>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="hidden lg:table-cell text-xs text-muted-foreground text-right">{employee.id}</TableCell>
+                  <TableCell className="hidden lg:table-cell text-sm text-right">{employee.email}</TableCell>
                   <TableCell className="hidden md:table-cell text-right">
                     <Badge variant="secondary">{employee.position}</Badge>
                   </TableCell>
-                  <TableCell className="hidden lg:table-cell text-right">{employee.department}</TableCell>
+                  <TableCell className="hidden lg:table-cell text-sm text-muted-foreground text-right">
+                    {employee.createdBy || 'النظام'}
+                  </TableCell>
                   <TableCell className="hidden sm:table-cell text-right">
                     {format(new Date(employee.startDate), 'dd/MM/yyyy')}
                   </TableCell>

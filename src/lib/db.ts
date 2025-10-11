@@ -117,24 +117,10 @@ export async function deleteEmployee(id: string): Promise<void> {
   let connection: mysql.Connection | null = null;
   try {
     connection = await getConnection();
-    
-    // Check if employee is assigned to any properties
-    const [assignedProperties] = await connection.query(
-      'SELECT COUNT(*) as count FROM employee_properties WHERE employeeId = ?',
-      [id]
-    );
-    
-    const assignedCount = (assignedProperties as any[])[0].count;
-    if (assignedCount > 0) {
-      // Remove from all assigned properties first
-      await connection.execute('DELETE FROM employee_properties WHERE employeeId = ?', [id]);
-    }
-    
-    // Delete the employee
     await connection.execute('DELETE FROM employees WHERE id = ?', [id]);
-  } catch (error: any) {
+  } catch (error) {
     console.error('Failed to delete employee', error);
-    throw new Error(`لا يمكن حذف الموظف: ${error.message}`);
+    throw error;
   }
 }
 
