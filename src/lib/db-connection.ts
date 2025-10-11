@@ -12,9 +12,16 @@ const dbConfig = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
+  connectTimeout: 60000, // 60 seconds
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0
 };
 
 let connection: mysql.Connection | null = null;
+let connectionPool: mysql.Pool | null = null;
 let migrationsHaveRun = false;
 
 async function columnExists(conn: mysql.Connection, tableName: string, columnName: string): Promise<boolean> {
@@ -72,7 +79,7 @@ async function constraintExists(conn: mysql.Connection, tableName: string, const
 }
 
 
-export async function getConnection() {
+export async function getConnection(retries = 3): Promise<mysql.Connection> {
   if (connection) {
     try {
       // Test if connection is still alive
@@ -84,26 +91,37 @@ export async function getConnection() {
     }
   }
   
-  try {
-    // The database is expected to exist. Direct connection attempt.
-    connection = await mysql.createConnection(dbConfig);
-    
-    // await runMigrationsInternal(connection);
-    // migrationsHaveRun = true;
+  let lastError: any;
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      // The database is expected to exist. Direct connection attempt.
+      connection = await mysql.createConnection(dbConfig);
+      
+      // await runMigrationsInternal(connection);
+      // migrationsHaveRun = true;
 
-    connection.on('error', (err) => {
-        console.error('Database connection error:', err);
-        connection = null;
-        migrationsHaveRun = false;
-    });
+      connection.on('error', (err) => {
+          console.error('Database connection error:', err);
+          connection = null;
+          migrationsHaveRun = false;
+      });
 
-    return connection;
-  } catch (error) {
-    console.error("DB Connection Error:", error);
-    connection = null;
-    migrationsHaveRun = false;
-    throw error;
+      return connection;
+    } catch (error) {
+      lastError = error;
+      console.error(`DB Connection Error (attempt ${attempt}/${retries}):`, error);
+      connection = null;
+      migrationsHaveRun = false;
+      
+      // Wait before retrying (exponential backoff)
+      if (attempt < retries) {
+        const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      }
+    }
   }
+  
+  throw lastError;
 }
 
 async function runMigrationsInternal(existingConnection?: mysql.Connection | null) {
