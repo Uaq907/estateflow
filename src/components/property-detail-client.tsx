@@ -299,14 +299,22 @@ export default function PropertyDetailClient({
 
   const handleAssignEmployee = async () => {
     if (!employeeToAssign) return;
-    const result = await handleAssignEmployeeToProperty(employeeToAssign, property.id);
-    if (result.success) {
-      toast({ title: 'Success', description: result.message });
-      const updatedAssigned = await getEmployeesForProperty(property.id);
-      setAssignedEmployees(updatedAssigned);
-      setEmployeeToAssign('');
-    } else {
-      toast({ variant: 'destructive', title: 'Error', description: result.message });
+    
+    try {
+      const result = await handleAssignEmployeeToProperty(employeeToAssign, property.id);
+      if (result.success) {
+        toast({ title: 'نجح', description: 'تم تعيين الموظف للعقار بنجاح' });
+        
+        // تحديث القائمة فوراً
+        const updatedAssigned = await getEmployeesForProperty(property.id);
+        setAssignedEmployees(updatedAssigned);
+        setEmployeeToAssign('');
+      } else {
+        toast({ variant: 'destructive', title: 'خطأ', description: result.message || 'فشل تعيين الموظف' });
+      }
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: 'خطأ', description: error.message || 'حدث خطأ غير متوقع' });
+      console.error('Error assigning employee:', error);
     }
   };
 
@@ -318,24 +326,28 @@ export default function PropertyDetailClient({
   const confirmRemoveEmployee = async () => {
     if (!employeeToRemove) return;
     
-    const result = await handleRemoveEmployeeFromProperty(employeeToRemove.id, property.id);
-    if (result.success) {
-      toast({ title: 'نجح', description: 'تم إزالة الموظف من العقار بنجاح' });
-      // تحديث القائمة من السيرفر
-      try {
-        const updatedEmployees = await getEmployeesForProperty(property.id);
-        setAssignedEmployees(updatedEmployees);
-      } catch (error) {
-        // في حالة فشل التحديث، استخدم الفلترة المحلية
-        setAssignedEmployees(assignedEmployees.filter(e => e.id !== employeeToRemove.id));
+    try {
+      const result = await handleRemoveEmployeeFromProperty(employeeToRemove.id, property.id);
+      if (result.success) {
+        toast({ title: 'نجح', description: 'تم إزالة الموظف من العقار بنجاح' });
+        
+        // تحديث القائمة فوراً
+        const updatedList = assignedEmployees.filter(e => e.id !== employeeToRemove.id);
+        setAssignedEmployees(updatedList);
+        
+        // إعادة جلب البيانات من السيرفر للتأكد
+        setTimeout(async () => {
+          const freshList = await getEmployeesForProperty(property.id);
+          setAssignedEmployees(freshList);
+        }, 500);
+      } else {
+        toast({ variant: 'destructive', title: 'خطأ', description: result.message || 'فشل إزالة الموظف' });
       }
-      // تحديث الصفحة بعد ثانية للتأكد من تطبيق التغييرات
-      setTimeout(() => {
-        router.refresh();
-      }, 500);
-    } else {
-      toast({ variant: 'destructive', title: 'خطأ', description: result.message });
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: 'خطأ', description: error.message || 'حدث خطأ غير متوقع' });
+      console.error('Error removing employee:', error);
     }
+    
     setIsRemoveEmployeeDialogOpen(false);
     setEmployeeToRemove(null);
   };

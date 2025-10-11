@@ -801,18 +801,16 @@ export async function handleAssignEmployeeToProperty(employeeId: string, propert
 export async function handleRemoveEmployeeFromProperty(employeeId: string, propertyId: string) {
     const loggedInEmployee = await getEmployeeFromSession();
     if (!hasPermission(loggedInEmployee, 'properties:update')) {
-        return { success: false, message: 'Permission denied: You need properties:update permission.' };
+        return { success: false, message: 'Permission denied.' };
     }
     try {
-        console.log(`Removing employee ${employeeId} from property ${propertyId}`);
         await removeEmployeeFromProperty(employeeId, propertyId);
-        console.log('Employee removed successfully');
         await logActivity(loggedInEmployee!.id, loggedInEmployee!.name, 'REMOVE_EMPLOYEE_FROM_PROPERTY', 'Property', propertyId, { removedEmployeeId: employeeId });
         revalidatePath(`/dashboard/properties/${propertyId}`);
-        return { success: true, message: 'Employee removed from property successfully.' };
-    } catch (error: any) {
+        return { success: true, message: 'Employee removed from property.' };
+    } catch (error) {
         console.error('Failed to remove employee from property:', error);
-        return { success: false, message: `Failed to remove employee: ${error.message || 'Unknown error'}` };
+        return { success: false, message: 'Failed to remove employee from property.' };
     }
 }
 
