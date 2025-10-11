@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { MoreHorizontal, Edit, Eye, Trash2, FileWarning, CheckCircle, HelpCircle, FileText } from 'lucide-react';
+import { MoreHorizontal, Edit, Eye, Trash2, FileWarning, CheckCircle, HelpCircle, FileText, History } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,8 @@ import {
 import { format } from 'date-fns';
 import { Skeleton } from './ui/skeleton';
 import { useLanguage } from '@/contexts/language-context';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import ExpenseHistory from './expense-history';
 
 interface ExpenseListProps {
   expenses: Expense[];
@@ -48,6 +50,28 @@ function ClientFormattedDate({ date }: { date: Date }) {
 
 export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDelete }: ExpenseListProps) {
   const { t } = useLanguage();
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
+  const [expenseHistory, setExpenseHistory] = useState<any[]>([]);
+  
+  const handleViewHistory = async (expense: Expense) => {
+    setSelectedExpense(expense);
+    setIsHistoryDialogOpen(true);
+    
+    // Fetch expense history
+    try {
+      const response = await fetch(`/api/expense-history?expenseId=${expense.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setExpenseHistory(data);
+      } else {
+        setExpenseHistory([]);
+      }
+    } catch (error) {
+      console.error('Error fetching expense history:', error);
+      setExpenseHistory([]);
+    }
+  };
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null);
 
@@ -218,6 +242,10 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
                                     {actionDetails.icon}
                                     <span>{actionDetails.label}</span>
                                 </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleViewHistory(expense)}>
+                                <History className="mr-2 h-4 w-4" />
+                                <span>عرض السجل</span>
+                              </DropdownMenuItem>
                             {canDelete && (
                               <DropdownMenuItem onClick={() => handleDeleteClick(expense)} className="text-destructive focus:text-destructive">
                                 <Trash2 className="mr-2 h-4 w-4" />
@@ -254,6 +282,32 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={isHistoryDialogOpen} onOpenChange={setIsHistoryDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="h-5 w-5" />
+              سجل المصروف
+            </DialogTitle>
+          </DialogHeader>
+          {selectedExpense && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">المصروف</p>
+                  <p className="font-semibold">{selectedExpense.category}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">المبلغ</p>
+                  <p className="font-semibold">AED {selectedExpense.amount.toLocaleString()}</p>
+                </div>
+              </div>
+              <ExpenseHistory expenseId={selectedExpense.id} history={expenseHistory} />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
