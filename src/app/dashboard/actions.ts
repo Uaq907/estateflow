@@ -179,17 +179,23 @@ export async function handleUpdateEmployee(id: string, employee: Partial<Omit<Em
 export async function handleDeleteEmployee(id: string) {
     const loggedInEmployee = await getEmployeeFromSession();
     if (!hasPermission(loggedInEmployee, 'employees:delete')) {
-        return { success: false, message: 'Permission denied.' };
+        return { success: false, message: 'ليس لديك صلاحية لحذف الموظفين.' };
     }
+    
+    // Prevent self-deletion
+    if (loggedInEmployee?.id === id) {
+        return { success: false, message: 'لا يمكنك حذف حسابك الخاص.' };
+    }
+    
     try {
         await dbDeleteEmployee(id);
         await logActivity(loggedInEmployee!.id, loggedInEmployee!.name, 'DELETE_EMPLOYEE', 'Employee', id);
         revalidatePath('/dashboard');
         revalidatePath('/dashboard/employees');
-        return { success: true, message: 'Employee deleted successfully.' };
-    } catch (error) {
+        return { success: true, message: 'تم حذف الموظف بنجاح.' };
+    } catch (error: any) {
         console.error('Failed to delete employee:', error);
-        return { success: false, message: 'Failed to delete employee.' };
+        return { success: false, message: error.message || 'فشل حذف الموظف.' };
     }
 }
 
