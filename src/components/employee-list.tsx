@@ -58,6 +58,23 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
     setEmployeeToDelete(null);
   };
 
+  // ترجمة المناصب الوظيفية
+  const translatePosition = (position: string): string => {
+    const translations: { [key: string]: string } = {
+      'Administrator': 'مدير النظام',
+      'System Administrator': 'مدير النظام',
+      'Property Manager': 'مدير عقارات',
+      'Employee': 'موظف',
+      'Accountant': 'محاسب',
+      'Maintenance': 'صيانة',
+      'Security': 'أمن',
+      'Receptionist': 'موظف استقبال',
+      'Supervisor': 'مشرف',
+      'Manager': 'مدير'
+    };
+    return translations[position] || position;
+  };
+
   return (
     <>
       <div className="rounded-md border" dir="rtl">
@@ -90,13 +107,13 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
                       </Avatar>
                       <div className="text-right">
                         <div className="font-medium">{employee.name}</div>
-                        <div className="text-sm text-muted-foreground md:hidden">{employee.position}</div>
+                        <div className="text-sm text-muted-foreground md:hidden">{translatePosition(employee.position)}</div>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="hidden lg:table-cell text-sm text-right">{employee.email}</TableCell>
                   <TableCell className="hidden md:table-cell text-right">
-                    <Badge variant="secondary">{employee.position}</Badge>
+                    <Badge variant="secondary">{translatePosition(employee.position)}</Badge>
                   </TableCell>
                   <TableCell className="hidden lg:table-cell text-sm text-muted-foreground text-right">
                     {employee.createdBy || 'النظام'}
@@ -109,7 +126,7 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
+                            <span className="sr-only">فتح القائمة</span>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
