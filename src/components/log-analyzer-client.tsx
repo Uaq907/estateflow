@@ -27,7 +27,7 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
     
     // إخفاء تفاصيل المصروفات
     if (entityType === 'Expense') {
-        return <span className="text-gray-400 italic text-xs">تفاصيل المصروف</span>;
+        return null;
     }
     
     try {
