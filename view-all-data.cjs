@@ -101,13 +101,13 @@ async function viewAllData() {
         // 8. المالكين
         console.log('\n👨‍💼 المالكين:');
         console.log('─'.repeat(60));
-        const [owners] = await connection.query('SELECT id, name, contact, email, nationality FROM owners');
+        const [owners] = await connection.query('SELECT id, name, phone, email, nationality FROM owners');
         console.table(owners);
 
         // 9. البنوك
         console.log('\n🏦 البنوك:');
         console.log('─'.repeat(60));
-        const [banks] = await connection.query('SELECT id, name, branchCode, accountNumber FROM banks');
+        const [banks] = await connection.query('SELECT id, name, accountNumber FROM banks');
         console.table(banks);
 
         console.log('\n' + '='.repeat(60));
