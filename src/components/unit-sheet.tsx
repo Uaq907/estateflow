@@ -140,27 +140,62 @@ export default function UnitSheet({
               <SheetDescription>{sheetDescription}</SheetDescription>
             </SheetHeader>
             <div className="flex-1 py-6 space-y-4 overflow-y-auto pr-6">
+                <div className="bg-muted/50 rounded-lg p-3 text-sm text-muted-foreground mb-4">
+                    <span className="text-destructive">*</span> الحقول المطلوبة إجبارية
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="unitNumber">{t('unitSheet.unitNumber')}</Label>
-                        <Input id="unitNumber" name="unitNumber" placeholder={t('unitSheet.unitNumberPlaceholder')} defaultValue={currentValues.unitNumber} required />
+                        <Label htmlFor="unitNumber">
+                            {t('unitSheet.unitNumber')} <span className="text-destructive">*</span>
+                        </Label>
+                        <Input 
+                            id="unitNumber" 
+                            name="unitNumber" 
+                            placeholder={t('unitSheet.unitNumberPlaceholder')} 
+                            defaultValue={currentValues.unitNumber} 
+                            required
+                            onInvalid={(e) => {
+                                (e.target as HTMLInputElement).setCustomValidity('يرجى إدخال رقم الوحدة');
+                            }}
+                            onInput={(e) => {
+                                (e.target as HTMLInputElement).setCustomValidity('');
+                            }}
+                        />
                     </div>
 
                     {propertyType === 'Building' && (
                         <div className="space-y-2">
-                            <Label htmlFor="floor">{t('unitSheet.floor')}</Label>
-                            <Input id="floor" name="floor" type="number" placeholder={t('unitSheet.floorPlaceholder')} defaultValue={currentValues.floor ?? ''} required />
+                            <Label htmlFor="floor">
+                                {t('unitSheet.floor')} <span className="text-destructive">*</span>
+                            </Label>
+                            <Input 
+                                id="floor" 
+                                name="floor" 
+                                type="number" 
+                                placeholder={t('unitSheet.floorPlaceholder')} 
+                                defaultValue={currentValues.floor ?? ''}
+                                required
+                                onInvalid={(e) => {
+                                    (e.target as HTMLInputElement).setCustomValidity('يرجى إدخال رقم الطابق');
+                                }}
+                                onInput={(e) => {
+                                    (e.target as HTMLInputElement).setCustomValidity('');
+                                }}
+                            />
                         </div>
                     )}
 
                     <div className="space-y-2">
-                        <Label htmlFor="type">{t('unitSheet.type')}</Label>
-                        <Select name="type" value={selectedUnitType} onValueChange={setSelectedUnitType}>
+                        <Label htmlFor="type">
+                            {t('unitSheet.type')} <span className="text-destructive">*</span>
+                        </Label>
+                        <Select name="type" value={selectedUnitType} onValueChange={setSelectedUnitType} required>
                             <SelectTrigger><SelectValue placeholder={t('unitSheet.selectType')} /></SelectTrigger>
                             <SelectContent>
                                 {unitTypeOptions.map(type => <SelectItem key={type} value={type}>{type}</SelectItem>)}
                             </SelectContent>
                         </Select>
+                        <input type="hidden" name="type" value={selectedUnitType} required />
                     </div>
 
                     <div className="space-y-2">
