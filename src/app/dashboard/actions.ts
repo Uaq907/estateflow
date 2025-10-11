@@ -515,9 +515,12 @@ export async function handleRenewLease(renewalData: {
             message: 'Lease renewed successfully.', 
             newLeaseId 
         };
-    } catch (error) {
+    } catch (error: any) {
         console.error('Failed to renew lease:', error);
-        return { success: false, message: 'Failed to renew lease.' };
+        return { 
+            success: false, 
+            message: `Failed to renew lease: ${error.message || 'Unknown error'}` 
+        };
     }
 }
 
