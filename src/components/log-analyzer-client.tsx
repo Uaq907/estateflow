@@ -221,6 +221,9 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
             'description': '📋 الوصف',
             'email': '📧 البريد',
             'name': '👤 الاسم',
+            'tenantName': '👤 اسم المستأجر',
+            'phone': '📞 الهاتف',
+            'reason': '📋 السبب',
             'tenantId': '🏠 المستأجر',
             'propertyId': '🏢 العقار',
             'unitId': '🏘️ الوحدة'
@@ -235,7 +238,7 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
             'Rejected': 'مرفوض'
         };
 
-        // قائمة الحقول التي يجب إخفاؤها
+        // قائمة الحقول التي يجب إخفاؤها (إلا في حالات خاصة)
         const hiddenFields = [
             'category', 
             'description', 
@@ -253,7 +256,6 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
             'taxAmount',
             'isRecurring',
             'recurrenceType',
-            'phone',
             'userAgent',
             'timestamp',
             'address',
@@ -269,7 +271,13 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
         return (
             <div className="space-y-1">
                 {Object.entries(parsed)
-                    .filter(([key]) => !hiddenFields.includes(key))
+                    .filter(([key]) => {
+                        // إظهار الهاتف والسبب فقط في حالة الحذف
+                        if (key === 'phone' || key === 'reason') {
+                            return true;
+                        }
+                        return !hiddenFields.includes(key);
+                    })
                     .map(([key, value], index) => {
                         const translatedKey = fieldNameMap[key] || key.replace(/([A-Z])/g, ' $1') + ':';
                         let displayValue = value;

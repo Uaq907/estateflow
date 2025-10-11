@@ -283,14 +283,30 @@ export async function handleUpdateTenant(id: string, tenant: Partial<Omit<Tenant
     }
 }
 
-export async function handleDeleteTenant(id: string) {
+export async function handleDeleteTenant(id: string, reason?: string) {
     const loggedInEmployee = await getEmployeeFromSession();
     if (!hasPermission(loggedInEmployee, 'tenants:delete')) {
         return { success: false, message: 'Permission denied.' };
     }
     try {
+        // Get tenant info before deletion
+        const connection = require('@/lib/db-connection').getConnection();
+        const [rows] = await (await connection).query('SELECT name, phone FROM tenants WHERE id = ?', [id]);
+        const tenant = (rows as any[])[0];
+        
         await dbDeleteTenant(id);
-        await logActivity(loggedInEmployee!.id, loggedInEmployee!.name, 'DELETE_TENANT', 'Tenant', id);
+        
+        // Log deletion with tenant name, phone, and reason
+        const logDetails: any = {};
+        if (tenant) {
+            logDetails.tenantName = tenant.name;
+            logDetails.phone = tenant.phone;
+        }
+        if (reason) {
+            logDetails.reason = reason;
+        }
+        
+        await logActivity(loggedInEmployee!.id, loggedInEmployee!.name, 'DELETE_TENANT', 'Tenant', id, logDetails);
         revalidatePath('/dashboard/tenants');
         revalidatePath('/dashboard/properties/*'); // Revalidate property pages as tenant info might be displayed there
         return { success: true, message: 'Tenant deleted successfully.' };
