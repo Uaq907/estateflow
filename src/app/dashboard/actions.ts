@@ -993,11 +993,21 @@ export async function handleUpdateExpense(id: string, expenseData: Partial<Omit<
                 const message = `*Expense Approved!*
 Your expense request for *${originalExpense.category}* (AED ${originalExpense.amount.toLocaleString()}) has been approved.`;
                 await sendNotification(originalExpense.employeeId, 'expense_approved', message);
+                
+                // Create tax receipt if expense has VAT
+                if (originalExpense.isVat && originalExpense.taxAmount && originalExpense.taxAmount > 0) {
+                    await createTaxReceiptFromExpense(originalExpense, loggedInEmployee!);
+                }
             } else if (dataToUpdate.status === 'Conditionally Approved') {
                 const message = `*Expense Conditionally Approved!*
 Your expense request for *${originalExpense.category}* (AED ${originalExpense.amount.toLocaleString()}) has been conditionally approved.
 ${dataToUpdate.managerNotes ? `Notes: ${dataToUpdate.managerNotes}` : ''}`;
                 await sendNotification(originalExpense.employeeId, 'expense_approved', message);
+                
+                // Create tax receipt if expense has VAT
+                if (originalExpense.isVat && originalExpense.taxAmount && originalExpense.taxAmount > 0) {
+                    await createTaxReceiptFromExpense(originalExpense, loggedInEmployee!);
+                }
             } else if (dataToUpdate.status === 'Rejected') {
                  const message = `*Expense Rejected*
 Your expense request for *${originalExpense.category}* (AED ${originalExpense.amount.toLocaleString()}) was rejected.
@@ -1578,6 +1588,174 @@ export async function handleDeleteOwner(id: string) {
         console.error('Failed to delete owner:', error);
         return { success: false, message: `Failed to delete owner: ${error.message}` };
     }
+}
+
+// --- Tax Receipt Actions ---
+
+export async function createTaxReceiptFromExpense(expense: any, approvedBy: any) {
+    try {
+        // Check if expense has VAT and tax amount
+        if (!expense.isVat || !expense.taxAmount || expense.taxAmount <= 0) {
+            console.log('No VAT amount in expense, skipping tax receipt creation');
+            return;
+        }
+
+        // Get property, unit, lease, and owner details
+        const { getPropertyById, getEmployeeById } = await import('@/lib/db');
+        const property = await getPropertyById(expense.propertyId);
+        const employee = await getEmployeeById(expense.employeeId);
+        
+        if (!property || !employee) {
+            console.error('Property or employee not found for tax receipt creation');
+            return;
+        }
+
+        // Get owner details from property
+        const connection = await require('@/lib/db-connection').getConnection();
+        const [ownerRows] = await connection.query(
+            'SELECT * FROM owners WHERE id = ?',
+            [property.ownerId]
+        );
+        const owner = (ownerRows as any[])[0];
+
+        // Check if owner has tax number
+        if (!owner || !owner.taxNumber) {
+            console.log('Owner does not have tax number, skipping tax receipt creation');
+            return;
+        }
+
+        // Get lease details if unit is specified (for commercial name)
+        let businessName = '';
+        let unitInfo = '';
+        if (expense.unitId) {
+            const [leaseRows] = await connection.query(`
+                SELECT l.*, u.number as unitNumber
+                FROM leases l
+                LEFT JOIN units u ON l.unitId = u.id
+                WHERE l.unitId = ? AND l.status = 'Active'
+                ORDER BY l.createdAt DESC
+                LIMIT 1
+            `, [expense.unitId]);
+            
+            if ((leaseRows as any[]).length > 0) {
+                const lease = (leaseRows as any[])[0];
+                businessName = lease.businessName || '';
+                unitInfo = lease.unitNumber ? ` - وحدة رقم ${lease.unitNumber}` : '';
+            }
+        }
+
+        // Generate invoice number
+        const invoiceNumber = `TR-${Date.now().toString().slice(-6)}`;
+        
+        // Create tax receipt data
+        const taxReceiptData = {
+            invoiceNumber,
+            customerName: owner.name || 'مالك العقار',
+            customerAddress: owner.address || property.address || 'Umm Al-Quwain, UAE',
+            customerTRN: owner.taxNumber,
+            serviceDescription: businessName 
+                ? `${businessName}${unitInfo} - ${expense.category} - ${expense.description || 'لا يوجد وصف'}`
+                : `${property.name || 'عقار'}${unitInfo} - ${expense.category} - ${expense.description || 'لا يوجد وصف'}`,
+            invoiceAmount: expense.baseAmount || expense.amount - (expense.taxAmount || 0),
+            vatAmount: expense.taxAmount || 0,
+            totalAmount: expense.amount,
+            amountInWords: convertAmountToWords(expense.amount),
+            invoiceDate: new Date().toISOString().split('T')[0],
+            trnNumber: '100427200900003',
+            bankDetails: {
+                bank: 'ADIB Bank',
+                accountHolder: 'Abdulla Mohamed Ali Omair AL Ali',
+                accountNumber: '18860565',
+                iban: 'AE76500000000188650565',
+                swiftCode: 'ADIBUQWA',
+                branch: 'Umm AL Quwain'
+            },
+            contactDetails: {
+                location: 'Umm Al-Quwain - UAE',
+                poBox: '125',
+                phones: ['050-6332331', '050-6271221', '055-6271211'],
+                emails: ['uaq79000@gmail.com', 'uaq42000@hotmail.com']
+            },
+            expenseId: expense.id,
+            ownerId: owner.id,
+            ownerName: owner.name,
+            propertyName: property.name,
+            businessName: businessName,
+            createdAt: new Date().toISOString().split('T')[0]
+        };
+
+        // Store in localStorage for now (in a real app, this would be stored in database)
+        if (typeof window !== 'undefined') {
+            const existingReceipts = JSON.parse(localStorage.getItem('taxReceipts') || '[]');
+            existingReceipts.unshift(taxReceiptData);
+            localStorage.setItem('taxReceipts', JSON.stringify(existingReceipts));
+        }
+
+        // Log activity
+        await logActivity(
+            approvedBy.id, 
+            approvedBy.name, 
+            'CREATE_TAX_RECEIPT', 
+            'TaxReceipt', 
+            invoiceNumber, 
+            { 
+                expenseId: expense.id, 
+                amount: expense.amount,
+                vatAmount: expense.taxAmount,
+                ownerId: owner.id,
+                ownerName: owner.name,
+                ownerTRN: owner.taxNumber
+            }
+        );
+
+        // Send notification about tax receipt creation
+        const message = `*تم إنشاء إيصال ضريبي تلقائياً*
+
+*رقم الإيصال:* ${invoiceNumber}
+*المالك:* ${owner.name}
+*الرقم الضريبي:* ${owner.taxNumber}
+${businessName ? `*الاسم التجاري:* ${businessName}` : ''}
+*المبلغ الإجمالي:* AED ${expense.amount.toLocaleString()}
+*مبلغ الضريبة:* AED ${(expense.taxAmount || 0).toLocaleString()}
+
+يمكنك عرضه في قسم الإيصالات الضريبية.`;
+        
+        await sendSystemTelegramNotification(message);
+
+        console.log('Tax receipt created successfully:', invoiceNumber);
+        return invoiceNumber;
+    } catch (error) {
+        console.error('Failed to create tax receipt:', error);
+    }
+}
+
+function convertAmountToWords(amount: number): string {
+    const ones = ['', 'واحد', 'اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'ثمانية', 'تسعة'];
+    const tens = ['', '', 'عشرون', 'ثلاثون', 'أربعون', 'خمسون', 'ستون', 'سبعون', 'ثمانون', 'تسعون'];
+    const hundreds = ['', 'مئة', 'مئتان', 'ثلاثمئة', 'أربعمئة', 'خمسمئة', 'ستمئة', 'سبعمئة', 'ثمانمئة', 'تسعمئة'];
+    
+    if (amount === 0) return 'صفر درهم إماراتي';
+    if (amount < 10) return `${ones[amount]} درهم إماراتي`;
+    if (amount < 100) {
+        const ten = Math.floor(amount / 10);
+        const one = amount % 10;
+        if (one === 0) return `${tens[ten]} درهم إماراتي`;
+        return `${ones[one]} و ${tens[ten]} درهم إماراتي`;
+    }
+    if (amount < 1000) {
+        const hundred = Math.floor(amount / 100);
+        const remainder = amount % 100;
+        if (remainder === 0) return `${hundreds[hundred]} درهم إماراتي`;
+        return `${hundreds[hundred]} و ${convertAmountToWords(remainder)}`;
+    }
+    if (amount < 10000) {
+        const thousand = Math.floor(amount / 1000);
+        const remainder = amount % 1000;
+        if (remainder === 0) return `${ones[thousand]} ألف درهم إماراتي`;
+        return `${ones[thousand]} ألف و ${convertAmountToWords(remainder)}`;
+    }
+    
+    return `${amount.toLocaleString()} درهم إماراتي`;
 }
 
 // --- Property Document Actions ---

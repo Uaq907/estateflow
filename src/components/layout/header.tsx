@@ -125,6 +125,8 @@ export function AppHeader({ loggedInEmployee }: { loggedInEmployee: Employee | n
                        {canReadLeases && <DropdownMenuItem asChild><Link href="/dashboard/financials"><FileSignature className="mr-2" />{t('nav.leasesPayments')}</Link></DropdownMenuItem>}
                        {canReadExpenses && <DropdownMenuItem asChild><Link href="/dashboard/expenses"><Receipt className="mr-2" />{t('nav.expenses')}</Link></DropdownMenuItem>}
                        {canReadCheques && <DropdownMenuItem asChild><Link href="/dashboard/cheques"><WalletCards className="mr-2"/>{t('nav.cheques')}</Link></DropdownMenuItem>}
+                       <DropdownMenuSeparator />
+                       <DropdownMenuItem asChild><Link href="/dashboard/tax-receipts"><Receipt className="mr-2" />إيصالات الضريبة</Link></DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 )}
@@ -250,6 +252,7 @@ export function AppHeader({ loggedInEmployee }: { loggedInEmployee: Employee | n
                     {canReadExpenses && <DropdownMenuItem asChild><Link href="/dashboard/expenses"><Receipt className="mr-2"/>{t('nav.expenses')}</Link></DropdownMenuItem>}
                     {canReadMaintenance && <DropdownMenuItem asChild><Link href="/dashboard/maintenance"><Wrench className="mr-2"/>{t('nav.maintenance')}</Link></DropdownMenuItem>}
                     {canReadCheques && <DropdownMenuItem asChild><Link href="/dashboard/cheques"><WalletCards className="mr-2"/>{t('nav.cheques')}</Link></DropdownMenuItem>}
+                    <DropdownMenuItem asChild><Link href="/dashboard/tax-receipts"><Receipt className="mr-2" />إيصالات الضريبة</Link></DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild><Link href="/dashboard/legal/eviction"><FileText className="mr-2" />{t('nav.eviction')}</Link></DropdownMenuItem>
                     <DropdownMenuItem asChild><Link href="/dashboard/legal/increase"><DollarSign className="mr-2" />{t('nav.increase')}</Link></DropdownMenuItem>
