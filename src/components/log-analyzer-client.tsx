@@ -448,6 +448,11 @@ export default function LogAnalyzerClient({ initialLogs, loggedInEmployee }: { i
 
     const filteredLogs = useMemo(() => {
         return logs.filter(log => {
+            // إخفاء جميع سجلات المصروفات
+            if (log.action === 'CREATE_EXPENSE' || log.action === 'UPDATE_EXPENSE' || log.action === 'DELETE_EXPENSE' || log.entityType === 'Expense') {
+                return false;
+            }
+            
             const lowercasedQuery = searchQuery.toLowerCase();
             const matchesSearch = lowercasedQuery === '' ||
                 (log.employeeName && log.employeeName.toLowerCase().includes(lowercasedQuery)) ||
