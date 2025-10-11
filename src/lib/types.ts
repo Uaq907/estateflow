@@ -252,7 +252,7 @@ export const expenseSchema = z.object({
     category: z.string().min(1, "Category is required."),
     supplier: z.string().optional().nullable(),
     description: z.string().optional().nullable(),
-    status: z.enum(['Pending', 'Approved', 'Rejected', 'Needs Correction', 'Conditionally Approved']),
+    status: z.enum(['Pending', 'Awaiting Receipt', 'Approved', 'Rejected', 'Needs Correction', 'Conditionally Approved']),
     receiptUrl: z.string().optional().nullable(),
     paymentReceiptUrl: z.string().optional().nullable(), // إيصال دفع المبلغ
     requestReceiptUrl: z.string().optional().nullable(), // إيصال الطلب
