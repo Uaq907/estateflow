@@ -8,21 +8,32 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 const dbConfig = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-  connectTimeout: 60000, // 60 seconds
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_DATABASE || 'estateflow',
+  connectTimeout: 30000, // 30 seconds
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
   enableKeepAlive: true,
-  keepAliveInitialDelay: 0
+  keepAliveInitialDelay: 0,
+  maxIdle: 10,
+  idleTimeout: 60000,
+  acquireTimeout: 30000
 };
 
 let connection: mysql.Connection | null = null;
 let connectionPool: mysql.Pool | null = null;
 let migrationsHaveRun = false;
+
+// Initialize connection pool
+function getPool() {
+  if (!connectionPool) {
+    connectionPool = mysql.createPool(dbConfig);
+  }
+  return connectionPool;
+}
 
 async function columnExists(conn: mysql.Connection, tableName: string, columnName: string): Promise<boolean> {
     try {
@@ -80,38 +91,31 @@ async function constraintExists(conn: mysql.Connection, tableName: string, const
 
 
 export async function getConnection(retries = 3): Promise<mysql.Connection> {
-  if (connection) {
-    try {
-      // Test if connection is still alive
-      await connection.ping();
-      return connection;
-    } catch {
-      // Connection is dead, will create a new one below
-      connection = null as any;
-    }
-  }
-  
   let lastError: any;
+  
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      // The database is expected to exist. Direct connection attempt.
-      connection = await mysql.createConnection(dbConfig);
+      // Use pool to get a connection
+      const pool = getPool();
+      const poolConnection = await pool.getConnection();
       
-      // await runMigrationsInternal(connection);
-      // migrationsHaveRun = true;
-
-      connection.on('error', (err) => {
-          console.error('Database connection error:', err);
-          connection = null;
-          migrationsHaveRun = false;
-      });
-
-      return connection;
+      // Test connection
+      await poolConnection.ping();
+      
+      return poolConnection as mysql.Connection;
     } catch (error) {
       lastError = error;
       console.error(`DB Connection Error (attempt ${attempt}/${retries}):`, error);
-      connection = null;
-      migrationsHaveRun = false;
+      
+      // Reset pool on error
+      if (connectionPool) {
+        try {
+          await connectionPool.end();
+        } catch (e) {
+          // Ignore errors when closing pool
+        }
+        connectionPool = null;
+      }
       
       // Wait before retrying (exponential backoff)
       if (attempt < retries) {
@@ -129,9 +133,13 @@ async function runMigrationsInternal(existingConnection?: mysql.Connection | nul
 }
 
 export async function closeConnection() {
+    if (connectionPool) {
+        await connectionPool.end();
+        connectionPool = null;
+    }
     if (connection) {
         await connection.end();
         connection = null;
-        migrationsHaveRun = false;
     }
+    migrationsHaveRun = false;
 }
