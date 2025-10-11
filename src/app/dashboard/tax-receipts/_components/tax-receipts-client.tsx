@@ -34,7 +34,7 @@ export default function TaxReceiptsClient({
 
   const generateReceiptHTML = () => {
     const receiptNumber = `TAX-${new Date().getFullYear()}-${Date.now().toString().slice(-6)}`;
-    const date = new Date().toLocaleDateString('ar-SA');
+    const date = new Date().toLocaleDateString('en-GB');
     
     return `
 <!DOCTYPE html>

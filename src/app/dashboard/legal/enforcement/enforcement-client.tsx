@@ -188,7 +188,7 @@ export default function EnforcementPageClient({ loggedInEmployee }: { loggedInEm
       <body>
         <div class="header">
           <h1>ملف التنفيذ - لائحة الدعوى</h1>
-          <p>تاريخ: ${new Date().toLocaleDateString('ar-SA')}</p>
+          <p>تاريخ: ${new Date().toLocaleDateString('en-GB')}</p>
         </div>
         
         <div class="case-info">

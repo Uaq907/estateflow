@@ -100,9 +100,9 @@ export default function EvictionPageClient({
       'تاريخ_العقد': newEviction.submittedDate || '',
       'قيمة_الايجار': newEviction.dueAmount || '0',
       'تاريخ_البداية': newEviction.submittedDate || '',
-      'تاريخ_النهاية': new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toLocaleDateString('ar-SA'),
+      'تاريخ_النهاية': new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB'),
       'المبلغ_المتأخر': newEviction.dueAmount || '0',
-      'تاريخ_اليوم': new Date().toLocaleDateString('ar-SA')
+      'تاريخ_اليوم': new Date().toLocaleDateString('en-GB')
     };
     
     let filled = templateContent;

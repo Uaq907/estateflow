@@ -75,7 +75,7 @@ export class PDFReportGenerator {
     const reportIdWidth = this.doc.getTextWidth(reportId);
     this.doc.text(reportId, 210 - this.rightMargin - reportIdWidth, 15);
     
-    const dateText = new Date().toLocaleDateString('ar-SA');
+    const dateText = new Date().toLocaleDateString('en-GB');
     const dateWidth = this.doc.getTextWidth(dateText);
     this.doc.text(dateText, 210 - this.rightMargin - dateWidth, 22);
     
@@ -123,7 +123,7 @@ export class PDFReportGenerator {
 
   private addInfoTable(reportData: PDFReportData): void {
     const tableData = [
-      ['تاريخ الإنشاء:', reportData.generatedAt.toLocaleDateString('ar-SA')],
+      ['تاريخ الإنشاء:', reportData.generatedAt.toLocaleDateString('en-GB')],
       ['الفترة الزمنية:', reportData.period],
       ['نوع التقرير:', this.getReportTypeName(reportData.type)],
       ['حالة التقرير:', 'مكتمل']
@@ -536,7 +536,7 @@ export class PDFReportGenerator {
       this.doc.text(pageText, 210 - this.rightMargin - pageWidth, 285);
       
       // Center - Date
-      const dateText = new Date().toLocaleDateString('ar-SA');
+      const dateText = new Date().toLocaleDateString('en-GB');
       const dateWidth = this.doc.getTextWidth(dateText);
       this.doc.text(dateText, (210 - dateWidth) / 2, 285);
       

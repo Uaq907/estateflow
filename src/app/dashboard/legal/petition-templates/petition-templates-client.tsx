@@ -306,7 +306,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
     تاريخ_البداية: '01/02/2022',
     تاريخ_النهاية: '31/01/2023',
     المبلغ_المتأخر: '2,500',
-    تاريخ_اليوم: new Date().toLocaleDateString('ar-SA')
+    تاريخ_اليوم: new Date().toLocaleDateString('en-GB')
   };
 
   // تحميل النماذج من localStorage مع دمج النماذج الجديدة
@@ -517,7 +517,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
       ايميل_المدعي: request.clientEmail,
       اسم_العقار: request.propertyName,
       قيمة_الايجار: request.amount,
-      تاريخ_اليوم: new Date().toLocaleDateString('ar-SA')
+      تاريخ_اليوم: new Date().toLocaleDateString('en-GB')
     };
 
     // تطبيق البيانات على النموذج المحدد
