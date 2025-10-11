@@ -814,16 +814,34 @@ export async function handleAssignEmployeeToProperty(employeeId: string, propert
 export async function handleRemoveEmployeeFromProperty(employeeId: string, propertyId: string) {
     const loggedInEmployee = await getEmployeeFromSession();
     if (!hasPermission(loggedInEmployee, 'properties:update')) {
-        return { success: false, message: 'Permission denied.' };
+        return { success: false, message: 'ليس لديك صلاحية تعديل العقارات.' };
     }
+    
     try {
+        console.log(`[handleRemoveEmployeeFromProperty] Removing employee ${employeeId} from property ${propertyId}`);
+        
         await removeEmployeeFromProperty(employeeId, propertyId);
-        await logActivity(loggedInEmployee!.id, loggedInEmployee!.name, 'REMOVE_EMPLOYEE_FROM_PROPERTY', 'Property', propertyId, { removedEmployeeId: employeeId });
+        
+        await logActivity(
+            loggedInEmployee!.id, 
+            loggedInEmployee!.name, 
+            'REMOVE_EMPLOYEE_FROM_PROPERTY', 
+            'Property', 
+            propertyId, 
+            { removedEmployeeId: employeeId }
+        );
+        
         revalidatePath(`/dashboard/properties/${propertyId}`);
-        return { success: true, message: 'Employee removed from property.' };
-    } catch (error) {
-        console.error('Failed to remove employee from property:', error);
-        return { success: false, message: 'Failed to remove employee from property.' };
+        revalidatePath(`/dashboard/properties`);
+        
+        console.log('[handleRemoveEmployeeFromProperty] Success');
+        return { success: true, message: 'تم إزالة الموظف من العقار بنجاح.' };
+    } catch (error: any) {
+        console.error('[handleRemoveEmployeeFromProperty] Error:', error);
+        return { 
+            success: false, 
+            message: `فشل إزالة الموظف: ${error.message || 'خطأ غير معروف'}` 
+        };
     }
 }
 

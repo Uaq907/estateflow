@@ -1246,12 +1246,24 @@ export async function removeEmployeeFromProperty(employeeId: string, propertyId:
     let connection: mysql.Connection | null = null;
     try {
         connection = await getConnection();
-        await connection.execute(
+        
+        console.log(`[DB] Removing employee ${employeeId} from property ${propertyId}`);
+        
+        const [result] = await connection.execute(
             'DELETE FROM employee_properties WHERE employeeId = ? AND propertyId = ?',
             [employeeId, propertyId]
         );
+        
+        const affectedRows = (result as any).affectedRows;
+        console.log(`[DB] Affected rows: ${affectedRows}`);
+        
+        if (affectedRows === 0) {
+            console.warn('[DB] No rows deleted - assignment may not exist');
+        } else {
+            console.log('[DB] Employee removed successfully');
+        }
     } catch(e) {
-        console.error("Error removing employee from property", e);
+        console.error("[DB] Error removing employee from property:", e);
         throw e;
     }
 }
