@@ -84,7 +84,7 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
               <TableHead className="text-right">الاسم</TableHead>
               <TableHead className="hidden lg:table-cell text-right">البريد الإلكتروني</TableHead>
               <TableHead className="hidden md:table-cell text-right">المنصب</TableHead>
-              <TableHead className="hidden lg:table-cell text-right">أنشئ بواسطة</TableHead>
+              <TableHead className="hidden lg:table-cell text-right">القسم</TableHead>
               <TableHead className="hidden sm:table-cell text-right">تاريخ البدء</TableHead>
               {(onEdit || onDelete) && (
                 <TableHead className="text-right">
@@ -116,7 +116,7 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
                     <Badge variant="secondary">{translatePosition(employee.position)}</Badge>
                   </TableCell>
                   <TableCell className="hidden lg:table-cell text-sm text-muted-foreground text-right">
-                    {employee.createdBy || 'النظام'}
+                    {employee.department || 'غير محدد'}
                   </TableCell>
                   <TableCell className="hidden sm:table-cell text-right">
                     {format(new Date(employee.startDate), 'dd/MM/yyyy')}
