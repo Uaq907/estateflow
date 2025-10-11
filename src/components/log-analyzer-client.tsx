@@ -561,11 +561,17 @@ export default function LogAnalyzerClient({ initialLogs, loggedInEmployee }: { i
                     description: result.message || 'تم حذف البيانات بنجاح'
                 });
                 
-                // انتظر قليلاً ثم أعد تحميل الصفحة
-                setTimeout(() => {
-                    router.refresh();
-                    window.location.reload();
-                }, 1500);
+                // إذا تم حذف المستخدم الحالي، توجيه لصفحة تسجيل الدخول
+                if ((result as any).shouldLogout) {
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    setTimeout(() => {
+                        router.refresh();
+                        window.location.reload();
+                    }, 1500);
+                }
             } else {
                 console.error('[handleDeleteAllData] Failed:', result.message);
                 toast({
@@ -691,8 +697,9 @@ export default function LogAnalyzerClient({ initialLogs, loggedInEmployee }: { i
                             <p className="text-red-600 font-bold text-center mt-4">
                               ⚠️ تحذير: هذا الإجراء لا يمكن التراجع عنه!
                             </p>
-                            <p className="text-gray-700 text-sm text-center">
-                              ملاحظة: سيتم حذف جميع الموظفين ماعدا حسابك الحالي
+                            <p className="text-red-700 font-semibold text-sm text-center bg-red-50 p-3 rounded-md border-2 border-red-300">
+                              🔴 سيتم حذف جميع البيانات بما في ذلك جميع الموظفين (حسابك أيضاً)<br/>
+                              سيتم تسجيل خروجك تلقائياً بعد الحذف
                             </p>
                           </AlertDialogDescription>
                         </AlertDialogHeader>

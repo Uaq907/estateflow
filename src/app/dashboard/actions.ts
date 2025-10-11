@@ -1620,17 +1620,14 @@ export async function handleDeleteAllSystemData() {
             }
         }
         
-        // حذف جميع الموظفين ماعدا المستخدم الحالي
+        // حذف جميع الموظفين بدون استثناء
         try {
-            console.log('[handleDeleteAllSystemData] Deleting employees except current user...');
-            const [result] = await connection.execute(
-                'DELETE FROM employees WHERE id != ?',
-                [loggedInEmployee!.id]
-            );
+            console.log('[handleDeleteAllSystemData] Deleting ALL employees...');
+            const [result] = await connection.execute('DELETE FROM employees');
             const count = (result as any).affectedRows;
             deletedCounts['employees'] = count;
             totalDeleted += count;
-            console.log(`[handleDeleteAllSystemData] Deleted ${count} employees`);
+            console.log(`[handleDeleteAllSystemData] Deleted ${count} employees (including current user)`);
         } catch (e: any) {
             console.error('[handleDeleteAllSystemData] Error deleting employees:', e.message);
             deletedCounts['employees'] = 0;
@@ -1650,8 +1647,9 @@ export async function handleDeleteAllSystemData() {
         console.log('[handleDeleteAllSystemData] Deletion completed successfully. Total:', totalDeleted);
         return { 
             success: true, 
-            message: `تم حذف ${totalDeleted} سجل بنجاح (تم الاحتفاظ بحسابك فقط).`,
-            deletedCounts 
+            message: `تم حذف ${totalDeleted} سجل بنجاح. سيتم تسجيل خروجك الآن.`,
+            deletedCounts,
+            shouldLogout: true
         };
     } catch (error: any) {
         console.error('[handleDeleteAllSystemData] Failed:', error);
