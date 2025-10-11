@@ -319,11 +319,22 @@ export default function PropertyDetailClient({
     if (!employeeToRemove) return;
     
     const result = await handleRemoveEmployeeFromProperty(employeeToRemove.id, property.id);
-     if (result.success) {
-      toast({ title: 'Success', description: result.message });
-      setAssignedEmployees(assignedEmployees.filter(e => e.id !== employeeToRemove.id));
+    if (result.success) {
+      toast({ title: 'نجح', description: 'تم إزالة الموظف من العقار بنجاح' });
+      // تحديث القائمة من السيرفر
+      try {
+        const updatedEmployees = await getEmployeesForProperty(property.id);
+        setAssignedEmployees(updatedEmployees);
+      } catch (error) {
+        // في حالة فشل التحديث، استخدم الفلترة المحلية
+        setAssignedEmployees(assignedEmployees.filter(e => e.id !== employeeToRemove.id));
+      }
+      // تحديث الصفحة بعد ثانية للتأكد من تطبيق التغييرات
+      setTimeout(() => {
+        router.refresh();
+      }, 500);
     } else {
-      toast({ variant: 'destructive', title: 'Error', description: result.message });
+      toast({ variant: 'destructive', title: 'خطأ', description: result.message });
     }
     setIsRemoveEmployeeDialogOpen(false);
     setEmployeeToRemove(null);
