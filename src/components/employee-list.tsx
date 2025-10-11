@@ -64,14 +64,14 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-right">Name</TableHead>
-              <TableHead className="hidden lg:table-cell text-right">ID</TableHead>
-              <TableHead className="hidden md:table-cell text-right">Position</TableHead>
-              <TableHead className="hidden lg:table-cell text-right">Department</TableHead>
-              <TableHead className="hidden sm:table-cell text-right">Start Date</TableHead>
+              <TableHead className="text-right">الاسم</TableHead>
+              <TableHead className="hidden lg:table-cell text-right">المعرف</TableHead>
+              <TableHead className="hidden md:table-cell text-right">المنصب</TableHead>
+              <TableHead className="hidden lg:table-cell text-right">القسم</TableHead>
+              <TableHead className="hidden sm:table-cell text-right">تاريخ البدء</TableHead>
               {(onEdit || onDelete) && (
                 <TableHead className="text-right">
-                  <span className="sr-only">Actions</span>
+                  <span className="sr-only">إجراءات</span>
                 </TableHead>
               )}
             </TableRow>
@@ -115,13 +115,13 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
                         <DropdownMenuContent align="start">
                           {onEdit && (
                             <DropdownMenuItem onClick={() => onEdit(employee)}>
-                              <span>Edit</span>
+                              <span>تعديل</span>
                               <Edit className="ml-2 h-4 w-4" />
                             </DropdownMenuItem>
                           )}
                           {onDelete && (
                             <DropdownMenuItem onClick={() => handleDeleteClick(employee)} className="text-destructive focus:text-destructive">
-                              <span>Delete</span>
+                              <span>حذف</span>
                               <Trash2 className="ml-2 h-4 w-4" />
                             </DropdownMenuItem>
                           )}
@@ -134,7 +134,7 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
             ) : (
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-right">
-                  No employees found.
+                  لا يوجد موظفون.
                 </TableCell>
               </TableRow>
             )}
@@ -145,16 +145,16 @@ export default function EmployeeList({ employees, onEdit, onDelete }: EmployeeLi
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>هل أنت متأكد تماماً؟</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the employee record for{' '}
-              <span className="font-semibold">{employeeToDelete?.name}</span>.
+              لا يمكن التراجع عن هذا الإجراء. سيتم حذف سجل الموظف{' '}
+              <span className="font-semibold">{employeeToDelete?.name}</span> بشكل نهائي.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className="bg-destructive hover:bg-destructive/90">
-              Delete
+              حذف
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
