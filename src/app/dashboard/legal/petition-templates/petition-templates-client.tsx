@@ -254,7 +254,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
   const [showNewRequestDialog, setShowNewRequestDialog] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [requests, setRequests] = useState(petitionRequests);
-  const [isEditingEnabled, setIsEditingEnabled] = useState(true);
+  const [isEditingEnabled] = useState(true); // دائماً مفعّل
   const [isCustomTitle, setIsCustomTitle] = useState(false);
   const [customTitle, setCustomTitle] = useState('');
   const [currentActiveTemplate, setCurrentActiveTemplate] = useState<string>('');
@@ -337,11 +337,6 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
         localStorage.setItem('petitionTemplates', JSON.stringify(petitionTemplates));
       }
       
-      // تحميل حالة التعديل
-      const savedEditingState = localStorage.getItem('templatesEditingEnabled');
-      if (savedEditingState) {
-        setIsEditingEnabled(JSON.parse(savedEditingState));
-      }
     } catch (error) {
       console.error('Error loading templates from localStorage:', error);
     }
@@ -708,21 +703,6 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
     }
   };
   
-  // تبديل حالة التعديل
-  const toggleEditingMode = () => {
-    const newState = !isEditingEnabled;
-    setIsEditingEnabled(newState);
-    localStorage.setItem('templatesEditingEnabled', JSON.stringify(newState));
-    
-    if (newState) {
-      alert('✅ تم تفعيل إمكانية التعديل\n\nيمكنك الآن تعديل وحذف النماذج');
-    } else {
-      alert('🔒 تم تعطيل إمكانية التعديل\n\nالنماذج محمية الآن من التعديل والحذف');
-      // إلغاء أي تعديل جاري
-      setEditingTemplateId(null);
-      setIsPreviewEditing(false);
-    }
-  };
 
   // التحرير المباشر
   const handleStartInlineEdit = (template: any) => {
@@ -1010,48 +990,17 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+          <h1 className="text-3xl font-bold text-gray-900">
             نماذج الدعاوى
-            {!isEditingEnabled && (
-              <span className="text-sm bg-green-100 text-green-700 px-3 py-1 rounded-full border border-green-300 flex items-center gap-1">
-                🔒 محمي من التعديل
-              </span>
-            )}
           </h1>
           <p className="text-gray-600 mt-2">
             إدارة وتحرير نماذج الدعاوى القانونية
-            {!isEditingEnabled && (
-              <span className="text-green-600 font-medium"> (وضع القراءة فقط)</span>
-            )}
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Button 
-            onClick={toggleEditingMode} 
-            variant={isEditingEnabled ? "default" : "outline"}
-            className={`flex items-center gap-2 ${
-              isEditingEnabled 
-                ? 'bg-red-600 hover:bg-red-700 text-white' 
-                : 'bg-green-50 hover:bg-green-100 border-green-300 text-green-700'
-            }`}
-          >
-            {isEditingEnabled ? '🔓 تعطيل التعديل' : '🔒 تفعيل التعديل'}
-          </Button>
-          <Button onClick={handleUpdateTemplates} variant="outline" className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 border-blue-300 text-blue-700">
-            ⬆️ تحديث النماذج
-          </Button>
-          <Button onClick={handleResetTemplates} variant="outline" className="flex items-center gap-2" disabled={!isEditingEnabled}>
-            🔄 إعادة تعيين
-          </Button>
-          <Button onClick={() => setShowRequestsDialog(true)} variant="outline" className="flex items-center gap-2">
-            📋 قائمة الطلبات
-          </Button>
-          <Button onClick={() => setShowNewRequestDialog(true)} variant="outline" className="flex items-center gap-2">
-            ➕ طلب جديد
-          </Button>
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
             <DialogTrigger asChild>
-              <Button className="flex items-center gap-2" disabled={!isEditingEnabled}>
+              <Button className="flex items-center gap-2">
                 <Plus className="h-4 w-4" />
                 إنشاء نموذج جديد
               </Button>
@@ -1288,7 +1237,6 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                     onClick={() => handleDuplicateTemplate(template)}
                     className="h-8 w-8 p-0"
                     title="نسخ النموذج"
-                    disabled={!isEditingEnabled}
                   >
                     <Plus className="h-3 w-3" />
                   </Button>
@@ -1297,8 +1245,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                     size="sm"
                     onClick={() => handleEditTemplate(template)}
                     className="h-8 w-8 p-0"
-                    title={isEditingEnabled ? "تعديل النموذج" : "التعديل معطل"}
-                    disabled={!isEditingEnabled}
+                    title="تعديل النموذج"
                   >
                     <Edit className="h-3 w-3" />
                   </Button>
@@ -1307,8 +1254,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                     size="sm"
                     onClick={() => handleDeleteTemplate(template.id)}
                     className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                    title={isEditingEnabled ? "حذف النموذج" : "الحذف معطل"}
-                    disabled={!isEditingEnabled}
+                    title="حذف النموذج"
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
@@ -1394,8 +1340,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                     size="sm"
                     onClick={() => handleStartInlineEdit(template)}
                     className="flex-1 flex items-center gap-2"
-                    disabled={!isEditingEnabled}
-                    title={isEditingEnabled ? "تعديل مباشر" : "التعديل معطل"}
+                    title="تعديل مباشر"
                   >
                     <Edit className="h-3 w-3" />
                     تعديل مباشر
@@ -1512,8 +1457,7 @@ export default function PetitionTemplatesClient({ loggedInEmployee }: PetitionTe
                           size="sm"
                           onClick={handleStartPreviewEdit}
                           className="h-8 px-3 text-xs"
-                          title={isEditingEnabled ? "تعديل النموذج" : "التعديل معطل"}
-                          disabled={!isEditingEnabled}
+                          title="تعديل النموذج"
                         >
                           ✏️ تعديل
                         </Button>
