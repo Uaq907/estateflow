@@ -30,6 +30,31 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
         return null;
     }
     
+    // عرض IP فقط لعمليات تسجيل الدخول
+    if (entityType === 'System' || entityType?.includes('ip:') || entityType?.includes('.')) {
+        try {
+            const parsed = JSON.parse(details);
+            if (parsed.ip) {
+                return (
+                    <div className="text-xs">
+                        <span className="font-semibold text-blue-700">🌐 IP:</span>
+                        <span className="ml-2 text-gray-800 font-medium">{parsed.ip}</span>
+                    </div>
+                );
+            }
+        } catch (e) {
+            // إذا كان عنوان IP مباشر
+            if (entityType?.includes('.')) {
+                return (
+                    <div className="text-xs">
+                        <span className="font-semibold text-blue-700">🌐 IP:</span>
+                        <span className="ml-2 text-gray-800 font-medium">{entityType}</span>
+                    </div>
+                );
+            }
+        }
+    }
+    
     try {
         // تنظيف البيانات قبل التحليل
         const cleanDetails = typeof details === 'string' ? details.trim() : details;
