@@ -23,16 +23,6 @@ const poolConfig = {
   acquireTimeout: 30000
 };
 
-const connectionConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_DATABASE || 'estateflow',
-  connectTimeout: 30000,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 0
-};
-
 let connection: mysql.Connection | null = null;
 let connectionPool: mysql.Pool | null = null;
 let migrationsHaveRun = false;
