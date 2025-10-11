@@ -89,8 +89,19 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
                                 'features': 'المميزات',
                                 'ownerId': 'المالك',
                                 'managerId': 'المدير',
+                                'startDate': 'تاريخ البداية',
+                                'endDate': 'تاريخ النهاية',
+                                'totalLeaseAmount': 'إجمالي الإيجار',
+                                'rentPaymentAmount': 'مبلغ الدفعة',
+                                'numberOfPayments': 'عدد الدفعات',
+                                // الحقول المختصرة
                                 'p': 'العقار',
-                                'd': 'التفاصيل'
+                                'd': 'التفاصيل',
+                                's': 'الحالة',
+                                'n': 'الاسم',
+                                'e': 'البريد',
+                                'a': 'المبلغ',
+                                't': 'النوع'
                             };
 
                             // ترجمة قيم الحالات
