@@ -20,7 +20,7 @@ import { handleDeleteActivityLog, handleDeleteAllActivityLogs } from '@/app/dash
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/language-context';
 
-function formatLogDetails(details: string | null | undefined, showAllVariables: boolean = false, t?: (key: string) => string, entityType?: string) {
+function formatLogDetails(details: string | null | undefined, showAllVariables: boolean = false, t?: (key: string) => string, entityType?: string | null) {
     if (!details || details === 'null' || details === 'undefined') {
         return <span className="text-gray-400 italic text-xs">لا توجد تفاصيل</span>;
     }

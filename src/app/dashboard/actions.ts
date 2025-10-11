@@ -1620,7 +1620,7 @@ export async function createTaxReceiptFromExpense(expense: any, approvedBy: any)
         }
 
         // Get property, unit, lease, and owner details
-        const { getPropertyById, getEmployeeById } = await import('@/lib/db');
+        const { getPropertyById } = await import('@/lib/db');
         const property = await getPropertyById(expense.propertyId);
         const employee = await getEmployeeById(expense.employeeId);
         
