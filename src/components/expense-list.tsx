@@ -94,8 +94,6 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
         return 'default';
       case 'Pending':
         return 'secondary';
-      case 'Conditionally Approved':
-        return 'outline';
       case 'Rejected':
       case 'Needs Correction':
         return 'destructive';
@@ -180,7 +178,6 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
                            expense.status === 'Approved' ? t('expenses.approved') :
                            expense.status === 'Rejected' ? t('expenses.rejected') :
                            expense.status === 'Needs Correction' ? t('expenses.needsCorrection') :
-                           expense.status === 'Conditionally Approved' ? t('expenses.conditionallyApproved') :
                            expense.status}
                         </Badge>
                         {expense.managerName && (

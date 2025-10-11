@@ -29,7 +29,7 @@ interface ExpenseDialogProps {
 }
 
 const expenseCategories = ['Maintenance', 'Utilities', 'Marketing', 'Supplies', 'Legal', 'Other'];
-const expenseStatuses: Expense['status'][] = ['Pending', 'Approved', 'Rejected', 'Needs Correction', 'Conditionally Approved'];
+const expenseStatuses: Expense['status'][] = ['Pending', 'Approved', 'Rejected', 'Needs Correction'];
 
 export default function ExpenseDialog({ isOpen, onOpenChange, expense, properties, onSubmit, loggedInEmployee }: ExpenseDialogProps) {
   const formRef = useRef<HTMLFormElement>(null);
