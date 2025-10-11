@@ -632,13 +632,8 @@ export default function LogAnalyzerClient({ initialLogs, loggedInEmployee }: { i
                                 <Badge variant="secondary">{formatAction(log.action)}</Badge>
                             </TableCell>
                             <TableCell className="text-sm max-w-md">
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <span className="font-semibold text-blue-600">{formatEntityType(log.entityType)}</span>
-                                    </div>
-                                    <div className="text-muted-foreground break-words">
-                                        {formatLogDetails(log.details, showAllVariables, t, log.entityType)}
-                                    </div>
+                                <div className="text-muted-foreground break-words">
+                                    {formatLogDetails(log.details, showAllVariables, t, log.entityType)}
                                 </div>
                             </TableCell>
                             <TableCell>
