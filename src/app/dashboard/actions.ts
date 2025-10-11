@@ -845,29 +845,6 @@ async function sendNotification(employeeId: string, event: NotificationEvent, me
     }
 }
 
-// Send notifications to all managers when a new expense is submitted
-async function sendExpenseSubmittedNotifications(expenseId: string, employeeName: string, category: string, amount: number) {
-    try {
-        // Get all employees
-        const { getEmployees } = await import('@/lib/db');
-        const allEmployees = await getEmployees();
-        
-        // Filter managers who have expenses:approve permission
-        const managers = allEmployees.filter(emp => hasPermission(emp, 'expenses:approve'));
-        
-        const message = `*مصروف جديد مقدم*\n\nالموظف: ${employeeName}\nالفئة: ${category}\nالمبلغ: AED ${amount.toLocaleString()}\n\nيرجى مراجعته في لوحة التحكم.`;
-        
-        // Send notification to each manager
-        for (const manager of managers) {
-            await sendNotification(manager.id, 'new_expense_submitted', message);
-        }
-        
-        console.log(`Sent expense submission notifications to ${managers.length} manager(s)`);
-    } catch (error) {
-        console.error('Failed to send expense submitted notifications:', error);
-    }
-}
-
 // --- Expense Actions ---
 
 async function sendSystemTelegramNotification(text: string) {
@@ -950,9 +927,6 @@ export async function handleAddExpense(expenseData: Partial<Omit<Expense, 'id' |
 Please review it in the dashboard.`;
         await sendSystemTelegramNotification(message);
 
-        // Send header notifications to all managers with approval permission
-        await sendExpenseSubmittedNotifications(addedExpense.id, loggedInEmployee!.name, expenseData.category || '', finalAmount);
-
         revalidatePath('/dashboard/expenses');
         return { success: true, message: 'Expense submitted successfully.' };
     } catch (error: any) {
@@ -1014,7 +988,6 @@ export async function handleUpdateExpense(id: string, expenseData: Partial<Omit<
         if (dataToUpdate.status && dataToUpdate.status !== originalExpense.status) {
             const actionMap: Record<string, string> = {
                 'Approved': 'Approved',
-                'Conditionally Approved': 'Conditionally Approved',
                 'Rejected': 'Rejected',
                 'Needs Correction': 'Needs Correction',
                 'Pending': 'Resubmitted'
@@ -1036,16 +1009,6 @@ export async function handleUpdateExpense(id: string, expenseData: Partial<Omit<
             if (dataToUpdate.status === 'Approved') {
                 const message = `*Expense Approved!*
 Your expense request for *${originalExpense.category}* (AED ${originalExpense.amount.toLocaleString()}) has been approved.`;
-                await sendNotification(originalExpense.employeeId, 'expense_approved', message);
-                
-                // Create tax receipt if expense has VAT
-                if (originalExpense.isVat && originalExpense.taxAmount && originalExpense.taxAmount > 0) {
-                    await createTaxReceiptFromExpense(originalExpense, loggedInEmployee!);
-                }
-            } else if (dataToUpdate.status === 'Conditionally Approved') {
-                const message = `*Expense Conditionally Approved!*
-Your expense request for *${originalExpense.category}* (AED ${originalExpense.amount.toLocaleString()}) has been conditionally approved.
-${dataToUpdate.managerNotes ? `Notes: ${dataToUpdate.managerNotes}` : ''}`;
                 await sendNotification(originalExpense.employeeId, 'expense_approved', message);
                 
                 // Create tax receipt if expense has VAT

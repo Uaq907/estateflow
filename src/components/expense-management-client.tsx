@@ -21,7 +21,7 @@ import { Label } from './ui/label';
 import { useLanguage } from '@/contexts/language-context';
 
 const expenseCategories = ['Maintenance', 'Utilities', 'Marketing', 'Supplies', 'Legal', 'Other'];
-const expenseStatuses = ['Pending', 'Approved', 'Rejected', 'Needs Correction', 'Conditionally Approved'];
+const expenseStatuses = ['Pending', 'Approved', 'Rejected', 'Needs Correction'];
 
 
 export default function ExpenseManagementClient({ 
@@ -203,10 +203,6 @@ export default function ExpenseManagementClient({
         case 'approve':
             updateData.status = 'Approved';
             successMessage = 'Expense has been approved.';
-            break;
-        case 'conditional_approve':
-            updateData.status = 'Conditionally Approved';
-            successMessage = 'Expense has been conditionally approved.';
             break;
         case 'reject':
             updateData.status = 'Rejected';

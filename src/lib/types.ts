@@ -252,7 +252,7 @@ export const expenseSchema = z.object({
     category: z.string().min(1, "Category is required."),
     supplier: z.string().optional().nullable(),
     description: z.string().optional().nullable(),
-    status: z.enum(['Pending', 'Awaiting Receipt', 'Approved', 'Rejected', 'Needs Correction', 'Conditionally Approved']),
+    status: z.enum(['Pending', 'Approved', 'Rejected', 'Needs Correction']),
     receiptUrl: z.string().optional().nullable(),
     paymentReceiptUrl: z.string().optional().nullable(), // إيصال دفع المبلغ
     requestReceiptUrl: z.string().optional().nullable(), // إيصال الطلب
@@ -264,6 +264,9 @@ export const expenseSchema = z.object({
     isVat: z.coerce.boolean().optional().nullable(),
     baseAmount: z.coerce.number().optional().nullable(),
     taxAmount: z.coerce.number().optional().nullable(),
+    amountWithoutTax: z.coerce.number().optional().nullable(),
+    totalAmount: z.coerce.number().optional().nullable(),
+    taxRate: z.coerce.number().optional().nullable(),
     isRecurring: z.coerce.boolean().optional().nullable(),
     recurrenceType: z.enum(['Monthly', 'Quarterly', 'Annually']).optional().nullable(),
     recurrenceEndDate: z.coerce.date().optional().nullable(),
@@ -279,7 +282,7 @@ export type Expense = z.infer<typeof expenseSchema>;
 export const expenseHistorySchema = z.object({
     id: z.string(),
     expenseId: z.string(),
-    action: z.enum(['Created', 'Submitted', 'Approved', 'Conditionally Approved', 'Rejected', 'Needs Correction', 'Corrected', 'Resubmitted']),
+    action: z.enum(['Created', 'Submitted', 'Approved', 'Rejected', 'Needs Correction', 'Corrected', 'Resubmitted']),
     performedBy: z.string(),
     performedByName: z.string().optional().nullable(),
     notes: z.string().optional().nullable(),

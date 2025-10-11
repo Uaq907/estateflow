@@ -77,7 +77,7 @@ async function addTestExpenses() {
                 category: 'Marketing',
                 supplier: 'وكالة التسويق الرقمي',
                 description: 'حملة تسويقية للعقار',
-                status: 'Awaiting Receipt',
+                status: 'Pending',
                 taxNumber: 'VAT789012',
                 isVat: true,
                 taxAmount: 150,
@@ -113,7 +113,7 @@ async function addTestExpenses() {
                 category: 'Legal',
                 supplier: 'مكتب المحاماة القانوني',
                 description: 'استشارات قانونية',
-                status: 'Conditionally Approved',
+                status: 'Pending',
                 taxNumber: null,
                 isVat: false,
                 taxAmount: 0,
@@ -210,10 +210,8 @@ async function addTestExpenses() {
 
         console.log(`✅ تم إضافة ${testExpenses.length} مصروف تجريبي بنجاح!`);
         console.log('\n📋 توزيع الحالات:');
-        console.log('  - Pending: 2 مصروف');
-        console.log('  - Awaiting Receipt: 1 مصروف');
+        console.log('  - Pending: 4 مصروف');
         console.log('  - Approved: 2 مصروف');
-        console.log('  - Conditionally Approved: 1 مصروف');
         console.log('  - Needs Correction: 1 مصروف');
         console.log('  - Rejected: 1 مصروف');
         console.log('\n🌐 يمكنك الآن مشاهدة المصروفات على: http://localhost:5000/dashboard/expenses');
