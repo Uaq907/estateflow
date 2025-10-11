@@ -28,7 +28,7 @@ export default async function SettingsPage() {
       description: 'إنشاء وعرض التقارير المختلفة',
       icon: FileText,
       href: '/dashboard/settings/reports',
-      permission: 'reports:view' as const
+      permission: 'settings:manage' as const
     },
     {
       title: 'إعدادات الوحدات',
