@@ -16,7 +16,7 @@ import { DatePicker } from './date-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Skeleton } from './ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from './ui/alert-dialog';
-import { handleDeleteActivityLog, handleDeleteAllActivityLogs } from '@/app/dashboard/actions';
+import { handleDeleteActivityLog, handleDeleteAllActivityLogs, getSystemDataReport, handleDeleteAllSystemData } from '@/app/dashboard/actions';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/language-context';
 
@@ -446,6 +446,8 @@ export default function LogAnalyzerClient({ initialLogs, loggedInEmployee }: { i
     const [currentPage, setCurrentPage] = useState(1);
     const [showAllVariables, setShowAllVariables] = useState(false);
     const [logs, setLogs] = useState(initialLogs);
+    const [dataReport, setDataReport] = useState<any>(null);
+    const [showDataReport, setShowDataReport] = useState(false);
     const logsPerPage = 50;
     const router = useRouter();
 
@@ -516,6 +518,27 @@ export default function LogAnalyzerClient({ initialLogs, loggedInEmployee }: { i
         }
     };
 
+    const handleLoadDataReport = async () => {
+        const result = await getSystemDataReport();
+        if (result.success && result.data) {
+            setDataReport(result.data);
+            setShowDataReport(true);
+        } else {
+            alert(result.message || 'فشل تحميل التقرير');
+        }
+    };
+
+    const handleDeleteAllData = async () => {
+        const result = await handleDeleteAllSystemData();
+        if (result.success) {
+            setShowDataReport(false);
+            alert(result.message);
+            router.refresh();
+        } else {
+            alert(result.message);
+        }
+    };
+
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -576,6 +599,61 @@ export default function LogAnalyzerClient({ initialLogs, loggedInEmployee }: { i
                           <AlertDialogCancel>{t('logAnalyzer.cancel')}</AlertDialogCancel>
                           <AlertDialogAction onClick={handleDeleteAllLogs} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                             {t('logAnalyzer.delete')}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                    <AlertDialog open={showDataReport} onOpenChange={setShowDataReport}>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="sm" onClick={handleLoadDataReport}>
+                          <Database className="h-4 w-4 mr-2" />
+                          حذف جميع البيانات
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="max-w-2xl">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="text-red-600 text-xl">⚠️ تحذير: حذف جميع البيانات الداخلية</AlertDialogTitle>
+                          <AlertDialogDescription className="space-y-4">
+                            <p className="text-base font-semibold text-gray-800">
+                              سيتم حذف جميع البيانات التالية من النظام بشكل نهائي:
+                            </p>
+                            {dataReport && (
+                              <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-right" dir="rtl">
+                                <div className="grid grid-cols-2 gap-3 text-sm">
+                                  {dataReport.properties > 0 && <div className="flex justify-between border-b pb-1"><span>🏢 العقارات:</span><span className="font-bold text-red-600">{dataReport.properties}</span></div>}
+                                  {dataReport.units > 0 && <div className="flex justify-between border-b pb-1"><span>🏘️ الوحدات:</span><span className="font-bold text-red-600">{dataReport.units}</span></div>}
+                                  {dataReport.tenants > 0 && <div className="flex justify-between border-b pb-1"><span>👥 المستأجرين:</span><span className="font-bold text-red-600">{dataReport.tenants}</span></div>}
+                                  {dataReport.leases > 0 && <div className="flex justify-between border-b pb-1"><span>📄 العقود:</span><span className="font-bold text-red-600">{dataReport.leases}</span></div>}
+                                  {dataReport.expenses > 0 && <div className="flex justify-between border-b pb-1"><span>💰 المصروفات:</span><span className="font-bold text-red-600">{dataReport.expenses}</span></div>}
+                                  {dataReport.cheques > 0 && <div className="flex justify-between border-b pb-1"><span>💳 الشيكات:</span><span className="font-bold text-red-600">{dataReport.cheques}</span></div>}
+                                  {dataReport.payments > 0 && <div className="flex justify-between border-b pb-1"><span>💵 المدفوعات:</span><span className="font-bold text-red-600">{dataReport.payments}</span></div>}
+                                  {dataReport.owners > 0 && <div className="flex justify-between border-b pb-1"><span>👤 المالكين:</span><span className="font-bold text-red-600">{dataReport.owners}</span></div>}
+                                  {dataReport.assets > 0 && <div className="flex justify-between border-b pb-1"><span>🛠️ الأصول:</span><span className="font-bold text-red-600">{dataReport.assets}</span></div>}
+                                  {dataReport.legalCases > 0 && <div className="flex justify-between border-b pb-1"><span>⚖️ القضايا:</span><span className="font-bold text-red-600">{dataReport.legalCases}</span></div>}
+                                  {dataReport.maintenanceRequests > 0 && <div className="flex justify-between border-b pb-1"><span>🔧 طلبات الصيانة:</span><span className="font-bold text-red-600">{dataReport.maintenanceRequests}</span></div>}
+                                  {dataReport.activityLogs > 0 && <div className="flex justify-between border-b pb-1"><span>📝 السجلات:</span><span className="font-bold text-red-600">{dataReport.activityLogs}</span></div>}
+                                  {dataReport.employeeProperties > 0 && <div className="flex justify-between border-b pb-1"><span>👔 تعيينات الموظفين:</span><span className="font-bold text-red-600">{dataReport.employeeProperties}</span></div>}
+                                </div>
+                                <div className="mt-4 pt-3 border-t-2 border-red-500">
+                                  <div className="flex justify-between text-lg font-bold">
+                                    <span>📊 إجمالي السجلات:</span>
+                                    <span className="text-red-600">{Object.values(dataReport).reduce((a: number, b: any) => a + (Number(b) || 0), 0)}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            <p className="text-red-600 font-bold text-center mt-4">
+                              ⚠️ تحذير: هذا الإجراء لا يمكن التراجع عنه!
+                            </p>
+                            <p className="text-gray-700 text-sm text-center">
+                              ملاحظة: سيتم الاحتفاظ ببيانات الموظفين والبنوك فقط
+                            </p>
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleDeleteAllData} className="bg-red-600 hover:bg-red-700">
+                            نعم، احذف جميع البيانات
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>

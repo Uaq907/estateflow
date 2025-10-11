@@ -1506,6 +1506,129 @@ export async function handleDeleteAllActivityLogs() {
     }
 }
 
+export async function getSystemDataReport() {
+    const loggedInEmployee = await getEmployeeFromSession();
+    if (!hasPermission(loggedInEmployee, 'settings:manage')) {
+        return { success: false, message: 'ليس لديك صلاحية.', data: null };
+    }
+    
+    try {
+        const connection = await getConnection();
+        
+        const report: any = {
+            properties: 0,
+            units: 0,
+            tenants: 0,
+            leases: 0,
+            expenses: 0,
+            cheques: 0,
+            payments: 0,
+            owners: 0,
+            assets: 0,
+            employeeProperties: 0,
+            activityLogs: 0,
+            maintenanceRequests: 0,
+            legalCases: 0
+        };
+        
+        const tables = [
+            { key: 'properties', table: 'properties' },
+            { key: 'units', table: 'units' },
+            { key: 'tenants', table: 'tenants' },
+            { key: 'leases', table: 'leases' },
+            { key: 'expenses', table: 'expenses' },
+            { key: 'cheques', table: 'cheques' },
+            { key: 'payments', table: 'payments' },
+            { key: 'owners', table: 'owners' },
+            { key: 'assets', table: 'assets' },
+            { key: 'employeeProperties', table: 'employee_properties' },
+            { key: 'activityLogs', table: 'activity_logs' },
+            { key: 'maintenanceRequests', table: 'maintenance_requests' },
+            { key: 'legalCases', table: 'legal_cases' }
+        ];
+        
+        for (const { key, table } of tables) {
+            try {
+                const [rows] = await connection.query(`SELECT COUNT(*) as count FROM ${table}`);
+                report[key] = (rows as any)[0].count;
+            } catch (e) {
+                report[key] = 0;
+            }
+        }
+        
+        return { success: true, data: report };
+    } catch (error: any) {
+        console.error('Failed to get system data report:', error);
+        return { success: false, message: error.message, data: null };
+    }
+}
+
+export async function handleDeleteAllSystemData() {
+    const loggedInEmployee = await getEmployeeFromSession();
+    if (!hasPermission(loggedInEmployee, 'settings:manage')) {
+        return { success: false, message: 'ليس لديك صلاحية حذف البيانات.' };
+    }
+    
+    try {
+        const connection = await getConnection();
+        
+        // الحذف بالترتيب الصحيح لتجنب مشاكل Foreign Keys
+        const tables = [
+            'payments',
+            'cheques',
+            'expenses',
+            'assets',
+            'maintenance_requests',
+            'legal_cases',
+            'activity_logs',
+            'leases',
+            'units',
+            'properties',
+            'tenants',
+            'owners',
+            'employee_properties'
+        ];
+        
+        let totalDeleted = 0;
+        const deletedCounts: any = {};
+        
+        for (const table of tables) {
+            try {
+                const [result] = await connection.execute(`DELETE FROM ${table}`);
+                const count = (result as any).affectedRows;
+                deletedCounts[table] = count;
+                totalDeleted += count;
+            } catch (e: any) {
+                console.error(`Error deleting from ${table}:`, e.message);
+                deletedCounts[table] = 0;
+            }
+        }
+        
+        await logActivity(
+            loggedInEmployee!.id, 
+            loggedInEmployee!.name, 
+            'DELETE_ALL_SYSTEM_DATA', 
+            'System', 
+            'all',
+            { totalDeleted, tables: deletedCounts }
+        );
+        
+        revalidatePath('/dashboard');
+        
+        return { 
+            success: true, 
+            message: `تم حذف ${totalDeleted} سجل بنجاح.`,
+            deletedCounts 
+        };
+    } catch (error: any) {
+        console.error('Failed to delete all system data:', error);
+        return { 
+            success: false, 
+            message: `فشل حذف البيانات: ${error.message}` 
+        };
+    }
+}
+
 // --- Owner Actions ---
 
 export async function handleAddOwner(ownerData: Omit<Owner, 'id'>) {
