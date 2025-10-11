@@ -44,6 +44,13 @@ export default function ExpenseManagementClient({
   const [propertyFilter, setPropertyFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [expensesPerPage, setExpensesPerPage] = useState(10);
+  const [showDashboardCards, setShowDashboardCards] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('showExpenseDashboardCards');
+      return saved !== null ? JSON.parse(saved) : true;
+    }
+    return true;
+  });
 
   const canCreate = hasPermission(loggedInEmployee, 'expenses:create');
   const canRead = hasPermission(loggedInEmployee, 'expenses:read-all') || hasPermission(loggedInEmployee, 'expenses:read-own');
@@ -243,15 +250,30 @@ export default function ExpenseManagementClient({
                     {t('expenses.description')}
                 </p>
             </div>
-            {canCreate && (
-                <Button onClick={handleAddNew}>
-                    <PlusCircle className="mr-2" />
-                    {t('expenses.addExpense')}
+            <div className="flex gap-2">
+                <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      const newValue = !showDashboardCards;
+                      setShowDashboardCards(newValue);
+                      if (typeof window !== 'undefined') {
+                        localStorage.setItem('showExpenseDashboardCards', JSON.stringify(newValue));
+                      }
+                    }}
+                >
+                    {showDashboardCards ? '🔽 إخفاء البطاقات' : '🔼 إظهار البطاقات'}
                 </Button>
-            )}
+                {canCreate && (
+                    <Button onClick={handleAddNew}>
+                        <PlusCircle className="mr-2" />
+                        {t('expenses.addExpense')}
+                    </Button>
+                )}
+            </div>
           </div>
 
-          <ExpenseDashboardCards expenses={filteredExpenses} />
+          {showDashboardCards && <ExpenseDashboardCards expenses={filteredExpenses} />}
           
           <Card>
             <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
