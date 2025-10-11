@@ -78,6 +78,7 @@ import {
     updateEvictionRequest as dbUpdateEvictionRequest,
     deleteEvictionRequest as dbDeleteEvictionRequest,
 } from '@/lib/db';
+import { getConnection } from '@/lib/db-connection';
 import type { Employee, LeasePayment, Tenant, Lease, PaymentTransaction, Expense, MaintenanceContract, Asset, Payee, Bank, Owner, Property, Unit, UnitConfiguration, Cheque, ChequeTransaction, PropertyDocument, PushSubscription, NotificationPreferences } from '@/lib/types';
 import fs from 'node:fs/promises';
 import path from 'node:path';
