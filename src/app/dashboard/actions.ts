@@ -1531,6 +1531,7 @@ export async function getSystemDataReport() {
             payments: 0,
             owners: 0,
             assets: 0,
+            employees: 0,
             employeeProperties: 0,
             activityLogs: 0,
             maintenanceRequests: 0,
@@ -1547,6 +1548,7 @@ export async function getSystemDataReport() {
             { key: 'payments', table: 'payments' },
             { key: 'owners', table: 'owners' },
             { key: 'assets', table: 'assets' },
+            { key: 'employees', table: 'employees' },
             { key: 'employeeProperties', table: 'employee_properties' },
             { key: 'activityLogs', table: 'activity_logs' },
             { key: 'maintenanceRequests', table: 'maintenance_requests' },
@@ -1581,6 +1583,9 @@ export async function handleDeleteAllSystemData() {
     try {
         const connection = await getConnection();
         
+        console.log('[handleDeleteAllSystemData] Starting deletion process...');
+        console.log('[handleDeleteAllSystemData] Current user:', loggedInEmployee?.name, loggedInEmployee?.id);
+        
         // الحذف بالترتيب الصحيح لتجنب مشاكل Foreign Keys
         const tables = [
             'payments',
@@ -1603,14 +1608,32 @@ export async function handleDeleteAllSystemData() {
         
         for (const table of tables) {
             try {
+                console.log(`[handleDeleteAllSystemData] Deleting from ${table}...`);
                 const [result] = await connection.execute(`DELETE FROM ${table}`);
                 const count = (result as any).affectedRows;
                 deletedCounts[table] = count;
                 totalDeleted += count;
+                console.log(`[handleDeleteAllSystemData] Deleted ${count} rows from ${table}`);
             } catch (e: any) {
-                console.error(`Error deleting from ${table}:`, e.message);
+                console.error(`[handleDeleteAllSystemData] Error deleting from ${table}:`, e.message);
                 deletedCounts[table] = 0;
             }
+        }
+        
+        // حذف جميع الموظفين ماعدا المستخدم الحالي
+        try {
+            console.log('[handleDeleteAllSystemData] Deleting employees except current user...');
+            const [result] = await connection.execute(
+                'DELETE FROM employees WHERE id != ?',
+                [loggedInEmployee!.id]
+            );
+            const count = (result as any).affectedRows;
+            deletedCounts['employees'] = count;
+            totalDeleted += count;
+            console.log(`[handleDeleteAllSystemData] Deleted ${count} employees`);
+        } catch (e: any) {
+            console.error('[handleDeleteAllSystemData] Error deleting employees:', e.message);
+            deletedCounts['employees'] = 0;
         }
         
         await logActivity(
@@ -1624,13 +1647,14 @@ export async function handleDeleteAllSystemData() {
         
         revalidatePath('/dashboard');
         
+        console.log('[handleDeleteAllSystemData] Deletion completed successfully. Total:', totalDeleted);
         return { 
             success: true, 
-            message: `تم حذف ${totalDeleted} سجل بنجاح.`,
+            message: `تم حذف ${totalDeleted} سجل بنجاح (تم الاحتفاظ بحسابك فقط).`,
             deletedCounts 
         };
     } catch (error: any) {
-        console.error('Failed to delete all system data:', error);
+        console.error('[handleDeleteAllSystemData] Failed:', error);
         return { 
             success: false, 
             message: `فشل حذف البيانات: ${error.message}` 

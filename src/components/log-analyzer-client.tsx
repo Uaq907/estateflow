@@ -674,10 +674,11 @@ export default function LogAnalyzerClient({ initialLogs, loggedInEmployee }: { i
                                   {dataReport.payments > 0 && <div className="flex justify-between border-b pb-1"><span>💵 المدفوعات:</span><span className="font-bold text-red-600">{dataReport.payments}</span></div>}
                                   {dataReport.owners > 0 && <div className="flex justify-between border-b pb-1"><span>👤 المالكين:</span><span className="font-bold text-red-600">{dataReport.owners}</span></div>}
                                   {dataReport.assets > 0 && <div className="flex justify-between border-b pb-1"><span>🛠️ الأصول:</span><span className="font-bold text-red-600">{dataReport.assets}</span></div>}
+                                  {dataReport.employees > 0 && <div className="flex justify-between border-b pb-1"><span>👔 الموظفين:</span><span className="font-bold text-red-600">{dataReport.employees}</span></div>}
                                   {dataReport.legalCases > 0 && <div className="flex justify-between border-b pb-1"><span>⚖️ القضايا:</span><span className="font-bold text-red-600">{dataReport.legalCases}</span></div>}
                                   {dataReport.maintenanceRequests > 0 && <div className="flex justify-between border-b pb-1"><span>🔧 طلبات الصيانة:</span><span className="font-bold text-red-600">{dataReport.maintenanceRequests}</span></div>}
                                   {dataReport.activityLogs > 0 && <div className="flex justify-between border-b pb-1"><span>📝 السجلات:</span><span className="font-bold text-red-600">{dataReport.activityLogs}</span></div>}
-                                  {dataReport.employeeProperties > 0 && <div className="flex justify-between border-b pb-1"><span>👔 تعيينات الموظفين:</span><span className="font-bold text-red-600">{dataReport.employeeProperties}</span></div>}
+                                  {dataReport.employeeProperties > 0 && <div className="flex justify-between border-b pb-1"><span>🔗 تعيينات الموظفين:</span><span className="font-bold text-red-600">{dataReport.employeeProperties}</span></div>}
                                 </div>
                                 <div className="mt-4 pt-3 border-t-2 border-red-500">
                                   <div className="flex justify-between text-lg font-bold">
@@ -691,7 +692,7 @@ export default function LogAnalyzerClient({ initialLogs, loggedInEmployee }: { i
                               ⚠️ تحذير: هذا الإجراء لا يمكن التراجع عنه!
                             </p>
                             <p className="text-gray-700 text-sm text-center">
-                              ملاحظة: سيتم الاحتفاظ ببيانات الموظفين والبنوك فقط
+                              ملاحظة: سيتم حذف جميع الموظفين ماعدا حسابك الحالي
                             </p>
                           </AlertDialogDescription>
                         </AlertDialogHeader>
