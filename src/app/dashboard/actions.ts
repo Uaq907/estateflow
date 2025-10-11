@@ -886,7 +886,8 @@ export async function handleAddExpense(expenseData: Partial<Omit<Expense, 'id' |
         };
 
         const addedExpense = await dbAddExpense(dataToSave as Omit<Expense, 'id' | 'createdAt' | 'updatedAt'>);
-        await logActivity(loggedInEmployee!.id, loggedInEmployee!.name, 'CREATE_EXPENSE', 'Expense', addedExpense.id, { category: expenseData.category, amount: finalAmount });
+        // تم تعطيل تسجيل المصروفات في السجل
+        // await logActivity(loggedInEmployee!.id, loggedInEmployee!.name, 'CREATE_EXPENSE', 'Expense', addedExpense.id, { category: expenseData.category, amount: finalAmount });
         
         // Add to expense history
         await addExpenseHistory({
@@ -964,7 +965,8 @@ export async function handleUpdateExpense(id: string, expenseData: Partial<Omit<
         }
 
         await dbUpdateExpense(id, dataToUpdate);
-        await logActivity(loggedInEmployee!.id, loggedInEmployee!.name, 'UPDATE_EXPENSE', 'Expense', id, { updatedFields: updatedFieldsForLog });
+        // تم تعطيل تسجيل المصروفات في السجل
+        // await logActivity(loggedInEmployee!.id, loggedInEmployee!.name, 'UPDATE_EXPENSE', 'Expense', id, { updatedFields: updatedFieldsForLog });
 
         // --- Add to expense history ---
         if (dataToUpdate.status && dataToUpdate.status !== originalExpense.status) {
@@ -1037,7 +1039,8 @@ export async function handleDeleteExpense(id: string) {
     }
     try {
         await dbDeleteExpense(id);
-        await logActivity(loggedInEmployee!.id, loggedInEmployee!.name, 'DELETE_EXPENSE', 'Expense', id);
+        // تم تعطيل تسجيل المصروفات في السجل
+        // await logActivity(loggedInEmployee!.id, loggedInEmployee!.name, 'DELETE_EXPENSE', 'Expense', id);
         revalidatePath('/dashboard/expenses');
         return { success: true, message: 'Expense deleted successfully.' };
     } catch (error: any) {

@@ -72,7 +72,25 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
                                 'bankName': 'البنك',
                                 'chequeNumber': 'رقم الشيك',
                                 'notes': 'الملاحظات',
-                                'clearedDate': 'تاريخ الصرف'
+                                'clearedDate': 'تاريخ الصرف',
+                                'name': 'الاسم',
+                                'email': 'البريد الإلكتروني',
+                                'phone': 'الهاتف',
+                                'address': 'العنوان',
+                                'type': 'النوع',
+                                'location': 'الموقع',
+                                'latitude': 'خط العرض',
+                                'longitude': 'خط الطول',
+                                'price': 'السعر',
+                                'size': 'المساحة',
+                                'bedrooms': 'غرف النوم',
+                                'bathrooms': 'دورات المياه',
+                                'description': 'الوصف',
+                                'features': 'المميزات',
+                                'ownerId': 'المالك',
+                                'managerId': 'المدير',
+                                'p': 'العقار',
+                                'd': 'التفاصيل'
                             };
 
                             // ترجمة قيم الحالات
@@ -85,8 +103,8 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
 
                             const translatedFieldName = fieldNameMap[fieldName] || fieldName.replace(/([A-Z])/g, ' $1');
                             
-                            let oldValue = fieldValues.old !== undefined ? fieldValues.old : 'N/A';
-                            let newValue = fieldValues.new !== undefined ? fieldValues.new : 'N/A';
+                            let oldValue = fieldValues.old !== undefined && fieldValues.old !== null ? fieldValues.old : '';
+                            let newValue = fieldValues.new !== undefined && fieldValues.new !== null ? fieldValues.new : '';
 
                             // ترجمة القيم إذا كانت حالات
                             if (fieldName === 'status') {
@@ -96,12 +114,12 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
 
                             // تنسيق التواريخ
                             if (fieldName.includes('Date') || fieldName.includes('date')) {
-                                if (oldValue !== 'N/A' && oldValue !== null) {
+                                if (oldValue && oldValue !== '') {
                                     try {
                                         oldValue = new Date(oldValue).toLocaleDateString('en-GB');
                                     } catch (e) {}
                                 }
-                                if (newValue !== 'N/A' && newValue !== null) {
+                                if (newValue && newValue !== '') {
                                     try {
                                         newValue = new Date(newValue).toLocaleDateString('en-GB');
                                     } catch (e) {}
@@ -116,13 +134,17 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
                                 newValue = `AED ${newValue.toLocaleString()}`;
                             }
 
+                            // عرض القيم الفارغة كـ "-"
+                            const displayOldValue = oldValue === '' ? '-' : String(oldValue);
+                            const displayNewValue = newValue === '' ? '-' : String(newValue);
+
                             return (
                                 <li key={`${fieldName}-${index}`} className="text-xs">
                                     <span className="font-semibold">{translatedFieldName}:</span>
                                     {' '}
-                                    <span className="text-red-600 dark:text-red-400 line-through">{oldValue}</span>
+                                    <span className="text-red-600 dark:text-red-400 line-through">{displayOldValue}</span>
                                     {' ← '}
-                                    <span className="text-green-600 dark:text-green-400 font-medium">{newValue}</span>
+                                    <span className="text-green-600 dark:text-green-400 font-medium">{displayNewValue}</span>
                                 </li>
                             );
                         })}
