@@ -20,9 +20,14 @@ import { handleDeleteActivityLog, handleDeleteAllActivityLogs } from '@/app/dash
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/language-context';
 
-function formatLogDetails(details: string | null | undefined, showAllVariables: boolean = false, t?: (key: string) => string) {
+function formatLogDetails(details: string | null | undefined, showAllVariables: boolean = false, t?: (key: string) => string, entityType?: string) {
     if (!details || details === 'null' || details === 'undefined') {
         return <span className="text-gray-400 italic text-xs">لا توجد تفاصيل</span>;
+    }
+    
+    // إخفاء تفاصيل المصروفات
+    if (entityType === 'Expense') {
+        return <span className="text-gray-400 italic text-xs">تفاصيل المصروف</span>;
     }
     
     try {
@@ -172,42 +177,64 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
             'Rejected': 'مرفوض'
         };
 
+        // قائمة الحقول التي يجب إخفاؤها
+        const hiddenFields = [
+            'category', 
+            'description', 
+            'supplier',
+            'propertyId',
+            'unitId',
+            'tenantId',
+            'employeeId',
+            'managerId',
+            'receiptUrl',
+            'managerNotes',
+            'taxNumber',
+            'isVat',
+            'baseAmount',
+            'taxAmount',
+            'isRecurring',
+            'recurrenceType'
+        ];
+
         return (
             <div className="space-y-1">
-                {Object.entries(parsed).map(([key, value], index) => {
-                    const translatedKey = fieldNameMap[key] || key.replace(/([A-Z])/g, ' $1') + ':';
-                    let displayValue = value;
+                {Object.entries(parsed)
+                    .filter(([key]) => !hiddenFields.includes(key))
+                    .map(([key, value], index) => {
+                        const translatedKey = fieldNameMap[key] || key.replace(/([A-Z])/g, ' $1') + ':';
+                        let displayValue = value;
 
-                    // ترجمة الحالات
-                    if (key === 'status' && typeof value === 'string') {
-                        displayValue = statusMap[value] || value;
-                    }
-
-                    // تنسيق التواريخ
-                    if ((key.includes('Date') || key.includes('date')) && value && value !== 'N/A' && value !== null) {
-                        try {
-                            displayValue = new Date(value as string).toLocaleDateString('en-GB');
-                        } catch (e) {
-                            displayValue = value;
+                        // ترجمة الحالات
+                        if (key === 'status' && typeof value === 'string') {
+                            displayValue = statusMap[value] || value;
                         }
-                    }
 
-                    // تنسيق المبالغ
-                    if (key === 'amount' && typeof value === 'number') {
-                        displayValue = `AED ${value.toLocaleString()}`;
-                    }
+                        // تنسيق التواريخ
+                        if ((key.includes('Date') || key.includes('date')) && value && value !== 'N/A' && value !== null) {
+                            try {
+                                displayValue = new Date(value as string).toLocaleDateString('en-GB');
+                            } catch (e) {
+                                displayValue = value;
+                            }
+                        }
 
-                    return (
-                        <div key={`${key}-${index}`} className="flex items-start gap-2">
-                            <span className="text-xs font-bold text-blue-700 dark:text-blue-400 min-w-[110px]">
-                                {translatedKey}
-                            </span>
-                            <span className="text-xs text-gray-800 dark:text-gray-200 font-medium break-all">
-                                {typeof displayValue === 'object' ? JSON.stringify(displayValue) : String(displayValue)}
-                            </span>
-                        </div>
-                    );
-                })}
+                        // تنسيق المبالغ
+                        if (key === 'amount' && typeof value === 'number') {
+                            displayValue = `AED ${value.toLocaleString()}`;
+                        }
+
+                        return (
+                            <div key={`${key}-${index}`} className="flex items-start gap-2">
+                                <span className="text-xs font-bold text-blue-700 dark:text-blue-400 min-w-[110px]">
+                                    {translatedKey}
+                                </span>
+                                <span className="text-xs text-gray-800 dark:text-gray-200 font-medium break-all">
+                                    {typeof displayValue === 'object' ? JSON.stringify(displayValue) : String(displayValue)}
+                                </span>
+                            </div>
+                        );
+                    })}
             </div>
         );
 
@@ -546,7 +573,7 @@ export default function LogAnalyzerClient({ initialLogs, loggedInEmployee }: { i
                                         )}
                                     </div>
                                     <div className="text-muted-foreground break-words">
-                                        {formatLogDetails(log.details, showAllVariables, t)}
+                                        {formatLogDetails(log.details, showAllVariables, t, log.entityType)}
                                     </div>
                                 </div>
                             </TableCell>
