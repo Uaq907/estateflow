@@ -617,10 +617,11 @@ export async function handleAddLeasePayment(paymentData: Omit<LeasePayment, 'id'
 }
 
 export async function handleUpdateLeasePayment(paymentId: string, paymentData: Partial<Omit<LeasePayment, 'id' | 'leaseId' | 'transactions'>>) {
-     const loggedInEmployee = await getEmployeeFromSession();
+    const loggedInEmployee = await getEmployeeFromSession();
     if (!hasPermission(loggedInEmployee, 'leases:update')) {
         return { success: false, message: 'Permission denied.' };
     }
+    
     try {
         const dataToSave = {
             ...paymentData,

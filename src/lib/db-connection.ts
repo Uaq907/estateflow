@@ -7,7 +7,7 @@ import mysql from 'mysql2/promise';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-const dbConfig = {
+const poolConfig = {
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
@@ -19,7 +19,18 @@ const dbConfig = {
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
   maxIdle: 10,
-  idleTimeout: 60000
+  idleTimeout: 60000,
+  acquireTimeout: 30000
+};
+
+const connectionConfig = {
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_DATABASE || 'estateflow',
+  connectTimeout: 30000,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0
 };
 
 let connection: mysql.Connection | null = null;
@@ -29,7 +40,7 @@ let migrationsHaveRun = false;
 // Initialize connection pool
 function getPool() {
   if (!connectionPool) {
-    connectionPool = mysql.createPool(dbConfig);
+    connectionPool = mysql.createPool(poolConfig);
   }
   return connectionPool;
 }

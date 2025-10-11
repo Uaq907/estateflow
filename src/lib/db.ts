@@ -889,12 +889,6 @@ export async function getLeaseWithDetails(leaseId: string): Promise<LeaseWithDet
         if (data.length === 0) return null;
         const row = data[0];
         
-        // Validate required data exists
-        if (!row.tenantId || !row.unitId || !row.propertyId) {
-            console.error('Missing required data for lease:', { tenantId: row.tenantId, unitId: row.unitId, propertyId: row.propertyId });
-            return null;
-        }
-        
         const leaseData = {
             ...row,
             id: String(row.id)
@@ -904,21 +898,21 @@ export async function getLeaseWithDetails(leaseId: string): Promise<LeaseWithDet
             lease: leaseSchema.parse(leaseData),
             tenant: tenantSchema.parse({
                 id: String(row.tenantId),
-                name: row.tenantName || 'Unknown',
-                email: row.tenantEmail || '',
-                phone: row.tenantPhone || '',
-                allowLogin: row.tenantAllowLogin || false
+                name: row.tenantName,
+                email: row.tenantEmail,
+                phone: row.tenantPhone,
+                allowLogin: row.tenantAllowLogin
             }),
             unit: unitSchema.parse({
                 id: String(row.unitId),
                 propertyId: String(row.propertyId),
-                unitNumber: row.unitNumber || 'Unknown',
+                unitNumber: row.unitNumber,
                 type: row.unitType || 'Residential',
                 status: row.unitStatus || 'Rented',
             }),
             property: propertySchema.parse({
                 id: String(row.propertyId),
-                name: row.propertyName || 'Unknown',
+                name: row.propertyName,
                 type: row.propertyType || 'Building',
             }),
         };
