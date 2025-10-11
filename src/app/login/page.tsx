@@ -48,11 +48,21 @@ function LoginForm() {
     try {
       const formData = new FormData(event.currentTarget);
       const result = await authenticate(undefined, formData);
-      setErrorMessage(result);
-    } catch (error) {
+      
+      // فقط اعرض رسالة خطأ إذا كانت موجودة
+      if (result) {
+        setErrorMessage(result);
+        setIsLoading(false);
+      }
+      // إذا كان result فارغ، معناه تم redirect بنجاح
+    } catch (error: any) {
+      // التحقق من أن الخطأ ليس redirect
+      if (error?.message?.includes('NEXT_REDIRECT')) {
+        // هذا redirect ناجح، لا نفعل شيء
+        return;
+      }
       console.error('Login error:', error);
-      setErrorMessage('An error occurred during login');
-    } finally {
+      setErrorMessage('حدث خطأ أثناء تسجيل الدخول');
       setIsLoading(false);
     }
   };
