@@ -386,6 +386,7 @@ export async function handleRenewLease(renewalData: {
     customPayments?: Array<{dueDate: Date, amount: number, description: string}> | null;
 }): Promise<{ success: boolean; message: string; newLeaseId?: string }> {
     const loggedInEmployee = await getEmployeeFromSession();
+    
     if (!hasPermission(loggedInEmployee, 'leases:update')) {
         return { success: false, message: 'Permission denied.' };
     }
