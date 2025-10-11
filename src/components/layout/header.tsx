@@ -9,7 +9,7 @@ import {
     Receipt, Wrench, Package, WalletCards, MapPin, Calendar, Clock, 
     LogOut, User, Upload, FileBarChart, DollarSign, BarChart3, Settings, 
     FileSignature, ListOrdered, Bell, Lock, Scale, FileText, Gavel, Hammer,
-    Globe, UserCog, Archive, Mail
+    Globe, UserCog, Archive
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -206,7 +206,6 @@ export function AppHeader({ loggedInEmployee }: { loggedInEmployee: Employee | n
                         <DropdownMenuSeparator className="xl:hidden"/>
                         {canManageSettings && <DropdownMenuItem asChild><Link href="/dashboard/settings/unit-configurations"><Settings className="mr-2" />{t('settings.unitConfigurations')}</Link></DropdownMenuItem>}
                         {canViewLogs && <DropdownMenuItem asChild><Link href="/dashboard/settings/log-analyzer"><ListOrdered className="mr-2" />{t('settings.logAnalyzer')}</Link></DropdownMenuItem>}
-                        <DropdownMenuItem asChild><Link href="/dashboard/settings/messages"><Mail className="mr-2" />البريد الداخلي</Link></DropdownMenuItem>
                         {canReadLeases && <DropdownMenuItem asChild><Link href="/dashboard/leases/history"><Archive className="mr-2" />{t('nav.leaseHistory')}</Link></DropdownMenuItem>}
                         {canManageSettings && <DropdownMenuItem asChild><Link href="/dashboard/settings/reports"><BarChart3 className="mr-2" />{t('settings.reports')}</Link></DropdownMenuItem>}
                       </DropdownMenuContent>
