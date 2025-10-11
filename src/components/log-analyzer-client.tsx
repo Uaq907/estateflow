@@ -252,7 +252,18 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
             'baseAmount',
             'taxAmount',
             'isRecurring',
-            'recurrenceType'
+            'recurrenceType',
+            'phone',
+            'userAgent',
+            'timestamp',
+            'address',
+            'nationality',
+            'emiratesId',
+            'emiratesIdUrl',
+            'passportNumber',
+            'passportUrl',
+            'tradeLicenseNumber',
+            'tradeLicenseUrl'
         ];
 
         return (
