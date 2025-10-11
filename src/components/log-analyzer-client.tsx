@@ -58,15 +58,66 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
                             const fieldName = Array.isArray(fields) ? value[0] : key;
                             const fieldValues = Array.isArray(fields) ? value[1] : value;
 
-                            const oldValue = fieldValues.old !== undefined ? JSON.stringify(fieldValues.old) : 'N/A';
-                            const newValue = fieldValues.new !== undefined ? JSON.stringify(fieldValues.new) : 'N/A';
+                            // ترجمة أسماء الحقول
+                            const fieldNameMap: Record<string, string> = {
+                                'status': 'الحالة',
+                                'amount': 'المبلغ',
+                                'dueDate': 'تاريخ الاستحقاق',
+                                'payeeName': 'اسم المستفيد',
+                                'bankName': 'البنك',
+                                'chequeNumber': 'رقم الشيك',
+                                'notes': 'الملاحظات',
+                                'clearedDate': 'تاريخ الصرف'
+                            };
+
+                            // ترجمة قيم الحالات
+                            const statusMap: Record<string, string> = {
+                                'Pending': 'معلق',
+                                'Cleared': 'تم الصرف',
+                                'Bounced': 'مرتجع',
+                                'Cancelled': 'ملغي'
+                            };
+
+                            const translatedFieldName = fieldNameMap[fieldName] || fieldName.replace(/([A-Z])/g, ' $1');
+                            
+                            let oldValue = fieldValues.old !== undefined ? fieldValues.old : 'N/A';
+                            let newValue = fieldValues.new !== undefined ? fieldValues.new : 'N/A';
+
+                            // ترجمة القيم إذا كانت حالات
+                            if (fieldName === 'status') {
+                                oldValue = statusMap[oldValue] || oldValue;
+                                newValue = statusMap[newValue] || newValue;
+                            }
+
+                            // تنسيق التواريخ
+                            if (fieldName.includes('Date') || fieldName.includes('date')) {
+                                if (oldValue !== 'N/A' && oldValue !== null) {
+                                    try {
+                                        oldValue = new Date(oldValue).toLocaleDateString('en-GB');
+                                    } catch (e) {}
+                                }
+                                if (newValue !== 'N/A' && newValue !== null) {
+                                    try {
+                                        newValue = new Date(newValue).toLocaleDateString('en-GB');
+                                    } catch (e) {}
+                                }
+                            }
+
+                            // تنسيق المبالغ
+                            if (fieldName === 'amount' && typeof oldValue === 'number') {
+                                oldValue = `AED ${oldValue.toLocaleString()}`;
+                            }
+                            if (fieldName === 'amount' && typeof newValue === 'number') {
+                                newValue = `AED ${newValue.toLocaleString()}`;
+                            }
 
                             return (
                                 <li key={`${fieldName}-${index}`} className="text-xs">
-                                    <span className="font-semibold capitalize">{fieldName.replace(/([A-Z])/g, ' $1')}:</span>
+                                    <span className="font-semibold">{translatedFieldName}:</span>
+                                    {' '}
                                     <span className="text-red-600 dark:text-red-400 line-through">{oldValue}</span>
-                                    {' -> '}
-                                    <span className="text-green-600 dark:text-green-400">{newValue}</span>
+                                    {' ← '}
+                                    <span className="text-green-600 dark:text-green-400 font-medium">{newValue}</span>
                                 </li>
                             );
                         })}
@@ -95,24 +146,68 @@ function formatLogDetails(details: string | null | undefined, showAllVariables: 
         }
 
         // Generic JSON object formatting - عرض محسّن للتفاصيل
+        const fieldNameMap: Record<string, string> = {
+            'payeeName': '👤 اسم المستفيد',
+            'bankName': '🏦 البنك',
+            'chequeNumber': '📄 رقم الشيك',
+            'amount': '💰 المبلغ',
+            'dueDate': '📅 تاريخ الاستحقاق',
+            'status': '🔵 الحالة',
+            'notes': '📝 الملاحظات',
+            'category': '📁 الفئة',
+            'description': '📋 الوصف',
+            'email': '📧 البريد',
+            'name': '👤 الاسم',
+            'tenantId': '🏠 المستأجر',
+            'propertyId': '🏢 العقار',
+            'unitId': '🏘️ الوحدة'
+        };
+
+        const statusMap: Record<string, string> = {
+            'Pending': 'معلق',
+            'Cleared': 'تم الصرف',
+            'Bounced': 'مرتجع',
+            'Cancelled': 'ملغي',
+            'Approved': 'موافق عليه',
+            'Rejected': 'مرفوض'
+        };
+
         return (
             <div className="space-y-1">
-                {Object.entries(parsed).map(([key, value], index) => (
-                    <div key={`${key}-${index}`} className="flex items-start gap-2">
-                        <span className="text-xs font-bold text-blue-700 min-w-[70px]">
-                            {key === 'email' ? '📧 البريد:' : 
-                             key === 'name' ? '👤 الاسم:' :
-                             key === 'amount' ? '💰 المبلغ:' :
-                             key === 'category' ? '📁 الفئة:' :
-                             key === 'dueDate' ? '📅 الاستحقاق:' :
-                             key === 'tenantId' ? '🏠 المستأجر:' :
-                             key.replace(/([A-Z])/g, ' $1') + ':'}
-                        </span>
-                        <span className="text-xs text-gray-800 font-medium break-all">
-                            {typeof value === 'string' ? value : JSON.stringify(value)}
-                        </span>
-                    </div>
-                ))}
+                {Object.entries(parsed).map(([key, value], index) => {
+                    const translatedKey = fieldNameMap[key] || key.replace(/([A-Z])/g, ' $1') + ':';
+                    let displayValue = value;
+
+                    // ترجمة الحالات
+                    if (key === 'status' && typeof value === 'string') {
+                        displayValue = statusMap[value] || value;
+                    }
+
+                    // تنسيق التواريخ
+                    if ((key.includes('Date') || key.includes('date')) && value && value !== 'N/A' && value !== null) {
+                        try {
+                            displayValue = new Date(value as string).toLocaleDateString('en-GB');
+                        } catch (e) {
+                            displayValue = value;
+                        }
+                    }
+
+                    // تنسيق المبالغ
+                    if (key === 'amount' && typeof value === 'number') {
+                        displayValue = `AED ${value.toLocaleString()}`;
+                    }
+
+                    return (
+                        <div key={`${key}-${index}`} className="flex items-start gap-2">
+                            <span className="text-xs font-bold text-blue-700 dark:text-blue-400 min-w-[110px]">
+                                {translatedKey}
+                            </span>
+                            <span className="text-xs text-gray-800 dark:text-gray-200 font-medium break-all">
+                                {typeof displayValue === 'object' ? JSON.stringify(displayValue) : String(displayValue)}
+                            </span>
+                        </div>
+                    );
+                })}
             </div>
         );
 
