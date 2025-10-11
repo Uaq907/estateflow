@@ -875,8 +875,8 @@ export async function getLeaseWithDetails(leaseId: string): Promise<LeaseWithDet
             SELECT 
                 l.*,
                 t.id as tenantId, t.name as tenantName, t.email as tenantEmail, t.phone as tenantPhone, t.allowLogin as tenantAllowLogin,
-                u.unitNumber as unitNumber, u.type as unitType, u.id as unitId,
-                p.name as propertyName, p.id as propertyId,
+                u.unitNumber as unitNumber, u.type as unitType, u.status as unitStatus, u.id as unitId,
+                p.name as propertyName, p.type as propertyType, p.id as propertyId,
                 (SELECT SUM(pt.amountPaid) FROM payment_transactions pt LEFT JOIN lease_payments lp ON pt.leasePaymentId = lp.id WHERE lp.leaseId = l.id) as totalPaidAmount
             FROM leases l
             LEFT JOIN tenants t ON l.tenantId = t.id
@@ -907,13 +907,13 @@ export async function getLeaseWithDetails(leaseId: string): Promise<LeaseWithDet
                 id: String(row.unitId),
                 propertyId: String(row.propertyId),
                 unitNumber: row.unitNumber,
-                type: row.unitType,
-                status: 'Unknown', // Not fetched, can be added if needed
+                type: row.unitType || 'Residential',
+                status: row.unitStatus || 'Rented',
             }),
             property: propertySchema.parse({
                 id: String(row.propertyId),
                 name: row.propertyName,
-                type: 'Unknown', // Not fetched, can be added if needed
+                type: row.propertyType || 'Building',
             }),
         };
 
