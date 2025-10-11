@@ -21,21 +21,21 @@ export default async function SettingsPage() {
       description: 'عرض وتحليل سجلات النشاط في النظام',
       icon: Activity,
       href: '/dashboard/settings/log-analyzer',
-      permission: 'settings:view-logs'
+      permission: 'settings:view-logs' as const
     },
     {
       title: 'التقارير',
       description: 'إنشاء وعرض التقارير المختلفة',
       icon: FileText,
       href: '/dashboard/settings/reports',
-      permission: 'reports:view'
+      permission: 'reports:view' as const
     },
     {
       title: 'إعدادات الوحدات',
       description: 'إدارة تكوينات أنواع الوحدات',
       icon: Package,
       href: '/dashboard/settings/unit-configurations',
-      permission: 'settings:manage'
+      permission: 'settings:manage' as const
     }
   ];
 
