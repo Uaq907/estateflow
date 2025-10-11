@@ -635,52 +635,6 @@ export default function LogAnalyzerClient({ initialLogs, loggedInEmployee }: { i
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2">
                                         <span className="font-semibold text-blue-600">{formatEntityType(log.entityType)}</span>
-                                        {log.entityId && log.entityId !== 'undefined' && (() => {
-                                            const getEntityLink = (entityType: string, entityId: string) => {
-                                                switch(entityType) {
-                                                    case 'Cheque':
-                                                        return '/dashboard/cheques';
-                                                    case 'Property':
-                                                        return `/dashboard/properties/${entityId}`;
-                                                    case 'Lease':
-                                                        return `/dashboard/leases/${entityId}`;
-                                                    case 'Tenant':
-                                                        return '/dashboard/tenants';
-                                                    case 'Owner':
-                                                        return '/dashboard/owners';
-                                                    case 'Employee':
-                                                        return '/dashboard/employees';
-                                                    case 'Asset':
-                                                        return '/dashboard/assets';
-                                                    case 'MaintenanceContract':
-                                                        return '/dashboard/maintenance';
-                                                    default:
-                                                        return null;
-                                                }
-                                            };
-                                            const link = getEntityLink(log.entityType, log.entityId);
-                                            
-                                            if (link) {
-                                                return (
-                                                    <a 
-                                                        href={link}
-                                                        className="text-xs text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded font-medium cursor-pointer transition-colors"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            router.push(link);
-                                                        }}
-                                                    >
-                                                        {log.entityId}
-                                                    </a>
-                                                );
-                                            }
-                                            
-                                            return (
-                                                <span className="text-xs text-muted-foreground bg-gray-100 px-2 py-0.5 rounded">
-                                                    {log.entityId}
-                                                </span>
-                                            );
-                                        })()}
                                     </div>
                                     <div className="text-muted-foreground break-words">
                                         {formatLogDetails(log.details, showAllVariables, t, log.entityType)}
