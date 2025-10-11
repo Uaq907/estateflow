@@ -19,8 +19,7 @@ const dbConfig = {
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
   maxIdle: 10,
-  idleTimeout: 60000,
-  acquireTimeout: 30000
+  idleTimeout: 60000
 };
 
 let connection: mysql.Connection | null = null;
