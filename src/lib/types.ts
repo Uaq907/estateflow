@@ -254,6 +254,9 @@ export const expenseSchema = z.object({
     description: z.string().optional().nullable(),
     status: z.enum(['Pending', 'Approved', 'Rejected', 'Needs Correction', 'Conditionally Approved']),
     receiptUrl: z.string().optional().nullable(),
+    paymentReceiptUrl: z.string().optional().nullable(), // إيصال دفع المبلغ
+    requestReceiptUrl: z.string().optional().nullable(), // إيصال الطلب
+    purchaseReceiptUrl: z.string().optional().nullable(), // إيصال المشتريات
     managerNotes: z.string().optional().nullable(),
     createdAt: z.coerce.date(),
     updatedAt: z.coerce.date(),

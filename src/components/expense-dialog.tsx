@@ -301,15 +301,60 @@ export default function ExpenseDialog({ isOpen, onOpenChange, expense, propertie
               <Textarea id="description" name="description" defaultValue={expense?.description ?? ''} disabled={!isEditable} />
             </div>
 
-            <div className="space-y-2">
-                <Label htmlFor="receiptFile">{t('expenseForm.uploadReceipt')}</Label>
-                <Input id="receiptFile" name="receiptFile" type="file" required={!expense} disabled={!isEditable} />
-                {expense?.receiptUrl && (
-                    <div className="text-sm text-muted-foreground mt-2">
-                        <Link href={expense.receiptUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
-                            <FileText className="h-4 w-4" />
-                            View Current Receipt
-                        </Link>
+            <Separator className="my-2"/>
+            
+            <div className="space-y-4">
+                <h4 className="font-semibold text-sm">الإيصالات والمستندات</h4>
+                
+                <div className="space-y-2">
+                    <Label htmlFor="paymentReceiptFile">📄 إيصال دفع المبلغ</Label>
+                    <Input id="paymentReceiptFile" name="paymentReceiptFile" type="file" disabled={!isEditable} />
+                    {expense?.paymentReceiptUrl && (
+                        <div className="text-sm text-muted-foreground mt-2">
+                            <Link href={expense.paymentReceiptUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
+                                <FileText className="h-4 w-4" />
+                                عرض إيصال الدفع الحالي
+                            </Link>
+                        </div>
+                    )}
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="requestReceiptFile">📋 إيصال الطلب</Label>
+                    <Input id="requestReceiptFile" name="requestReceiptFile" type="file" disabled={!isEditable} />
+                    {expense?.requestReceiptUrl && (
+                        <div className="text-sm text-muted-foreground mt-2">
+                            <Link href={expense.requestReceiptUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
+                                <FileText className="h-4 w-4" />
+                                عرض إيصال الطلب الحالي
+                            </Link>
+                        </div>
+                    )}
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="purchaseReceiptFile">🛒 إيصال المشتريات</Label>
+                    <Input id="purchaseReceiptFile" name="purchaseReceiptFile" type="file" disabled={!isEditable} />
+                    {expense?.purchaseReceiptUrl && (
+                        <div className="text-sm text-muted-foreground mt-2">
+                            <Link href={expense.purchaseReceiptUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
+                                <FileText className="h-4 w-4" />
+                                عرض إيصال المشتريات الحالي
+                            </Link>
+                        </div>
+                    )}
+                </div>
+
+                {/* Keep old receiptFile for backward compatibility */}
+                {!expense?.paymentReceiptUrl && !expense?.requestReceiptUrl && !expense?.purchaseReceiptUrl && expense?.receiptUrl && (
+                    <div className="space-y-2">
+                        <Label>إيصال قديم</Label>
+                        <div className="text-sm text-muted-foreground mt-2">
+                            <Link href={expense.receiptUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
+                                <FileText className="h-4 w-4" />
+                                عرض الإيصال
+                            </Link>
+                        </div>
                     </div>
                 )}
             </div>

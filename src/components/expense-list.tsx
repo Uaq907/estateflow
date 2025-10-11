@@ -165,15 +165,39 @@ export default function ExpenseList({ expenses, loggedInEmployee, onAction, onDe
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                        {expense.receiptUrl ? (
-                            <Button asChild variant="outline" size="sm">
-                                <Link href={expense.receiptUrl} target="_blank">
-                                    <FileText className="mr-2 h-4 w-4" /> {t('expenses.view')}
-                                </Link>
-                            </Button>
-                        ) : (
-                           <span className="text-xs text-muted-foreground">{t('expenses.notUploaded')}</span>
-                        )}
+                        <div className="flex flex-col gap-1">
+                            {expense.paymentReceiptUrl && (
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={expense.paymentReceiptUrl} target="_blank" className="text-xs">
+                                        <FileText className="mr-1 h-3 w-3" /> دفع
+                                    </Link>
+                                </Button>
+                            )}
+                            {expense.requestReceiptUrl && (
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={expense.requestReceiptUrl} target="_blank" className="text-xs">
+                                        <FileText className="mr-1 h-3 w-3" /> طلب
+                                    </Link>
+                                </Button>
+                            )}
+                            {expense.purchaseReceiptUrl && (
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={expense.purchaseReceiptUrl} target="_blank" className="text-xs">
+                                        <FileText className="mr-1 h-3 w-3" /> مشتريات
+                                    </Link>
+                                </Button>
+                            )}
+                            {!expense.paymentReceiptUrl && !expense.requestReceiptUrl && !expense.purchaseReceiptUrl && expense.receiptUrl && (
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={expense.receiptUrl} target="_blank">
+                                        <FileText className="mr-2 h-4 w-4" /> {t('expenses.view')}
+                                    </Link>
+                                </Button>
+                            )}
+                            {!expense.paymentReceiptUrl && !expense.requestReceiptUrl && !expense.purchaseReceiptUrl && !expense.receiptUrl && (
+                                <span className="text-xs text-muted-foreground">{t('expenses.notUploaded')}</span>
+                            )}
+                        </div>
                     </TableCell>
                     <TableCell className="text-right">
                       {actionDetails.isPrimary ? (

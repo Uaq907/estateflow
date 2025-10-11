@@ -119,15 +119,41 @@ export default function ExpenseManagementClient({
     
     // This is the employee submitting or correcting a request
     if (action === 'submit') {
-        let receiptUrl: string | undefined | null = editingExpense?.receiptUrl;
-        const receiptFile = formData.get('receiptFile') as File;
-        if (receiptFile && receiptFile.size > 0) {
-            const uploadResult = await uploadFile(formData, 'receiptFile', 'expenses_receipts');
+        let paymentReceiptUrl: string | undefined | null = editingExpense?.paymentReceiptUrl;
+        let requestReceiptUrl: string | undefined | null = editingExpense?.requestReceiptUrl;
+        let purchaseReceiptUrl: string | undefined | null = editingExpense?.purchaseReceiptUrl;
+        
+        // رفع إيصال دفع المبلغ
+        const paymentReceiptFile = formData.get('paymentReceiptFile') as File;
+        if (paymentReceiptFile && paymentReceiptFile.size > 0) {
+            const uploadResult = await uploadFile(formData, 'paymentReceiptFile', 'expenses_receipts');
             if (!uploadResult.success) {
-                toast({ variant: 'destructive', title: 'Upload Failed', description: uploadResult.message });
+                toast({ variant: 'destructive', title: 'فشل الرفع', description: uploadResult.message });
                 return;
             }
-            receiptUrl = uploadResult.filePath;
+            paymentReceiptUrl = uploadResult.filePath;
+        }
+
+        // رفع إيصال الطلب
+        const requestReceiptFile = formData.get('requestReceiptFile') as File;
+        if (requestReceiptFile && requestReceiptFile.size > 0) {
+            const uploadResult = await uploadFile(formData, 'requestReceiptFile', 'expenses_receipts');
+            if (!uploadResult.success) {
+                toast({ variant: 'destructive', title: 'فشل الرفع', description: uploadResult.message });
+                return;
+            }
+            requestReceiptUrl = uploadResult.filePath;
+        }
+
+        // رفع إيصال المشتريات
+        const purchaseReceiptFile = formData.get('purchaseReceiptFile') as File;
+        if (purchaseReceiptFile && purchaseReceiptFile.size > 0) {
+            const uploadResult = await uploadFile(formData, 'purchaseReceiptFile', 'expenses_receipts');
+            if (!uploadResult.success) {
+                toast({ variant: 'destructive', title: 'فشل الرفع', description: uploadResult.message });
+                return;
+            }
+            purchaseReceiptUrl = uploadResult.filePath;
         }
 
          const expenseData = {
@@ -140,7 +166,10 @@ export default function ExpenseManagementClient({
             taxNumber: formData.get('taxNumber') as string,
             isVat: formData.get('isVat') === 'on',
             baseAmount: Number(formData.get('baseAmount')),
-            receiptUrl,
+            paymentReceiptUrl,
+            requestReceiptUrl,
+            purchaseReceiptUrl,
+            receiptUrl: paymentReceiptUrl || requestReceiptUrl || purchaseReceiptUrl, // للتوافق مع الكود القديم
         };
         
         const result = expenseId 
