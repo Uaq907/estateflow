@@ -394,7 +394,9 @@ export default function LogAnalyzerClient({ initialLogs, loggedInEmployee }: { i
                         <SelectTrigger className="w-full sm:w-auto flex-grow sm:flex-grow-0 sm:w-[180px]"><SelectValue placeholder={t('logAnalyzer.filterByAction')}/></SelectTrigger>
                         <SelectContent>
                           {uniqueActions.map(action => (
-                            <SelectItem key={action} value={action} className="capitalize">{action}</SelectItem>
+                            <SelectItem key={action} value={action} className="capitalize">
+                              {action === 'all' ? t('logAnalyzer.allActions') : formatAction(action)}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                     </Select>
